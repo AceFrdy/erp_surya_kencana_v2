@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 const Index = lazy(() => import('../pages/Index'));
 const Ecommerce = lazy(() => import('../pages/Ecommerce'));
+const OrderSorting = lazy(() => import('../pages/Basic'))
 
 const routes = [
     // dashboard
@@ -16,8 +17,8 @@ const routes = [
     },
     // menu penjualan
     {
-        path: '/produk',
-        element: <Ecommerce />,
+        path: '/menupenjualan/product/kategoriproduk',
+        element: <OrderSorting />,
         layout: 'default',
     },
 ];

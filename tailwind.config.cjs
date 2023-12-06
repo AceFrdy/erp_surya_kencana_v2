@@ -1,4 +1,12 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require('tailwindcss/plugin');
+const rotateX = plugin(function ({ addUtilities }) {
+    addUtilities({
+        '.rotate-y-180': {
+            transform: 'rotateY(180deg)',
+        },
+    });
+});
 module.exports = {
     content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
     darkMode: 'class',
@@ -87,5 +95,6 @@ module.exports = {
             strategy: 'class',
         }),
         require('@tailwindcss/typography'),
+        rotateX,
     ],
 };
