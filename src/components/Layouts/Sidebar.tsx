@@ -283,7 +283,7 @@ const Sidebar = () => {
                                         <AnimateHeight duration={300} height={currentMenu === 'customer' ? 'auto' : 0}>
                                             <ul className="sub-menu text-gray-500">
                                                 <li>
-                                                    <NavLink to="/menupenjualan/customer/produk">{('Offline')}</NavLink>
+                                                    <NavLink to="/customer-offline">{('Offline')}</NavLink>
                                                 </li>
                                                 <li>
                                                     <NavLink to="/menupenjualan/customer/kategoriproduk">{('Online')}</NavLink>
