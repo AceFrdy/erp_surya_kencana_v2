@@ -13,30 +13,38 @@ const EditCabang = () => {
                     <span>Edit Cabang</span>
                 </li>
             </ul>
-            <form className="space-y-5">
-                <h1 className="text-lg font-bold mb-12">Edit Cabang</h1>
-                <div>
-                    <input type="text" placeholder="Nama Cabang..." className="form-input" />
+            <div className="pt-5 space-y-8 ">
+                {/* Single File */}
+                <div className="grid lg:grid-cols-1 grid-cols-1 gap-6">
+                    <div className="panel " id="single_file">
+                        <div className="flex items-center justify-between mb-5"></div>
+                        <form className="space-y-5">
+                            <h1 className="text-lg font-bold mb-12">Edit Cabang</h1>
+                            <div>
+                                <input type="text" placeholder="Nama Cabang..." className="form-input" />
+                            </div>
+                            <div>
+                                <input type="text" placeholder="Alamat Cabang..." className="form-input" />
+                            </div>
+                            <div>
+                                <input type="text" placeholder="No Handphone..." className="form-input" />
+                            </div>
+                            <div className="flex">
+                                <Link to="/menupenjualan/cabang/listcabang">
+                                    <button type="submit" className="btn btn-primary !mt-6">
+                                        Ubah
+                                    </button>
+                                </Link>
+                                <Link to="/menupenjualan/cabang/listcabang">
+                                    <button type="submit" className="btn btn-primary !mt-6 ml-6">
+                                        Cencel
+                                    </button>
+                                </Link>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div>
-                    <input type="text" placeholder="Alamat Cabang..." className="form-input" />
-                </div>
-                <div>
-                    <input type="text" placeholder="No Handphone..." className="form-input" />
-                </div>
-                <div className="flex">
-                    <Link to="/menupenjualan/cabang/listcabang">
-                        <button type="submit" className="btn btn-primary !mt-6">
-                            Ubah
-                        </button>
-                    </Link>
-                    <Link to="/menupenjualan/cabang/listcabang">
-                        <button type="submit" className="btn btn-primary !mt-6 ml-6">
-                            Cencel
-                        </button>
-                    </Link>
-                </div>
-            </form>
+            </div>
         </div>
     );
 };
