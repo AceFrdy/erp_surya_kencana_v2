@@ -1,12 +1,10 @@
-import { DataTable } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import Tippy from '@tippyjs/react';
-import { IRootState } from '../store';
-import { setPageTitle } from '../store/themeConfigSlice';
-import IconBell from '../components/Icon/IconBell';
+import React, { SetStateAction, useState, Fragment } from 'react';
+import { Dialog, Transition, Tab } from '@headlessui/react';
+
+import { Pagination } from '@mantine/core';
+import { Link } from 'react-router-dom';
+import IconPlus from '../components/Icon/IconPlus';
 import IconTrashLines from '../components/Icon/IconTrashLines';
-import IconCode from '../components/Icon/IconCode';
 import IconPencil from '../components/Icon/IconPencil';
 const tableData = [
     {
@@ -57,85 +55,148 @@ const tableData = [
         position: 'Data Scientist',
         office: 'Canada',
     },
+    {
+        id: 4,
+        nama: 'Vincent Carpenter',
+        email: 'vincent@gmail.com',
+        date: '13/08/2020',
+        sale: 100,
+        status: 'Canceled',
+        register: '1 day ago',
+        progress: '60%',
+        position: 'Data Scientist',
+        office: 'Canada',
+    },
+    {
+        id: 4,
+        nama: 'Vincent Carpenter',
+        email: 'vincent@gmail.com',
+        date: '13/08/2020',
+        sale: 100,
+        status: 'Canceled',
+        register: '1 day ago',
+        progress: '60%',
+        position: 'Data Scientist',
+        office: 'Canada',
+    },
+    {
+        id: 4,
+        nama: 'Vincent Carpenter',
+        email: 'vincent@gmail.com',
+        date: '13/08/2020',
+        sale: 100,
+        status: 'Canceled',
+        register: '1 day ago',
+        progress: '60%',
+        position: 'Data Scientist',
+        office: 'Canada',
+    },
+    {
+        id: 4,
+        nama: 'Vincent Carpenter',
+        email: 'vincent@gmail.com',
+        date: '13/08/2020',
+        sale: 100,
+        status: 'Canceled',
+        register: '1 day ago',
+        progress: '60%',
+        position: 'Data Scientist',
+        office: 'Canada',
+    },
 ];
-
 const Basic = () => {
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(setPageTitle('Tables'));
-    });
-    const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
+    const [currentPage, setCurrentPage] = useState<number>(1); // Menggunakan tipe data number untuk state currentPage
+    const itemsPerPage = 5;
+    const totalPages = Math.ceil(tableData.length / itemsPerPage);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = tableData.slice(indexOfFirstItem, indexOfLastItem);
+    const [modal1, setModal1] = useState(false);
 
-    const [tabs, setTabs] = useState<string[]>([]);
-    const toggleCode = (name: string) => {
-        if (tabs.includes(name)) {
-            setTabs((value) => value.filter((d) => d !== name));
-        } else {
-            setTabs([...tabs, name]);
-        }
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page); // Memperbarui state currentPage saat halaman berubah
     };
-    // const [page, setPage] = useState(1);
-    // const PAGE_SIZES = [10, 20, 30, 50, 100];
-    // const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    // const initialRecords = rowData.slice(0, pageSize);
-    // const [recordsData, setRecordsData] = useState(initialRecords);
-
-    // useEffect(() => {
-    //     setPage(1);
-    // }, [pageSize]);
-
-    // useEffect(() => {
-    //     const from = (page - 1) * pageSize;
-    //     const to = from + pageSize;
-    //     setRecordsData(rowData.slice(from, to));
-    // }, [page, pageSize]);
 
     return (
         <div>
-            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
-                <div className="rounded-full bg-primary p-1.5 text-white ring-2 ring-primary/30 ltr:mr-3 rtl:ml-3">
-                    <IconBell />
-                </div>
-                <span className="ltr:mr-3 rtl:ml-3">Documentation: </span>
-                <a href="https://www.npmjs.com/package/mantine-datatable" target="_blank" className="block hover:underline">
-                    https://www.npmjs.com/package/mantine-datatable
-                </a>
-            </div> */}
+            <div className="mb-5">
+                <Transition appear show={modal1} as={Fragment}>
+                    <Dialog as="div" open={modal1} onClose={() => setModal1(false)}>
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0"
+                            enterTo="opacity-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100"
+                            leaveTo="opacity-0"
+                        >
+                            <div className="fixed inset-0" />
+                        </Transition.Child>
+                        <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
+                            <div className="flex items-start justify-center min-h-screen px-4">
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ease-out duration-300"
+                                    enterFrom="opacity-0 scale-95"
+                                    enterTo="opacity-100 scale-100"
+                                    leave="ease-in duration-200"
+                                    leaveFrom="opacity-100 scale-100"
+                                    leaveTo="opacity-0 scale-95"
+                                >
+                                    <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
+                                        <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                                            <div className="text-lg font-bold">Tambah Kategori</div>
+                                            {/* <button type="button" className="text-white-dark hover:text-dark" onClick={() => setModal1(false)}>
+                                                <svg>...</svg>
+                                            </button> */}
+                                        </div>
+                                        <div className="p-5">
+                                            <div>
+                                                <form className="space-y-5">
+                                                    <div>
+                                                        <input type="textfield" placeholder="Masukan Kategori" className="form-input" />
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div className="flex justify-end items-center mt-8">
+                                                <button type="button" className="btn btn-outline-danger" onClick={() => setModal1(false)}>
+                                                    Discard
+                                                </button>
+                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setModal1(false)}>
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </Dialog.Panel>
+                                </Transition.Child>
+                            </div>
+                        </div>
+                    </Dialog>
+                </Transition>
+            </div>
+            <ul className="flex space-x-2 rtl:space-x-reverse">
+                <li>
+                    <Link to="/" className="text-primary hover:underline">
+                        Home
+                    </Link>
+                </li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                    <span>Menu Penjualan</span>
+                </li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                    <span>Kategori Produk</span>
+                </li>
+            </ul>
             <div className="panel mt-6">
-                {/* <h5 className="font-semibold text-lg dark:text-white-light mb-5"></h5> */}
                 <div className="datatables">
-                    {/* <DataTable
-                        noRecordsText="No results match your search query"
-                        highlightOnHover
-                        className="whitespace-nowrap table-hover"
-                        records={recordsData}
-                        columns={[
-                            { accessor: 'id', title: 'ID' },
-                            { accessor: 'firstName', title: 'First Name' },
-                            { accessor: 'lastName', title: 'Last Name' },
-                            { accessor: 'email' },
-                            { accessor: 'phone' },
-                        ]}
-                        totalRecords={rowData.length}
-                        recordsPerPage={pageSize}
-                        page={page}
-                        onPageChange={(p) => setPage(p)}
-                        recordsPerPageOptions={PAGE_SIZES}
-                        onRecordsPerPageChange={setPageSize}
-                        minHeight={200}
-                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
-                    /> */}
                     <div className="flex items-center justify-between mb-5">
-                        <h5 className="font-semibold text-lg dark:text-white-light">Kategori Produk</h5>
-                        {/* <button type="button" onClick={() => toggleCode('code6')} className="font-semibold hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-600">
-                            <span className="flex items-center">
-                                <IconCode className="me-2" />
-                                Code
-                            </span>
-                        </button> */}
-                        <button type="button" className="btn btn-outline-primary">
-                                Add
-                            </button>
+                        <h5 className="font-semibold text-lg dark:text-white-light">Kategori Produk </h5>
+                        {/* <Link to="/menupenjualan/product/kategoriproduk/forminput"> */}
+                        <button type="button" className=" px-2 btn btn-outline-info" onClick={() => setModal1(true)}>
+                            <IconPlus className="flex mx-2" fill={true} /> Add
+                        </button>
+                        {/* </Link> */}
                     </div>
                     <div className="table-responsive mb-5">
                         <table>
@@ -145,59 +206,26 @@ const Basic = () => {
                                     <th>Nama Kategori</th>
                                     <th></th>
                                     <th></th>
-                                    <th className="text-center">Action</th>
+                                    <th className="text-center">Opsi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {tableData.map((data) => {
+                                {currentItems.map((data, index) => {
                                     return (
-                                        <tr key={data.id}>
+                                        <tr key={index}>
                                             <td>{data.id}</td>
                                             <td>
                                                 <div className="whitespace-nowrap">{data.nama}</div>
                                             </td>
-                                            <td>
-                                                {/* <div className="h-1.5 bg-[#ebedf2] dark:bg-dark/40 rounded-full flex w-full">
-                                                    <div
-                                                        className={`h-1.5 rounded-full rounded-bl-full text-center text-white text-xs ${
-                                                            data.status === 'completed'
-                                                                ? 'bg-success'
-                                                                : data.status === 'Pending'
-                                                                ? 'bg-secondary'
-                                                                : data.status === 'In Progress'
-                                                                ? 'bg-info'
-                                                                : data.status === 'Canceled'
-                                                                ? 'bg-danger'
-                                                                : 'bg-success'
-                                                        }`}
-                                                        style={{ width: `${data.progress}` }}
-                                                    ></div>
-                                                </div> */}
-                                            </td>
-                                            <td>
-                                                {/* <div
-                                                    className={`whitespace-nowrap ${
-                                                        data.status === 'completed'
-                                                            ? 'text-success'
-                                                            : data.status === 'Pending'
-                                                            ? 'text-secondary'
-                                                            : data.status === 'In Progress'
-                                                            ? 'text-info'
-                                                            : data.status === 'Canceled'
-                                                            ? 'text-danger'
-                                                            : 'text-success'
-                                                    }`}
-                                                >
-                                                    {data.progress}
-                                                </div> */}
-                                            </td>
+                                            <td></td>
+                                            <td></td>
                                             <td className="p-3 border-b border-[#ebedf2] dark:border-[#191e3a] text-center">
-                                                    <button type="button" style={{ color: 'orange' }}>
-                                                        <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                                    </button>
-                                                    <button type="button" style={{ color: 'red' }}>
-                                                        <IconTrashLines />
-                                                    </button>
+                                                <button type="button" style={{ color: 'orange' }}>
+                                                    <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                                </button>
+                                                <button type="button" style={{ color: 'red' }}>
+                                                    <IconTrashLines />
+                                                </button>
                                             </td>
                                         </tr>
                                     );
@@ -205,6 +233,9 @@ const Basic = () => {
                             </tbody>
                         </table>
                     </div>
+
+                    {/* Integrasikan Pagination di sini */}
+                    <Pagination total={totalPages} page={currentPage} onChange={handlePageChange} size="md" />
                 </div>
             </div>
         </div>
