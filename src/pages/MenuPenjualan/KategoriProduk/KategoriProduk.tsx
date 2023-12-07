@@ -1,11 +1,11 @@
 import React, { SetStateAction, useState, Fragment } from 'react';
-import { Dialog, Transition, Tab } from '@headlessui/react';
+import { Dialog, Transition } from '@headlessui/react';
 
 import { Pagination } from '@mantine/core';
 import { Link } from 'react-router-dom';
-import IconPlus from '../components/Icon/IconPlus';
-import IconTrashLines from '../components/Icon/IconTrashLines';
-import IconPencil from '../components/Icon/IconPencil';
+import IconPlus from '../../../components/Icon/IconPlus';
+import IconTrashLines from '../../../components/Icon/IconTrashLines';
+import IconPencil from '../../../components/Icon/IconPencil';
 const tableData = [
     {
         id: 1,
@@ -111,7 +111,9 @@ const Basic = () => {
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = tableData.slice(indexOfFirstItem, indexOfLastItem);
-    const [modal1, setModal1] = useState(false);
+    const [addKategori, setAddKategori] = useState(false);
+    const [editKategori, setEditKategori] = useState(false);
+    const [hapusKategori, setHapusKategori] = useState(false);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page); // Memperbarui state currentPage saat halaman berubah
@@ -120,8 +122,59 @@ const Basic = () => {
     return (
         <div>
             <div className="mb-5">
-                <Transition appear show={modal1} as={Fragment}>
-                    <Dialog as="div" open={modal1} onClose={() => setModal1(false)}>
+                <Transition appear show={editKategori} as={Fragment}>
+                    <Dialog as="div" open={editKategori} onClose={() => setEditKategori(false)}>
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0"
+                            enterTo="opacity-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100"
+                            leaveTo="opacity-0"
+                        >
+                            <div className="fixed inset-0" />
+                        </Transition.Child>
+                        <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
+                            <div className="flex items-start justify-center min-h-screen px-4">
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ease-out duration-300"
+                                    enterFrom="opacity-0 scale-95"
+                                    enterTo="opacity-100 scale-100"
+                                    leave="ease-in duration-200"
+                                    leaveFrom="opacity-100 scale-100"
+                                    leaveTo="opacity-0 scale-95"
+                                >
+                                    <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
+                                        <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                                            <div className="text-lg font-bold">Edit Kategori</div>
+                                        </div>
+                                        <div className="p-5">
+                                            <div>
+                                                <form className="space-y-5">
+                                                    <div>
+                                                        <input type="textfield" placeholder="Masukan Kategori" className="form-input" />
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div className="flex justify-end items-center mt-8">
+                                                <button type="button" className="btn btn-outline-danger" onClick={() => setEditKategori(false)}>
+                                                    Discard
+                                                </button>
+                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setEditKategori(false)}>
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </Dialog.Panel>
+                                </Transition.Child>
+                            </div>
+                        </div>
+                    </Dialog>
+                </Transition>
+                <Transition appear show={addKategori} as={Fragment}>
+                    <Dialog as="div" open={addKategori} onClose={() => setAddKategori(false)}>
                         <Transition.Child
                             as={Fragment}
                             enter="ease-out duration-300"
@@ -147,9 +200,6 @@ const Basic = () => {
                                     <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
                                         <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
                                             <div className="text-lg font-bold">Tambah Kategori</div>
-                                            {/* <button type="button" className="text-white-dark hover:text-dark" onClick={() => setModal1(false)}>
-                                                <svg>...</svg>
-                                            </button> */}
                                         </div>
                                         <div className="p-5">
                                             <div>
@@ -160,11 +210,62 @@ const Basic = () => {
                                                 </form>
                                             </div>
                                             <div className="flex justify-end items-center mt-8">
-                                                <button type="button" className="btn btn-outline-danger" onClick={() => setModal1(false)}>
+                                                <button type="button" className="btn btn-outline-danger" onClick={() => setAddKategori(false)}>
                                                     Discard
                                                 </button>
-                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setModal1(false)}>
+                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setAddKategori(false)}>
                                                     Save
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </Dialog.Panel>
+                                </Transition.Child>
+                            </div>
+                        </div>
+                    </Dialog>
+                </Transition>
+                <Transition appear show={hapusKategori} as={Fragment}>
+                    <Dialog as="div" open={hapusKategori} onClose={() => setHapusKategori(false)}>
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0"
+                            enterTo="opacity-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100"
+                            leaveTo="opacity-0"
+                        >
+                            <div className="fixed inset-0" />
+                        </Transition.Child>
+                        <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
+                            <div className="flex items-start justify-center min-h-screen px-4">
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ease-out duration-300"
+                                    enterFrom="opacity-0 scale-95"
+                                    enterTo="opacity-100 scale-100"
+                                    leave="ease-in duration-200"
+                                    leaveFrom="opacity-100 scale-100"
+                                    leaveTo="opacity-0 scale-95"
+                                >
+                                    <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
+                                        <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                                            <div className="text-lg font-bold">Hapus Kategori</div>
+                                        </div>
+                                        <div className="p-5">
+                                            <div>
+                                                <form className="space-y-5">
+                                                    <div>
+                                                        <h1>Apakah Anda yakin ingin menghapus Kategori</h1>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div className="flex justify-end items-center mt-8">
+                                                <button type="button" className="btn btn-outline-danger" onClick={() => setHapusKategori(false)}>
+                                                    Discard
+                                                </button>
+                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setHapusKategori(false)}>
+                                                    Hapus
                                                 </button>
                                             </div>
                                         </div>
@@ -193,7 +294,7 @@ const Basic = () => {
                     <div className="flex items-center justify-between mb-5">
                         <h5 className="font-semibold text-lg dark:text-white-light">Kategori Produk </h5>
                         {/* <Link to="/menupenjualan/product/kategoriproduk/forminput"> */}
-                        <button type="button" className=" px-2 btn btn-outline-info" onClick={() => setModal1(true)}>
+                        <button type="button" className=" px-2 btn btn-outline-info" onClick={() => setAddKategori(true)}>
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
                         {/* </Link> */}
@@ -220,10 +321,10 @@ const Basic = () => {
                                             <td></td>
                                             <td></td>
                                             <td className="p-3 border-b border-[#ebedf2] dark:border-[#191e3a] text-center">
-                                                <button type="button" style={{ color: 'orange' }}>
+                                                <button type="button" style={{ color: 'orange' }} onClick={() => setEditKategori(true)}>
                                                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                                 </button>
-                                                <button type="button" style={{ color: 'red' }}>
+                                                <button type="button" style={{ color: 'red' }} onClick={() => setHapusKategori(true)}>
                                                     <IconTrashLines />
                                                 </button>
                                             </td>
