@@ -4,13 +4,7 @@ import ImageUploading, { ImageListType } from 'react-images-uploading';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
 
-const InputProduk = () => {
-    const options = [
-        { value: 'orange', label: 'Orange' },
-        { value: 'white', label: 'White' },
-        { value: 'purple', label: 'Purple' },
-    ];
-
+const EditProduk = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('File Upload Preview'));
@@ -26,15 +20,10 @@ const InputProduk = () => {
     };
 
     const [images, setImages] = useState<any>([]);
-    const [images2, setImages2] = useState<any>([]);
     const maxNumber = 69;
 
     const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
         setImages(imageList as never[]);
-    };
-
-    const onChange2 = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
-        setImages2(imageList as never[]);
     };
 
     return (
@@ -46,14 +35,14 @@ const InputProduk = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Add Produk</span>
+                    <span>Edit Produk</span>
                 </li>
             </ul>
             <div className="pt-5 space-y-8 ">
                 {/* Single File */}
                 <div className="grid lg:grid-cols-1 grid-cols-1 gap-6">
                     <div className="panel " id="single_file">
-                        <h1 className="text-lg font-bold mb-12">Tambah Produk</h1>
+                        <h1 className="text-lg font-bold mb-12">Edit Produk</h1>
                         <div className="flex items-center justify-between mb-5">
                             <form className="space-y-5">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -173,4 +162,4 @@ const InputProduk = () => {
     );
 };
 
-export default InputProduk;
+export default EditProduk;

@@ -514,7 +514,7 @@ const rowData = [
     },
 ];
 
-const Produk = () => {
+const Unit = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Multi Column Table'));
@@ -593,7 +593,7 @@ const Produk = () => {
                             >
                                 <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
                                     <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                        <div className="text-lg font-bold">Hapus Produk</div>
+                                        <div className="text-lg font-bold">Hapus Unit</div>
                                     </div>
                                     <div className="p-5">
                                         <div>
@@ -628,14 +628,14 @@ const Produk = () => {
                     <span>Menu Penjualan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> Produk</span>
+                    <span>Unit</span>
                 </li>
             </ul>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    <Link to="/menupenjualan/product/produk/addproduk">
+                    <Link to="/menupenjualan/product/unit/addunit">
                         <button type="button" className=" px-2 btn btn-outline-info">
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
@@ -644,7 +644,7 @@ const Produk = () => {
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Data Produk</h5>
+                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Data Unit</h5>
                 <div className="datatables">
                     <DataTable
                         highlightOnHover
@@ -654,23 +654,10 @@ const Produk = () => {
                             { accessor: 'id', title: 'No', sortable: true },
                             {
                                 accessor: 'firstName',
-                                title: 'Foto',
+                                title: 'Nama Unit',
                                 sortable: true,
-                                render: ({ id }) => (
-                                    <div className="flex items-center w-max">
-                                        <img className="w-16 h-16 ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
-                                    </div>
-                                ),
                             },
-                            { accessor: 'age', title: 'Code', sortable: true },
-                            { accessor: 'firstName', title: 'Nama', sortable: true },
-                            {
-                                accessor: 'dob',
-                                title: 'Qty',
-                                sortable: true,
-                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
-                            },
-                            { accessor: 'phone', title: 'Harga', sortable: true },
+                            { accessor: 'age', title: 'Kapasitas Unit', sortable: true },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
@@ -678,11 +665,10 @@ const Produk = () => {
                                 render: () => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/product/produk/editproduk">
+                                            <Link to="/menupenjualan/product/unit/editunit">
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-
                                         <button type="button" style={{ color: 'red' }} onClick={() => setHapusProduk(true)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2" />
                                         </button>
@@ -707,4 +693,4 @@ const Produk = () => {
     );
 };
 
-export default Produk;
+export default Unit;
