@@ -152,12 +152,16 @@ const FileUploadPreview = () => {
                                     )}
                                 </ImageUploading>
                                 {images.length === 0 ? <img src="/assets/images/file-preview.svg" className="max-w-md w-full m-auto" alt="" /> : ''}
+                                <div className='flex'>
                                 <button type="submit" className="btn btn-primary !mt-6">
                                     Submit
                                 </button>
-                                <button type="submit" className="btn btn-primary !mt-6">
+                                <Link to="/menupenjualan/product/produk">
+                                <button type="submit" className="btn btn-primary !mt-6 ml-6">
                                     Cencel
                                 </button>
+                                </Link>
+                                </div>
                             </div>
                         </div>
                     </div>
