@@ -109,7 +109,7 @@ const Basic = () => {
                 </a>
             </div> */}
             <div className="panel mt-6">
-                <h5 className="font-semibold text-lg dark:text-white-light mb-5">Iya Bang</h5>
+                {/* <h5 className="font-semibold text-lg dark:text-white-light mb-5"></h5> */}
                 <div className="datatables">
                     {/* <DataTable
                         noRecordsText="No results match your search query"
@@ -140,6 +140,9 @@ const Basic = () => {
                                 Code
                             </span>
                         </button> */}
+                        <button type="button" className="btn btn-outline-primary">
+                                Add
+                            </button>
                     </div>
                     <div className="table-responsive mb-5">
                         <table>
@@ -196,16 +199,12 @@ const Basic = () => {
                                                 </div> */}
                                             </td>
                                             <td className="p-3 border-b border-[#ebedf2] dark:border-[#191e3a] text-center">
-                                                <Tippy content="Edit">
-                                                    <button type="button">
-                                                        <IconPencil className="ltr:mr-2 rtl:ml-2" />
+                                                    <button type="button" style={{ color: 'orange' }}>
+                                                        <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                                     </button>
-                                                </Tippy>
-                                                <Tippy content="Delete">
-                                                    <button type="button">
+                                                    <button type="button" style={{ color: 'red' }}>
                                                         <IconTrashLines />
                                                     </button>
-                                                </Tippy>
                                             </td>
                                         </tr>
                                     );
