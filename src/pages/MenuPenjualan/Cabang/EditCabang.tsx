@@ -37,7 +37,7 @@ const EditCabang = () => {
                                 </Link>
                                 <Link to="/menupenjualan/cabang/listcabang">
                                     <button type="submit" className="btn btn-primary !mt-6 ml-6">
-                                        Cencel
+                                        Batal
                                     </button>
                                 </Link>
                             </div>
