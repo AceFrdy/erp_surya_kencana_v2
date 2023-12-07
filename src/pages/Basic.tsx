@@ -1,5 +1,5 @@
 import { DataTable } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Tippy from '@tippyjs/react';
 import { IRootState } from '../store';
@@ -8,6 +8,8 @@ import IconBell from '../components/Icon/IconBell';
 import IconTrashLines from '../components/Icon/IconTrashLines';
 import IconCode from '../components/Icon/IconCode';
 import IconPencil from '../components/Icon/IconPencil';
+import axios from 'axios';
+
 const tableData = [
     {
         id: 1,
@@ -58,8 +60,27 @@ const tableData = [
         office: 'Canada',
     },
 ];
-
+const token = localStorage.getItem('accessToken') ? localStorage.getItem('accessToken') : console.log('nothing');
 const Basic = () => {
+    const [categories, setCategories] = useState<{ id: number; product_category_name: string }[]>([]);
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/product-categories', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: 'Bearer 208|Sd3oTM01ZMSVUXWiSLW4t3yKtMGBgLRbv1MB1Z5W8d47786e',
+                },
+            })
+            .then((response) => {
+                const categories = response.data.data.resource.data;
+                setCategories(categories);
+                console.log("CATEGORIES:", categories);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    }, []);
+
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Tables'));
@@ -74,21 +95,7 @@ const Basic = () => {
             setTabs([...tabs, name]);
         }
     };
-    // const [page, setPage] = useState(1);
-    // const PAGE_SIZES = [10, 20, 30, 50, 100];
-    // const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    // const initialRecords = rowData.slice(0, pageSize);
-    // const [recordsData, setRecordsData] = useState(initialRecords);
 
-    // useEffect(() => {
-    //     setPage(1);
-    // }, [pageSize]);
-
-    // useEffect(() => {
-    //     const from = (page - 1) * pageSize;
-    //     const to = from + pageSize;
-    //     setRecordsData(rowData.slice(from, to));
-    // }, [page, pageSize]);
 
     return (
         <div>
@@ -149,12 +156,12 @@ const Basic = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {tableData.map((data) => {
+                                {categories.map((category, index) => {
                                     return (
-                                        <tr key={data.id}>
-                                            <td>{data.id}</td>
+                                        <tr key={category.id}>
+                                            <td>{index + 1}</td>
                                             <td>
-                                                <div className="whitespace-nowrap">{data.nama}</div>
+                                                <div className="whitespace-nowrap">{category.product_category_name}</div>
                                             </td>
                                             <td>
                                                 {/* <div className="h-1.5 bg-[#ebedf2] dark:bg-dark/40 rounded-full flex w-full">
