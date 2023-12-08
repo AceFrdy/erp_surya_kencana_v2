@@ -10,6 +10,7 @@ import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import IconPlus from '../../../components/Icon/IconPlus';
+import IconNotes from '../../../components/Icon/IconNotes';
 
 const rowData = [
     {
@@ -514,7 +515,7 @@ const rowData = [
     },
 ];
 
-const Produk = () => {
+const Suplier = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Multi Column Table'));
@@ -530,7 +531,7 @@ const Produk = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const [hapusProduk, setHapusProduk] = useState(false);
+    const [hapusSuplier, setHapusSuplier] = useState(false);
 
     useEffect(() => {
         setPage(1);
@@ -546,8 +547,8 @@ const Produk = () => {
         setInitialRecords(() => {
             return rowData.filter((item) => {
                 return (
+                    item.id.toString().includes(search.toLowerCase()) ||
                     item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.age.toString().toLowerCase().includes(search.toLowerCase()) ||
                     item.dob.toLowerCase().includes(search.toLowerCase()) ||
                     item.phone.toLowerCase().includes(search.toLowerCase())
                 );
@@ -563,20 +564,10 @@ const Produk = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
 
-    const formatDate = (date: any) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
-        }
-        return '';
-    };
-
     return (
         <div>
-            <Transition appear show={hapusProduk} as={Fragment}>
-                <Dialog as="div" open={hapusProduk} onClose={() => setHapusProduk(false)}>
+            <Transition appear show={hapusSuplier} as={Fragment}>
+                <Dialog as="div" open={hapusSuplier} onClose={() => setHapusSuplier(false)}>
                     <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
                         <div className="fixed inset-0" />
                     </Transition.Child>
@@ -593,21 +584,21 @@ const Produk = () => {
                             >
                                 <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
                                     <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                        <div className="text-lg font-bold">Hapus Produk</div>
+                                        <div className="text-lg font-bold">Hapus Supplier</div>
                                     </div>
                                     <div className="p-5">
                                         <div>
                                             <form className="space-y-5">
                                                 <div>
-                                                    <h1>Apakah Anda yakin ingin menghapus Kategori</h1>
+                                                    <h1>Apakah Anda yakin ingin menghapus Supplier ini</h1>
                                                 </div>
                                             </form>
                                         </div>
                                         <div className="flex justify-end items-center mt-8">
-                                            <button type="button" className="btn btn-outline-danger" onClick={() => setHapusProduk(false)}>
+                                            <button type="button" className="btn btn-outline-danger" onClick={() => setHapusSuplier(false)}>
                                                 Kembali
                                             </button>
-                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setHapusProduk(false)}>
+                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setHapusSuplier(false)}>
                                                 Hapus
                                             </button>
                                         </div>
@@ -628,14 +619,14 @@ const Produk = () => {
                     <span>Menu Penjualan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> Produk</span>
+                    <span> Supplier </span>
                 </li>
             </ul>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    <Link to="/menupenjualan/product/produk/addproduk">
+                    <Link to="/menupenjualan/supplier/addsupplier">
                         <button type="button" className=" px-2 btn btn-outline-info">
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
@@ -644,7 +635,7 @@ const Produk = () => {
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Data Produk</h5>
+                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Supplier</h5>
                 <div className="datatables">
                     <DataTable
                         highlightOnHover
@@ -652,25 +643,13 @@ const Produk = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
+                            { accessor: 'firstName', title: 'Nama Supplier', sortable: true },
+                            { accessor: 'phone', title: 'No HP', sortable: true },
                             {
-                                accessor: 'firstName',
-                                title: 'Foto',
+                                accessor: 'address.street',
+                                title: 'Address',
                                 sortable: true,
-                                render: ({ id }) => (
-                                    <div className="flex items-center w-max">
-                                        <img className="w-16 h-16 ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
-                                    </div>
-                                ),
                             },
-                            { accessor: 'age', title: 'Code', sortable: true },
-                            { accessor: 'firstName', title: 'Nama', sortable: true },
-                            {
-                                accessor: 'dob',
-                                title: 'Qty',
-                                sortable: true,
-                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
-                            },
-                            { accessor: 'phone', title: 'Harga', sortable: true },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
@@ -678,13 +657,12 @@ const Produk = () => {
                                 render: () => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/product/produk/editproduk">
+                                            <Link to="/menupenjualan/supplier/editsupplier">
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-
-                                        <button type="button" style={{ color: 'red' }} onClick={() => setHapusProduk(true)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2" />
+                                        <button type="button" style={{ color: 'red' }} onClick={() => setHapusSuplier(true)}>
+                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
                                     </div>
                                 ),
@@ -707,4 +685,4 @@ const Produk = () => {
     );
 };
 
-export default Produk;
+export default Suplier;
