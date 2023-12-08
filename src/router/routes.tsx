@@ -1,6 +1,8 @@
 import { lazy } from 'react';
+// import MultipleTables from '../pages/Customer/CustomerOffline/CustomerOffline';
 import InputCustomer from '../pages/Customer/CustomerOffline/InputCustomer';
-import MultipleTables from '../pages/Customer/CustomerOffline/MultipleTables';
+import CustomerOffline from '../pages/Customer/CustomerOffline/CustomerOffline';
+import EditCustomer from '../pages/Customer/CustomerOffline/EditCustomer';
 const Index = lazy(() => import('../pages/Index'));
 const Ecommerce = lazy(() => import('../pages/Ecommerce'));
 const Kategoriproduk = lazy(() => import('../pages/MenuPenjualan/KategoriProduk/KategoriProduk'))
@@ -73,12 +75,17 @@ const routes = [
     // Customer
     {
         path: '/customer/offline',
-        element: <MultipleTables />,
+        element: <CustomerOffline />,
         layout: 'default',
     },
     {
         path: '/customer/offline/tambah-customer-offline',
         element: <InputCustomer />,
+        layout: 'default',
+    },
+    {
+        path: '/customer/offline/edit-customer-offline',
+        element: <EditCustomer />,
         layout: 'default',
     },
     // Cabang

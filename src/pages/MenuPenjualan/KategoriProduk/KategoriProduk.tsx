@@ -1,11 +1,12 @@
-import React, { SetStateAction, useState, Fragment } from 'react';
+import React, { SetStateAction, useState, Fragment, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-
+import axios from 'axios';
 import { Pagination } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import IconPlus from '../../../components/Icon/IconPlus';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import IconPencil from '../../../components/Icon/IconPencil';
+
 const tableData = [
     {
         id: 1,
@@ -118,6 +119,27 @@ const Basic = () => {
     const handlePageChange = (page: number) => {
         setCurrentPage(page); // Memperbarui state currentPage saat halaman berubah
     };
+    const [data, setData] = useState([]);
+    const [categories, setCategories] = useState<{ id: number; product_category_name: string }[]>([]);
+    const [nextIndex, setNextIndex] = useState(1);
+
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/product-categories', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer 221|vMlocqeBvvlFFedU9SqwGTLGid6na3RhemkKauYd8d11453a`,
+                },
+            })
+            .then((response) => {
+                const categories = response.data.data.resource.data;
+                setCategories(categories); // Set categories state with fetched data
+                // console.log('CATEGORIES', categories);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    }, []);
 
     return (
         <div>
@@ -311,12 +333,12 @@ const Basic = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentItems.map((data, index) => {
+                                {categories.map((category, index) => {
                                     return (
-                                        <tr key={index}>
-                                            <td>{data.id}</td>
+                                        <tr key={category.id}>
+                                            <td>{index +1}</td>
                                             <td>
-                                                <div className="whitespace-nowrap">{data.nama}</div>
+                                                <div className="whitespace-nowrap">{category.product_category_name}</div>
                                             </td>
                                             <td></td>
                                             <td></td>

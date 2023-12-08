@@ -10,6 +10,7 @@ import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import IconPlus from '../../../components/Icon/IconPlus';
+import axios from 'axios';
 
 const rowData = [
     {
@@ -532,6 +533,9 @@ const Produk = () => {
     });
     const [hapusProduk, setHapusProduk] = useState(false);
 
+    // GET api
+    const [product, setProduct] = useState([]);
+
     useEffect(() => {
         setPage(1);
     }, [pageSize]);
@@ -572,6 +576,25 @@ const Produk = () => {
         }
         return '';
     };
+
+    // get produk
+    useEffect(() => {
+        axios
+          .get('https://erp.digitalindustryagency.com/api/products', {
+            headers: {
+              Accept: 'application/json',
+              Authorization: `Bearer 221|vMlocqeBvvlFFedU9SqwGTLGid6na3RhemkKauYd8d11453a`,
+            },
+          })
+          .then((response) => {
+            const productlist = response.data.data.resource.data;
+            setProduct(product); // Set categories state with fetched data
+            console.log("PRODUCT", productlist);
+          })
+          .catch((error) => {
+            console.error('Error fetching data:', error);
+          });
+      }, []);
 
     return (
         <div>
