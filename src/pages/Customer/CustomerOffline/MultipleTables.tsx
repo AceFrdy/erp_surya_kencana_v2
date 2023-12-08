@@ -631,6 +631,10 @@ const MultipleTables = () => {
         return status[random];
     };
 
+    const handleEdit = () => {
+        
+    }
+
     return (
         <div>
             <div className="panel mt-6">

@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { Button, Card, TextField } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-function InputCustomer() {
+const InputCustomer = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('accessToken') || '';
 
@@ -46,50 +45,48 @@ function InputCustomer() {
         console.error('Error adding customer data:', error);
         toast.error('Error adding data');
       });
+      
   };
 
   const handleCancel = () => {
     navigate('/customer/offline');
   };
 
-  return (
-    <Card sx={{ width: '100%', maxWidth: '800px', margin: 'auto', padding: '20px', textAlign: 'center' }}>
-      <h2>Customer Data Input Form</h2>
-      <div style={{ display: 'grid', gap: '20px' }}>
-        <TextField
-          label="Name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        />
-        <TextField
-          label="Address"
-          value={formData.address}
-          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-        />
-        <TextField
-          label="Contact"
-          value={formData.contact}
-          onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-        />
-      </div>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleCancel}
-        sx={{ width: '100px', margin: '30px auto', marginRight: '10px' }}
-      >
-        Back
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleAddData}
-        sx={{ width: '100px', margin: '30px auto' }}
-      >
-        Add
-      </Button>
-    </Card>
-  );
-}
+    return (
+        <div>
+            <ul className="flex space-x-2 rtl:space-x-reverse mb-4">
+                <li>
+                    <Link to="#" className="text-primary hover:underline">
+                        Forms
+                    </Link>
+                </li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                    <span>Tambah Customer Offline</span>
+                </li>
+            </ul>
+            <div className="panel " id="single_file">
+                <form className="space-y-5">
+                    <div>
+                        <input type="text" placeholder="Nama Customer" className="form-input" />
+                    </div>
+                    <div>
+                        <input type="text" placeholder="No. Hp" className="form-input" />
+                    </div>
+                    <div>
+                        <input type="text" placeholder="Alamat" className="form-input" />
+                    </div>
+                    <div className='flex justify-center'>
+                        <button type="submit" onClick={handleAddData} className="btn btn-primary !mt-6 mr-8">
+                            Back
+                        </button>
+                        <button type="submit" onClick={handleCancel} className="btn btn-primary !mt-6">
+                            Add
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
 
 export default InputCustomer;
