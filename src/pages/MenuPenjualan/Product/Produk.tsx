@@ -10,6 +10,7 @@ import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import IconPlus from '../../../components/Icon/IconPlus';
+import Swal from 'sweetalert2';
 
 const rowData = [
     {
@@ -514,6 +515,36 @@ const rowData = [
     },
 ];
 
+const showAlert = async (type: number) => {
+    if (type === 11) {
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-secondary',
+                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
+                popup: 'sweet-alerts',
+            },
+            buttonsStyling: false,
+        });
+        swalWithBootstrapButtons
+            .fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true,
+                padding: '2em',
+            })
+            .then((result) => {
+                if (result.value) {
+                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
+                }
+            });
+    }
+};
 const Produk = () => {
     const dispatch = useDispatch();
     useEffect(() => {
@@ -683,7 +714,7 @@ const Produk = () => {
                                             </Link>
                                         </button>
 
-                                        <button type="button" style={{ color: 'red' }} onClick={() => setHapusProduk(true)}>
+                                        <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2" />
                                         </button>
                                     </div>
