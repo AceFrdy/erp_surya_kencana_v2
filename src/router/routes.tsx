@@ -14,6 +14,9 @@ const EditProduk = lazy(() => import('../pages/MenuPenjualan/Product/EditProduk'
 const ListCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/ListCabang'))
 const AddCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/AddCabang'))
 const EditCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/EditCabang'))
+const Supplier = lazy(() => import('../pages/MenuPenjualan/Supplier/Supplier'))
+const AddSupplier = lazy(() => import('../pages/MenuPenjualan/Supplier/AddSupplier'))
+const EditSupplier = lazy(() => import('../pages/MenuPenjualan/Supplier/EditSupplier'))
 
 
 
@@ -92,6 +95,22 @@ const routes = [
     {
         path: '/menupenjualan/cabang/listcabang/editcabang',
         element: <EditCabang />,
+        layout: 'default',
+    },
+    // Suplier
+    {
+        path: '/menupenjualan/supplier',
+        element: <Supplier />,
+        layout: 'default',
+    },
+    {
+        path: '/menupenjualan/supplier/addsupplier',
+        element: <AddSupplier />,
+        layout: 'default',
+    },
+    {
+        path: '/menupenjualan/supplier/editsupplier',
+        element: <EditSupplier />,
         layout: 'default',
     },
 ];
