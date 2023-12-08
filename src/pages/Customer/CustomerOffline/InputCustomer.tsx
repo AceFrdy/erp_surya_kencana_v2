@@ -32,7 +32,7 @@ function InputCustomer() {
       })
       .then((response) => {
         console.log('Customer data successfully added:', response.data);
-        navigate('/customer');
+        navigate('/customer/offline');
         toast.success('Data berhasil ditambahkan', {
           position: 'top-right',
           autoClose: 3000,
@@ -49,7 +49,7 @@ function InputCustomer() {
   };
 
   const handleCancel = () => {
-    navigate('/customer-offline');
+    navigate('/customer/offline');
   };
 
   return (

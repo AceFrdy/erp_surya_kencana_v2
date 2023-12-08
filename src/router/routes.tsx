@@ -46,12 +46,12 @@ const routes = [
     },
     // Customer
     {
-        path: '/customer-offline',
+        path: '/customer/offline',
         element: <MultipleTables />,
         layout: 'default',
     },
     {
-        path: '/tambah-customer',
+        path: '/customer/offline/tambah-customer-offline',
         element: <InputCustomer />,
         layout: 'default',
     },

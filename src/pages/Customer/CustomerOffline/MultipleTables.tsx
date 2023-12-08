@@ -525,6 +525,7 @@ const MultipleTables = () => {
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
     const [recordsData, setRecordsData] = useState(initialRecords);
+    const [editKategori, setEditKategori] = useState(false);
 
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
@@ -634,7 +635,7 @@ const MultipleTables = () => {
         <div>
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    <Link to="/tambah-customer">
+                    <Link to="/customer/offline/tambah-customer-offline">
                         <button type="button" className=" px-2 btn btn-outline-info">
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
@@ -668,12 +669,12 @@ const MultipleTables = () => {
                                 render: () => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <Tippy content="Edit">
-                                            <button type="button">
+                                            <button type="button" style={{ color: 'orange' }} onClick={() => setEditKategori(true)}>
                                                 <IconPencil />
                                             </button>
                                         </Tippy>
                                         <Tippy content="Delete">
-                                            <button type="button">
+                                            <button type="button" style={{ color: 'red' }} onClick={() => setEditKategori(true)}>
                                                 <IconTrashLines />
                                             </button>
                                         </Tippy>
