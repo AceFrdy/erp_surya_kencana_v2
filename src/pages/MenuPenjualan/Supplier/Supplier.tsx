@@ -584,13 +584,13 @@ const Suplier = () => {
                             >
                                 <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
                                     <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                        <div className="text-lg font-bold">Hapus Cabang</div>
+                                        <div className="text-lg font-bold">Hapus Supplier</div>
                                     </div>
                                     <div className="p-5">
                                         <div>
                                             <form className="space-y-5">
                                                 <div>
-                                                    <h1>Apakah Anda yakin ingin menghapus Cabang</h1>
+                                                    <h1>Apakah Anda yakin ingin menghapus Supplier ini</h1>
                                                 </div>
                                             </form>
                                         </div>
