@@ -229,8 +229,7 @@ const Sidebar = () => {
                                         <AnimateHeight duration={300} height={currentMenu === 'customer' ? 'auto' : 0}>
                                             <ul className="sub-menu text-gray-500">
                                                 <li>
-                                                    <NavLink to="/customer-offline">{('Offline')}</NavLink>
-                                                    <NavLink to="/menupenjualan/customer/offline">{'Offline'}</NavLink>
+                                                    <NavLink to="/customer/offline">{'Offline'}</NavLink>
                                                 </li>
                                                 <li>
                                                     <NavLink to="/menupenjualan/customer/online">{'Online'}</NavLink>
@@ -290,7 +289,7 @@ const Sidebar = () => {
                                     </li>
 
                                     <li className="nav-item">
-                                        <NavLink to="/apps/calendar" className="group">
+                                        <NavLink to="/menupenjualan/supplier" className="group">
                                             <div className="flex items-center">
                                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="group-hover:!text-primary shrink-0">
                                                     <path
@@ -336,7 +335,7 @@ const Sidebar = () => {
                                                     fill="currentColor"
                                                 ></path>
 
-                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Suplier')}</span>
+                                                <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Supplier')}</span>
                                             </div>
                                         </NavLink>
                                     </li>
