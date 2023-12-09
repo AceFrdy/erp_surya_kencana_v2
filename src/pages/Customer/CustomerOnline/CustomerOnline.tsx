@@ -10,7 +10,7 @@ import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import IconPlus from '../../../components/Icon/IconPlus';
-import axios from 'axios';
+import IconNotes from '../../../components/Icon/IconNotes';
 
 const rowData = [
     {
@@ -515,7 +515,7 @@ const rowData = [
     },
 ];
 
-const Produk = () => {
+const CustomerOnline = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Multi Column Table'));
@@ -531,10 +531,7 @@ const Produk = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const [hapusProduk, setHapusProduk] = useState(false);
-
-    // GET api
-    const [product, setProduct] = useState([]);
+    const [hapusCustomer, setHapusCustomer] = useState(false);
 
     useEffect(() => {
         setPage(1);
@@ -550,8 +547,8 @@ const Produk = () => {
         setInitialRecords(() => {
             return rowData.filter((item) => {
                 return (
+                    item.id.toString().includes(search.toLowerCase()) ||
                     item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.age.toString().toLowerCase().includes(search.toLowerCase()) ||
                     item.dob.toLowerCase().includes(search.toLowerCase()) ||
                     item.phone.toLowerCase().includes(search.toLowerCase())
                 );
@@ -567,49 +564,10 @@ const Produk = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
 
-    const formatDate = (date: any) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
-        }
-        return '';
-    };
-
-    // format currency
-    function formatCurrency(number) {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-        }).format(number);
-    }
-
-    // get produk
-    useEffect(() => {
-        axios
-            .get('https://erp.digitalindustryagency.com/api/products', {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer 229|1nMJJNBpmOChJR9RTPtkNGDE5AfC8hChQLkgQSxu46924ef6`,
-                },
-            })
-            .then((response) => {
-                const product = response.data.data.resource.data;
-                setProduct(product); // Set categories state with fetched data
-                setInitialRecords(product);
-                setRecordsData(product);
-                console.log('PRODUCT', product);
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error);
-            });
-    }, []);
-
     return (
         <div>
-            <Transition appear show={hapusProduk} as={Fragment}>
-                <Dialog as="div" open={hapusProduk} onClose={() => setHapusProduk(false)}>
+            <Transition appear show={hapusCustomer} as={Fragment}>
+                <Dialog as="div" open={hapusCustomer} onClose={() => setHapusCustomer(false)}>
                     <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
                         <div className="fixed inset-0" />
                     </Transition.Child>
@@ -626,21 +584,21 @@ const Produk = () => {
                             >
                                 <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
                                     <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                        <div className="text-lg font-bold">Hapus Produk</div>
+                                        <div className="text-lg font-bold">Hapus Customer</div>
                                     </div>
                                     <div className="p-5">
                                         <div>
                                             <form className="space-y-5">
                                                 <div>
-                                                    <h1>Apakah Anda yakin ingin menghapus Kategori</h1>
+                                                    <h1>Apakah Anda yakin ingin menghapus Customer</h1>
                                                 </div>
                                             </form>
                                         </div>
                                         <div className="flex justify-end items-center mt-8">
-                                            <button type="button" className="btn btn-outline-danger" onClick={() => setHapusProduk(false)}>
+                                            <button type="button" className="btn btn-outline-danger" onClick={() => setHapusCustomer(false)}>
                                                 Kembali
                                             </button>
-                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setHapusProduk(false)}>
+                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setHapusCustomer(false)}>
                                                 Hapus
                                             </button>
                                         </div>
@@ -658,17 +616,17 @@ const Produk = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Menu Penjualan</span>
+                    <span>Customer</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> Produk</span>
+                    <span> Customer Online</span>
                 </li>
             </ul>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    <Link to="/menupenjualan/product/produk/addproduk">
+                    <Link to="/customer/online/tambah-customer-online">
                         <button type="button" className=" px-2 btn btn-outline-info">
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
@@ -677,7 +635,7 @@ const Produk = () => {
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Data Produk</h5>
+                <h5 className="font-semibold text-lg dark:text-white-light mb-2">List Customer</h5>
                 <div className="datatables">
                     <DataTable
                         highlightOnHover
@@ -685,48 +643,13 @@ const Produk = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
+                            { accessor: 'firstName', title: 'Nama Customer', sortable: true },
                             {
-                                accessor: 'product_image',
-                                title: 'Foto',
-                                sortable: true,
-                                render: ({ product_image }) => (
-                                    <div className="flex items-center w-max">
-                                        <img className="w-16 h-16 ltr:mr-2 rtl:ml-2 object-cover" src={`${product_image}`} alt="" />
-                                    </div>
-                                ),
-                            },
-                            {
-                                accessor: 'product_pos',
-                                title: 'Code',
+                                accessor: 'address.street',
+                                title: 'Address',
                                 sortable: true,
                             },
-                            {
-                                accessor: 'product_name',
-                                title: 'Nama',
-                                sortable: true,
-                            },
-                            {
-                                accessor: 'product_stock',
-                                title: 'Qty',
-                                sortable: true,
-                                render: ({ product_stock }) => (
-                                    <span>
-                                        {Array.isArray(product_stock)
-                                            ? product_stock.length > 0
-                                                ? product_stock.reduce((totalQty, item) => totalQty + (item.qty || 0), 0)
-                                                : 0
-                                            : 0}
-                                    </span>
-                                ),
-                            },
-                            {
-                                accessor: 'product_price',
-                                title: 'Harga',
-                                sortable: true,
-                                render: ({ product_price }) => (
-                                    <span>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(product_price)}</span>
-                                ),
-                            },
+                            { accessor: 'phone', title: 'No HP', sortable: true },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
@@ -734,13 +657,12 @@ const Produk = () => {
                                 render: () => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/product/produk/editproduk">
+                                            <Link to="/customer/online/edit-customer-online">
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-
-                                        <button type="button" style={{ color: 'red' }} onClick={() => setHapusProduk(true)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2" />
+                                        <button type="button" style={{ color: 'red' }} onClick={() => setHapusCustomer(true)}>
+                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
                                     </div>
                                 ),
@@ -763,4 +685,4 @@ const Produk = () => {
     );
 };
 
-export default Produk;
+export default CustomerOnline;

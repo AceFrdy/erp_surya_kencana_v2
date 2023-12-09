@@ -140,6 +140,7 @@ const Basic = () => {
                 console.error('Error fetching data:', error);
             });
     }, []);
+    
 
     return (
         <div>

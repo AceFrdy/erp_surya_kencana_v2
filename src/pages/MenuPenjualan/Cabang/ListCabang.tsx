@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import IconPlus from '../../../components/Icon/IconPlus';
 import IconNotes from '../../../components/Icon/IconNotes';
+import axios from 'axios';
 
 const rowData = [
     {
@@ -532,6 +533,7 @@ const ListCabang = () => {
         direction: 'asc',
     });
     const [hapusCabang, setHapusCabang] = useState(false);
+    const [branch, setBranch] = useState([]);
 
     useEffect(() => {
         setPage(1);
@@ -563,6 +565,27 @@ const ListCabang = () => {
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
+
+    // get branch
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/branches', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer 236|MbxuMzgJNUwvwWRlbOBp8gWFF7EH3leqnc4iOfxf6ace0b04`,
+                },
+            })
+            .then((response) => {
+                const branch = response.data.data.resource.data;
+                setBranch(branch); // Set categories state with fetched data
+                setInitialRecords(branch);
+                setRecordsData(branch);
+                console.log('BRANCH', branch);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    }, []);
 
     return (
         <div>
@@ -643,13 +666,13 @@ const ListCabang = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'firstName', title: 'Nama Cabang', sortable: true },
+                            { accessor: 'branch_name', title: 'Nama Cabang', sortable: true },
                             {
-                                accessor: 'address.street',
+                                accessor: 'branch_address',
                                 title: 'Address',
                                 sortable: true,
                             },
-                            { accessor: 'phone', title: 'No HP', sortable: true },
+                            { accessor: 'branch_contact', title: 'No HP', sortable: true },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
@@ -660,7 +683,7 @@ const ListCabang = () => {
                                             <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
                                         <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/cabang/listcabang/editcabang">
+                                            <Link to="/menupenjualan/cabang/listcabang/editcabang/:id">
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>

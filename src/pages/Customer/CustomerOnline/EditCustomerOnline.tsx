@@ -4,7 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const InputCustomer = () => {
+const EditCustomerOnline = () => {
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') || '';
 
@@ -31,7 +31,7 @@ const InputCustomer = () => {
             })
             .then((response) => {
                 console.log('Customer data successfully added:', response.data);
-                navigate('/customer/offline');
+                navigate('/customer/online');
                 toast.success('Data berhasil ditambahkan', {
                     position: 'top-right',
                     autoClose: 3000,
@@ -48,7 +48,7 @@ const InputCustomer = () => {
     };
 
     const handleCancel = () => {
-        navigate('/customer/offline');
+        navigate('/customer/online');
     };
 
     return (
@@ -60,12 +60,12 @@ const InputCustomer = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Tambah Customer Offline</span>
+                    <span>Edit Customer Online</span>
                 </li>
             </ul>
             <div className="panel " id="single_file">
                 <form className="space-y-5">
-                    <h1 className="text-lg font-bold mb-12">Tambah Cabang</h1>
+                    <h1 className="text-lg font-bold mb-12">Edit Customer</h1>
                     <div>
                         <input type="text" placeholder="Nama Customer" className="form-input" />
                     </div>
@@ -76,11 +76,11 @@ const InputCustomer = () => {
                         <input type="text" placeholder="Alamat" className="form-input" />
                     </div>
                     <div className="flex justify-center">
-                        <button type="submit" onClick={handleAddData} className="btn btn-primary !mt-6 mr-8">
-                            <Link to="/customer/offline">Back</Link>
+                        <button type="submit" onClick={handleCancel} className="btn btn-primary !mt-6 mr-4">
+                            <Link to="/customer/online">Back</Link>
                         </button>
-                        <button type="submit" onClick={handleCancel} className="btn btn-primary !mt-6">
-                            <Link to="/customer/offline">Add</Link>
+                        <button type="submit" onClick={handleAddData} className="btn btn-primary !mt-6 mr-8">
+                            <Link to="/customer/online">Update</Link>
                         </button>
                     </div>
                 </form>
@@ -89,4 +89,4 @@ const InputCustomer = () => {
     );
 };
 
-export default InputCustomer;
+export default EditCustomerOnline;
