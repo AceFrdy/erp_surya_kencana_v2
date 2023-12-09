@@ -11,8 +11,6 @@ import { Link } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import IconPlus from '../../../components/Icon/IconPlus';
 import IconNotes from '../../../components/Icon/IconNotes';
-import axios from 'axios';
-import Swal from 'sweetalert2';
 
 const rowData = [
     {
@@ -517,37 +515,7 @@ const rowData = [
     },
 ];
 
-const showAlert = async (type: number) => {
-    if (type === 11) {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
-                popup: 'sweet-alerts',
-            },
-            buttonsStyling: false,
-        });
-        swalWithBootstrapButtons
-            .fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true,
-                padding: '2em',
-            })
-            .then((result) => {
-                if (result.value) {
-                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
-                }
-            });
-    }
-};
-const ListCabang = () => {
+const CustomerOnline = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Multi Column Table'));
@@ -563,8 +531,7 @@ const ListCabang = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const [hapusCabang, setHapusCabang] = useState(false);
-    const [branch, setBranch] = useState([]);
+    const [hapusCustomer, setHapusCustomer] = useState(false);
 
     useEffect(() => {
         setPage(1);
@@ -597,29 +564,51 @@ const ListCabang = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
 
-    // get branch
-    useEffect(() => {
-        axios
-            .get('https://erp.digitalindustryagency.com/api/branches', {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer 236|MbxuMzgJNUwvwWRlbOBp8gWFF7EH3leqnc4iOfxf6ace0b04`,
-                },
-            })
-            .then((response) => {
-                const branch = response.data.data.resource.data;
-                setBranch(branch); // Set categories state with fetched data
-                setInitialRecords(branch);
-                setRecordsData(branch);
-                console.log('BRANCH', branch);
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error);
-            });
-    }, []);
-
     return (
         <div>
+            <Transition appear show={hapusCustomer} as={Fragment}>
+                <Dialog as="div" open={hapusCustomer} onClose={() => setHapusCustomer(false)}>
+                    <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
+                        <div className="fixed inset-0" />
+                    </Transition.Child>
+                    <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
+                        <div className="flex items-start justify-center min-h-screen px-4">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 scale-95"
+                                enterTo="opacity-100 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 scale-100"
+                                leaveTo="opacity-0 scale-95"
+                            >
+                                <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
+                                    <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                                        <div className="text-lg font-bold">Hapus Customer</div>
+                                    </div>
+                                    <div className="p-5">
+                                        <div>
+                                            <form className="space-y-5">
+                                                <div>
+                                                    <h1>Apakah Anda yakin ingin menghapus Customer</h1>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div className="flex justify-end items-center mt-8">
+                                            <button type="button" className="btn btn-outline-danger" onClick={() => setHapusCustomer(false)}>
+                                                Kembali
+                                            </button>
+                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setHapusCustomer(false)}>
+                                                Hapus
+                                            </button>
+                                        </div>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition>
             <ul className="flex space-x-2 rtl:space-x-reverse">
                 <li>
                     <Link to="/" className="text-primary hover:underline">
@@ -627,17 +616,17 @@ const ListCabang = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Menu Penjualan</span>
+                    <span>Customer</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> Cabang </span>
+                    <span> Customer Online</span>
                 </li>
             </ul>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    <Link to="/menupenjualan/cabang/listcabang/addcabang">
+                    <Link to="/customer/online/tambah-customer-online">
                         <button type="button" className=" px-2 btn btn-outline-info">
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
@@ -646,7 +635,7 @@ const ListCabang = () => {
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">List Cabang</h5>
+                <h5 className="font-semibold text-lg dark:text-white-light mb-2">List Customer</h5>
                 <div className="datatables">
                     <DataTable
                         highlightOnHover
@@ -654,28 +643,25 @@ const ListCabang = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'branch_name', title: 'Nama Cabang', sortable: true },
+                            { accessor: 'firstName', title: 'Nama Customer', sortable: true },
                             {
-                                accessor: 'branch_address',
+                                accessor: 'address.street',
                                 title: 'Address',
                                 sortable: true,
                             },
-                            { accessor: 'branch_contact', title: 'No HP', sortable: true },
+                            { accessor: 'phone', title: 'No HP', sortable: true },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
                                 render: () => (
                                     <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button" style={{ color: 'blue' }}>
-                                            <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                        </button>
                                         <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/cabang/listcabang/editcabang/:id">
+                                            <Link to="/customer/online/edit-customer-online">
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                        <button type="button" style={{ color: 'red' }} onClick={() => setHapusCustomer(true)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
                                     </div>
@@ -699,4 +685,4 @@ const ListCabang = () => {
     );
 };
 
-export default ListCabang;
+export default CustomerOnline;

@@ -1,8 +1,6 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { Fragment, useEffect, useState } from 'react';
+import { useEffect, useState, Fragment } from 'react';
 import sortBy from 'lodash/sortBy';
-import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
 import IconBell from '../../../components/Icon/IconBell';
@@ -10,8 +8,9 @@ import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-import IconPlus from '../../../components/Icon/IconPlus';
 import { Dialog, Transition } from '@headlessui/react';
+import IconPlus from '../../../components/Icon/IconPlus';
+import IconNotes from '../../../components/Icon/IconNotes';
 
 const rowData = [
     {
@@ -519,18 +518,44 @@ const rowData = [
 const CustomerOffline = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Multiple Tables'));
+        dispatch(setPageTitle('Multi Column Table'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
     const [recordsData, setRecordsData] = useState(initialRecords);
-    const [hapusCustomer, setHapusCustomer] = useState(false);
+
+    const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
-        columnAccessor: 'firstName',
+        columnAccessor: 'id',
         direction: 'asc',
     });
+    const [hapusCustomer, setHapusCustomer] = useState(false);
+
+    useEffect(() => {
+        setPage(1);
+    }, [pageSize]);
+
+    useEffect(() => {
+        const from = (page - 1) * pageSize;
+        const to = from + pageSize;
+        setRecordsData([...initialRecords.slice(from, to)]);
+    }, [page, pageSize, initialRecords]);
+
+    useEffect(() => {
+        setInitialRecords(() => {
+            return rowData.filter((item) => {
+                return (
+                    item.id.toString().includes(search.toLowerCase()) ||
+                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
+                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
+                    item.phone.toLowerCase().includes(search.toLowerCase())
+                );
+            });
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -538,52 +563,6 @@ const CustomerOffline = () => {
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
-
-    const [page2, setPage2] = useState(1);
-    const [pageSize2, setPageSize2] = useState(PAGE_SIZES[0]);
-    const [initialRecords2, setInitialRecords2] = useState(sortBy(rowData, 'firstName'));
-    const [recordsData2, setRecordsData2] = useState(initialRecords2);
-
-    const [search2, setSearch2] = useState('');
-    const [sortStatus2, setSortStatus2] = useState<DataTableSortStatus>({
-        columnAccessor: 'firstName',
-        direction: 'asc',
-    });
-
-    useEffect(() => {
-        setPage2(1);
-    }, [pageSize2]);
-
-    useEffect(() => {
-        const from = (page2 - 1) * pageSize2;
-        const to = from + pageSize2;
-        setRecordsData2([...initialRecords2.slice(from, to)]);
-    }, [page2, pageSize2, initialRecords2]);
-
-    useEffect(() => {
-        setInitialRecords2(() => {
-            return rowData.filter((item: any) => {
-                return (
-                    item.firstName.toLowerCase().includes(search2.toLowerCase()) ||
-                    item.company.toLowerCase().includes(search2.toLowerCase()) ||
-                    item.age.toString().toLowerCase().includes(search2.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search2.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search2.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search2.toLowerCase())
-                );
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search2]);
-
-    useEffect(() => {
-        const data2 = sortBy(initialRecords2, sortStatus2.columnAccessor);
-        setInitialRecords2(sortStatus2.direction === 'desc' ? data2.reverse() : data2);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sortStatus2]);
-
-
-    const handleEdit = () => {};
 
     return (
         <div>
@@ -605,13 +584,13 @@ const CustomerOffline = () => {
                             >
                                 <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
                                     <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                        <div className="text-lg font-bold">Hapus Produk</div>
+                                        <div className="text-lg font-bold">Hapus Customer</div>
                                     </div>
                                     <div className="p-5">
                                         <div>
                                             <form className="space-y-5">
                                                 <div>
-                                                    <h1>Apakah Anda yakin ingin menghapus customer?</h1>
+                                                    <h1>Apakah Anda yakin ingin menghapus Customer</h1>
                                                 </div>
                                             </form>
                                         </div>
@@ -630,7 +609,21 @@ const CustomerOffline = () => {
                     </div>
                 </Dialog>
             </Transition>
-
+            <ul className="flex space-x-2 rtl:space-x-reverse">
+                <li>
+                    <Link to="/" className="text-primary hover:underline">
+                        Home
+                    </Link>
+                </li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                    <span>Customer</span>
+                </li>
+                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                    <span> Customer Offline</span>
+                </li>
+            </ul>
+            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
+            </div> */}
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
                     <Link to="/customer/offline/tambah-customer-offline">
@@ -638,22 +631,28 @@ const CustomerOffline = () => {
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
                     </Link>
+                    <div className="ltr:ml-auto rtl:mr-auto">
+                        <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                    </div>
                 </div>
-                <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    <h5 className="font-semibold text-lg dark:text-white-light">Customer Offline</h5>
-                </div>
+                <h5 className="font-semibold text-lg dark:text-white-light mb-2">List Customer</h5>
                 <div className="datatables">
                     <DataTable
+                        highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData2}
+                        records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'firstName', title: 'Nama' },
-                            { accessor: 'phone', title: 'No. Handphone' },
-                            { accessor: 'address.street', title: 'Alamat' },
+                            { accessor: 'firstName', title: 'Nama Customer', sortable: true },
+                            {
+                                accessor: 'address.street',
+                                title: 'Address',
+                                sortable: true,
+                            },
+                            { accessor: 'phone', title: 'No HP', sortable: true },
                             {
                                 accessor: 'action',
-                                title: 'Action',
+                                title: 'Opsi',
                                 titleClassName: '!text-center',
                                 render: () => (
                                     <div className="flex items-center w-max mx-auto gap-2">
@@ -662,22 +661,21 @@ const CustomerOffline = () => {
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-
                                         <button type="button" style={{ color: 'red' }} onClick={() => setHapusCustomer(true)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2" />
+                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
                                     </div>
                                 ),
                             },
                         ]}
-                        totalRecords={initialRecords2.length}
-                        recordsPerPage={pageSize2}
-                        page={page2}
-                        onPageChange={(p) => setPage2(p)}
+                        totalRecords={initialRecords.length}
+                        recordsPerPage={pageSize}
+                        page={page}
+                        onPageChange={(p) => setPage(p)}
                         recordsPerPageOptions={PAGE_SIZES}
-                        onRecordsPerPageChange={setPageSize2}
-                        sortStatus={sortStatus2}
-                        onSortStatusChange={setSortStatus2}
+                        onRecordsPerPageChange={setPageSize}
+                        sortStatus={sortStatus}
+                        onSortStatusChange={setSortStatus}
                         minHeight={200}
                         paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                     />

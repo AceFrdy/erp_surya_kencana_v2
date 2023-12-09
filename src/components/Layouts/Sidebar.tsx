@@ -233,7 +233,7 @@ const Sidebar = () => {
                                                     {/* <NavLink to="/menupenjualan/customer/offline">{'Offline'}</NavLink> */}
                                                 </li>
                                                 <li>
-                                                    <NavLink to="/menupenjualan/customer/online">{'Online'}</NavLink>
+                                                    <NavLink to="/customer/online">{'Online'}</NavLink>
                                                 </li>
                                             </ul>
                                         </AnimateHeight>

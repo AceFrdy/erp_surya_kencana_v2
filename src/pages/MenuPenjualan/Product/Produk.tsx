@@ -608,24 +608,34 @@ const Produk = () => {
         return '';
     };
 
+    // format currency
+    function formatCurrency(number) {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+        }).format(number);
+    }
+
     // get produk
     useEffect(() => {
         axios
-          .get('https://erp.digitalindustryagency.com/api/products', {
-            headers: {
-              Accept: 'application/json',
-              Authorization: `Bearer 221|vMlocqeBvvlFFedU9SqwGTLGid6na3RhemkKauYd8d11453a`,
-            },
-          })
-          .then((response) => {
-            const productlist = response.data.data.resource.data;
-            setProduct(product); // Set categories state with fetched data
-            console.log("PRODUCT", productlist);
-          })
-          .catch((error) => {
-            console.error('Error fetching data:', error);
-          });
-      }, []);
+            .get('https://erp.digitalindustryagency.com/api/products', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer 229|1nMJJNBpmOChJR9RTPtkNGDE5AfC8hChQLkgQSxu46924ef6`,
+                },
+            })
+            .then((response) => {
+                const product = response.data.data.resource.data;
+                setProduct(product); // Set categories state with fetched data
+                setInitialRecords(product);
+                setRecordsData(product);
+                console.log('PRODUCT', product);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    }, []);
 
     return (
         <div>
@@ -664,24 +674,47 @@ const Produk = () => {
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
                             {
-                                accessor: 'firstName',
+                                accessor: 'product_image',
                                 title: 'Foto',
                                 sortable: true,
-                                render: ({ id }) => (
+                                render: ({ product_image }) => (
                                     <div className="flex items-center w-max">
-                                        <img className="w-16 h-16 ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
+                                        <img className="w-16 h-16 ltr:mr-2 rtl:ml-2 object-cover" src={`${product_image}`} alt="" />
                                     </div>
                                 ),
                             },
-                            { accessor: 'age', title: 'Code', sortable: true },
-                            { accessor: 'firstName', title: 'Nama', sortable: true },
                             {
-                                accessor: 'dob',
+                                accessor: 'product_pos',
+                                title: 'Code',
+                                sortable: true,
+                            },
+                            {
+                                accessor: 'product_name',
+                                title: 'Nama',
+                                sortable: true,
+                            },
+                            {
+                                accessor: 'product_stock',
                                 title: 'Qty',
                                 sortable: true,
-                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
+                                render: ({ product_stock }) => (
+                                    <span>
+                                        {Array.isArray(product_stock)
+                                            ? product_stock.length > 0
+                                                ? product_stock.reduce((totalQty, item) => totalQty + (item.qty || 0), 0)
+                                                : 0
+                                            : 0}
+                                    </span>
+                                ),
                             },
-                            { accessor: 'phone', title: 'Harga', sortable: true },
+                            {
+                                accessor: 'product_price',
+                                title: 'Harga',
+                                sortable: true,
+                                render: ({ product_price }) => (
+                                    <span>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(product_price)}</span>
+                                ),
+                            },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
