@@ -4,7 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const EditCustomer = () => {
+const EditCustomerOnline = () => {
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') || '';
 
@@ -31,7 +31,7 @@ const EditCustomer = () => {
             })
             .then((response) => {
                 console.log('Customer data successfully added:', response.data);
-                navigate('/customer/offline');
+                navigate('/customer/online');
                 toast.success('Data berhasil ditambahkan', {
                     position: 'top-right',
                     autoClose: 3000,
@@ -48,7 +48,7 @@ const EditCustomer = () => {
     };
 
     const handleCancel = () => {
-        navigate('/customer/offline');
+        navigate('/customer/online');
     };
 
     return (
@@ -60,7 +60,7 @@ const EditCustomer = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Edit Customer Offline</span>
+                    <span>Edit Customer Online</span>
                 </li>
             </ul>
             <div className="panel " id="single_file">
@@ -77,10 +77,10 @@ const EditCustomer = () => {
                     </div>
                     <div className="flex justify-center">
                         <button type="submit" onClick={handleCancel} className="btn btn-primary !mt-6 mr-4">
-                            <Link to="/customer/offline">Back</Link>
+                            <Link to="/customer/online">Back</Link>
                         </button>
                         <button type="submit" onClick={handleAddData} className="btn btn-primary !mt-6 mr-8">
-                            <Link to="/customer/offline">Update</Link>
+                            <Link to="/customer/online">Update</Link>
                         </button>
                     </div>
                 </form>
@@ -89,4 +89,4 @@ const EditCustomer = () => {
     );
 };
 
-export default EditCustomer;
+export default EditCustomerOnline;

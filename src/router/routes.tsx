@@ -1,8 +1,11 @@
 import { lazy } from 'react';
 // import MultipleTables from '../pages/Customer/CustomerOffline/CustomerOffline';
-import InputCustomer from '../pages/Customer/CustomerOffline/InputCustomer';
 import CustomerOffline from '../pages/Customer/CustomerOffline/CustomerOffline';
-import EditCustomer from '../pages/Customer/CustomerOffline/EditCustomer';
+import EditCustomer from '../pages/Customer/CustomerOffline/EditCustomerOffline';
+import AddCustomerOffline from '../pages/Customer/CustomerOffline/AddCustomerOffline';
+import CustomerOnline from '../pages/Customer/CustomerOnline/CustomerOnline';
+import AddCustomerOnline from '../pages/Customer/CustomerOnline/AddCustomerOnline';
+import EditCustomerOnline from '../pages/Customer/CustomerOnline/EditCustomerOnline';
 const Index = lazy(() => import('../pages/Index'));
 const Ecommerce = lazy(() => import('../pages/Ecommerce'));
 const Kategoriproduk = lazy(() => import('../pages/MenuPenjualan/KategoriProduk/KategoriProduk'))
@@ -81,12 +84,27 @@ const routes = [
     },
     {
         path: '/customer/offline/tambah-customer-offline',
-        element: <InputCustomer />,
+        element: <AddCustomerOffline />,
         layout: 'default',
     },
     {
         path: '/customer/offline/edit-customer-offline',
         element: <EditCustomer />,
+        layout: 'default',
+    },
+    {
+        path: '/customer/online',
+        element: <CustomerOnline />,
+        layout: 'default',
+    },
+    {
+        path: '/customer/online/tambah-customer-online',
+        element: <AddCustomerOnline />,
+        layout: 'default',
+    },
+    {
+        path: '/customer/online/edit-customer-online',
+        element: <EditCustomerOnline />,
         layout: 'default',
     },
     // Cabang
@@ -101,7 +119,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menupenjualan/cabang/listcabang/editcabang',
+        path: '/menupenjualan/cabang/listcabang/editcabang/:id',
         element: <EditCabang />,
         layout: 'default',
     },
