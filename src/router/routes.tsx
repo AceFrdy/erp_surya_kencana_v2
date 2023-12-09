@@ -19,6 +19,7 @@ const EditCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/EditCabang')
 const Supplier = lazy(() => import('../pages/MenuPenjualan/Supplier/Supplier'))
 const AddSupplier = lazy(() => import('../pages/MenuPenjualan/Supplier/AddSupplier'))
 const EditSupplier = lazy(() => import('../pages/MenuPenjualan/Supplier/EditSupplier'))
+const ListRestock = lazy(() => import('../pages/MenuPenjualan/Restock/ListRestock'))
 
 
 
@@ -118,6 +119,12 @@ const routes = [
     {
         path: '/menupenjualan/supplier/editsupplier',
         element: <EditSupplier />,
+        layout: 'default',
+    },
+    // Restock
+    {
+        path: '/menupenjualan/restock/listrestock',
+        element: <ListRestock />,
         layout: 'default',
     },
 ];

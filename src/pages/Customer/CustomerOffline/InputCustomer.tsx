@@ -65,7 +65,7 @@ const InputCustomer = () => {
             </ul>
             <div className="panel " id="single_file">
                 <form className="space-y-5">
-                    <h1 className="text-lg font-bold mb-12">Tambah Cabang</h1>
+                    <h1 className="text-lg font-bold mb-12">Tambah Customer Offline</h1>
                     <div>
                         <input type="text" placeholder="Nama Customer" className="form-input" />
                     </div>
