@@ -1,14 +1,13 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../store/themeConfigSlice';
+import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-import IconBell from '../../components/Icon/IconBell';
-import IconXCircle from '../../components/Icon/IconXCircle';
-import IconPencil from '../../components/Icon/IconPencil';
-import IconTrashLines from '../../components/Icon/IconTrashLines';
+import IconPencil from '../../../components/Icon/IconPencil';
+import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-import IconPlus from '../../components/Icon/IconPlus';
+import Swal from 'sweetalert2';
+import IconSend from '../../../components/Icon/IconSend';
 
 const rowData = [
     {
@@ -17,6 +16,7 @@ const rowData = [
         lastName: 'Jensen',
         email: 'carolinejensen@zidant.com',
         dob: '2004-05-28',
+        status: 'Completed',
         address: {
             street: '529 Scholes Street',
             city: 'Temperanceville',
@@ -37,6 +37,7 @@ const rowData = [
         lastName: 'Grant',
         email: 'celestegrant@polarax.com',
         dob: '1989-11-19',
+        status: 'Pending',
         address: {
             street: '639 Kimball Street',
             city: 'Bascom',
@@ -57,6 +58,7 @@ const rowData = [
         lastName: 'Forbes',
         email: 'tillmanforbes@manglo.com',
         dob: '2016-09-05',
+        status: 'In Progress',
         address: {
             street: '240 Vandalia Avenue',
             city: 'Thynedale',
@@ -77,6 +79,7 @@ const rowData = [
         lastName: 'Whitley',
         email: 'daisywhitley@applideck.com',
         dob: '1987-03-23',
+        status: 'Canceled',
         address: {
             street: '350 Pleasant Place',
             city: 'Idledale',
@@ -97,6 +100,7 @@ const rowData = [
         lastName: 'Bowman',
         email: 'weberbowman@volax.com',
         dob: '1983-02-24',
+        status: 'Completed',
         address: {
             street: '154 Conway Street',
             city: 'Broadlands',
@@ -117,6 +121,7 @@ const rowData = [
         lastName: 'Townsend',
         email: 'buckleytownsend@orbaxter.com',
         dob: '2011-05-29',
+        status: 'Completed',
         address: {
             street: '131 Guernsey Street',
             city: 'Vallonia',
@@ -137,6 +142,7 @@ const rowData = [
         lastName: 'Bradshaw',
         email: 'latoyabradshaw@opportech.com',
         dob: '2010-11-23',
+        status: 'Canceled',
         address: {
             street: '668 Lenox Road',
             city: 'Lowgap',
@@ -157,6 +163,7 @@ const rowData = [
         lastName: 'Lindsay',
         email: 'katelindsay@gorganic.com',
         dob: '1987-07-02',
+        status: 'Pending',
         address: {
             street: '773 Harrison Avenue',
             city: 'Carlton',
@@ -177,6 +184,7 @@ const rowData = [
         lastName: 'Sandoval',
         email: 'marvasandoval@avit.com',
         dob: '2010-11-02',
+        status: 'Completed',
         address: {
             street: '200 Malta Street',
             city: 'Tuskahoma',
@@ -197,6 +205,7 @@ const rowData = [
         lastName: 'Russell',
         email: 'deckerrussell@quilch.com',
         dob: '1994-04-21',
+        status: 'In Progress',
         address: {
             street: '708 Bath Avenue',
             city: 'Coultervillle',
@@ -513,10 +522,66 @@ const rowData = [
     },
 ];
 
-const MultiColumn = () => {
+const showAlert = async (type: number) => {
+    if (type === 11) {
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-secondary',
+                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
+                popup: 'sweet-alerts',
+            },
+            buttonsStyling: false,
+        });
+        swalWithBootstrapButtons
+            .fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true,
+                padding: '2em',
+            })
+            .then((result) => {
+                if (result.value) {
+                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
+                }
+            });
+    }
+    if (type === 15) {
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+        });
+        toast.fire({
+            icon: 'success',
+            title: 'Berhasil Dikirim',
+            padding: '10px 20px',
+        });
+    }
+    if (type == 20) {
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+        });
+        toast.fire({
+            icon: 'success',
+            title: 'Data Berhasil Ditambah',
+            padding: '10px 20px',
+        });
+    }
+};
+const Distribusi = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Multi Column Table'));
+        dispatch(setPageTitle('Restock'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -526,9 +591,11 @@ const MultiColumn = () => {
 
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
-        columnAccessor: 'firstName',
+        columnAccessor: 'id',
         direction: 'asc',
     });
+
+    //
 
     useEffect(() => {
         setPage(1);
@@ -544,11 +611,10 @@ const MultiColumn = () => {
         setInitialRecords(() => {
             return rowData.filter((item) => {
                 return (
+                    item.id.toString().includes(search.toLowerCase()) ||
                     item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.company.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.age.toString().toLowerCase().includes(search.toLowerCase()) ||
                     item.dob.toLowerCase().includes(search.toLowerCase()) ||
+                    item.email.toLowerCase().includes(search.toLowerCase()) ||
                     item.phone.toLowerCase().includes(search.toLowerCase())
                 );
             });
@@ -562,8 +628,7 @@ const MultiColumn = () => {
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
-
-    const formatDate = (date: any) => {
+    const formatDate = (date: string | number | Date) => {
         if (date) {
             const dt = new Date(date);
             const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
@@ -573,6 +638,38 @@ const MultiColumn = () => {
         return '';
     };
 
+    // const [operasionalCost, setOperasionalCost] = useState('');
+    // const [cost, setCost] = useState('');
+
+    // const handleOperasioanalCostChange = (e: { target: { value: any } }) => {
+    //     const inputValue = e.target.value;
+    //     let formattedValue = '';
+
+    //     // Remove non-numeric characters
+    //     const numericValue = inputValue.replace(/\D/g, '');
+
+    //     // Format the number with 'Rp.' prefix
+    //     if (numericValue !== '') {
+    //         formattedValue = `Rp. ${parseInt(numericValue, 10).toLocaleString('id-ID')}`;
+    //     }
+
+    //     setOperasionalCost(formattedValue);
+    // };
+
+    // const handleCostChange = (e: { target: { value: any } }) => {
+    //     const inputValue = e.target.value;
+    //     let formatValue = '';
+
+    //     // Remove non-numeric characters
+    //     const numValue = inputValue.replace(/\D/g, '');
+
+    //     // Format the number with 'Rp.' prefix
+    //     if (numValue !== '') {
+    //         formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
+    //     }
+
+    //     setCost(formatValue);
+    // };
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -585,23 +682,69 @@ const MultiColumn = () => {
                     <span>Menu Penjualan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> Produk</span>
+                    <span> Distribusi </span>
                 </li>
             </ul>
-            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
-            </div> */}
             <div className="panel mt-6">
+                <h1 className="text-lg font-bold">Perkembangan Distribusi</h1>
+                <div className="flex mb-4 justify-end">
+                    <button type="button" className="btn btn-outline-danger mr-4" onClick={() => showAlert(11)}>
+                        <IconTrashLines className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                        Batal
+                    </button>
+                    <button type="button" className="btn btn-outline-primary" onClick={() => showAlert(15)}>
+                        <IconSend className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                        Kirim
+                    </button>
+                </div>
+                <form className="space-y-5">
+                    <div>
+                        <label htmlFor="gridState">Lokasi Tujuan</label>
+                        <select id="gridState" className="form-select text-white-dark">
+                            <option>Choose...</option>
+                            <option>...</option>
+                        </select>
+                    </div>
+                    {/* <div>
+                        <label htmlFor="Opcost">Operasional Cost</label>
+                        <input id="Opcost" type="text" value={operasionalCost} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
+                    </div> */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label htmlFor="Search">Search Produk</label>
+                            <input id="Search" type="text" className="form-input" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                        </div>
+                        <div>
+                            <label htmlFor="Qty">Qty</label>
+                            <input id="Qty" type="Text" placeholder="" className="form-input" />
+                        </div>
+                        <div>
+                            <label htmlFor="gridState">Satuan</label>
+                            <select id="gridState" className="form-select text-white-dark">
+                                <option>Choose...</option>
+                                <option>...</option>
+                            </select>
+                        </div>
+                    </div>
+                    {/* <div>
+                        <label className="flex items-center mt-1 cursor-pointer">
+                            <input type="checkbox" className="form-checkbox" />
+                            <span className="text-white-dark">Check me out</span>
+                        </label>
+                    </div> */}
+                    <button type="submit" className="btn btn-outline-primary !mt-6 w-full mb-6" onClick={() => showAlert(20)}>
+                        Tambah
+                    </button>
+                </form>
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    <Link to="/formkategori">
+                    {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
                         <button type="button" className=" px-2 btn btn-outline-info">
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
-                    </Link>
-                    <div className="ltr:ml-auto rtl:mr-auto">
-                        <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
-                    </div>
+                    </Link> */}
                 </div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Data Produk</h5>
+
+                <h5 className="font-semibold text-lg dark:text-white-light mb-4 mt-4 flex justify-center">Data Distribusi</h5>
                 <div className="datatables">
                     <DataTable
                         highlightOnHover
@@ -610,37 +753,65 @@ const MultiColumn = () => {
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
                             {
-                                accessor: 'firstName',
-                                title: 'Product Image',
+                                accessor: 'id',
+                                title: 'Barcode',
                                 sortable: true,
                                 render: ({ id }) => (
                                     <div className="flex items-center w-max">
-                                        <img className="w-16 h-16 ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
+                                        <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
+                                        {/* <div>{firstName + ' ' + lastName}</div> */}
                                     </div>
                                 ),
                             },
-                            { accessor: 'firstName', title: 'Product Name', sortable: true },
-                            { accessor: 'age', title: 'Product Price', sortable: true },
                             {
-                                accessor: 'dob',
-                                title: 'Product Modal',
+                                accessor: 'firstName',
+                                title: 'Nama',
                                 sortable: true,
-                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
                             },
-                            { accessor: 'email', title: 'Produc Barcode', sortable: true },
-                            { accessor: 'phone', title: 'Product IME.', sortable: true },
-                            { accessor: 'phone', title: 'Product Stock.', sortable: true },
+                            { accessor: 'age', title: 'Qty', sortable: true },
+                            // {
+                            //     accessor: 'status',
+                            //     title: 'Status',
+                            //     sortable: true,
+                            //     render: (data) => (
+                            //         <span
+                            //             className={`badge whitespace-nowrap ${
+                            //                 data.status === 'completed'
+                            //                     ? 'bg-primary   '
+                            //                     : data.status === 'Pending'
+                            //                     ? 'bg-secondary'
+                            //                     : data.status === 'In Progress'
+                            //                     ? 'bg-success'
+                            //                     : data.status === 'Canceled'
+                            //                     ? 'bg-danger'
+                            //                     : 'bg-primary'
+                            //             }`}
+                            //         >
+                            //             {data.status}
+                            //         </span>
+                            //     ),
+                            // },
+                            // {
+                            //     accessor: 'age',
+                            //     title: 'Distribution Qty',
+                            //     sortable: true,
+                            // },
                             {
                                 accessor: 'action',
-                                title: 'Action',
+                                title: 'Opsi',
                                 titleClassName: '!text-center',
                                 render: () => (
                                     <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button">
-                                            <IconPencil />
+                                        {/* <button type="button" style={{ color: 'blue' }}>
+                                            <IconNotes className="ltr:mr-2 rtl:ml-2 " />
+                                        </button> */}
+                                        <button type="button" style={{ color: 'orange' }}>
+                                            <Link to="/menupenjualan/distribution/editdistribution">
+                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                            </Link>
                                         </button>
-                                        <button type="button">
-                                            <IconTrashLines />
+                                        <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
                                     </div>
                                 ),
@@ -663,4 +834,4 @@ const MultiColumn = () => {
     );
 };
 
-export default MultiColumn;
+export default Distribusi;

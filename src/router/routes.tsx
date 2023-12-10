@@ -28,6 +28,7 @@ const DetailRestock = lazy(() => import('../pages/MenuPenjualan/Restock/DetailRe
 const Penjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/Penjualan'))
 const LaporanPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/LaporanPenjualan'))
 const DetailPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/DetailPenjualan'))
+const Distribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/Distribusi'))
 
 
 
@@ -179,6 +180,12 @@ const routes = [
     {
         path: '/menupenjualan/penjualan/detailpenjualan',
         element: <DetailPenjualan />,
+        layout: 'default',
+    },
+    // Distribution
+    {
+        path: '/menupenjualan/distribution/distribution',
+        element: <Distribusi />,
         layout: 'default',
     },
 ];

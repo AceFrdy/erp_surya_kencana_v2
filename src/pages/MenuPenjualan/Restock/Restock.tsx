@@ -742,7 +742,7 @@ const Restock = () => {
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
                     </Link> */}
-                    <div className="ltr:ml-auto rtl:mr-auto">
+                    <div className="ltr:ml-auto rtl:mr-auto mt-8">
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>

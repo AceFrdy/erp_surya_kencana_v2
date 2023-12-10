@@ -276,14 +276,13 @@ const Sidebar = () => {
                                                 </svg>
                                             </div>
                                         </button>
-
                                         <AnimateHeight duration={300} height={currentMenu === 'distribusi' ? 'auto' : 0}>
                                             <ul className="sub-menu text-gray-500">
                                                 <li>
-                                                    <NavLink to="/menupenjualan/penjualan/produk">{'Distribusi'}</NavLink>
+                                                    <NavLink to="/menupenjualan/distribution/distribution">{'Distribusi'}</NavLink>
                                                 </li>
                                                 <li>
-                                                    <NavLink to="/menupenjualan/penjualan/kategoriproduk">{'Laporan Distribusi'}</NavLink>
+                                                    <NavLink to="/menupenjualan/distribusion/laporandistribusion">{'Laporan Distribusi'}</NavLink>
                                                 </li>
                                             </ul>
                                         </AnimateHeight>

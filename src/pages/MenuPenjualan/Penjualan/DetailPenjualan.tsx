@@ -747,7 +747,7 @@ const DetailPenjualan = () => {
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
                             {
-                                accessor: 'age',
+                                accessor: 'id',
                                 title: 'Barcode',
                                 sortable: true,
                                 render: ({ id }) => (
