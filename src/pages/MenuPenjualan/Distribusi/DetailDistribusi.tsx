@@ -1,18 +1,14 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-import IconBell from '../../../components/Icon/IconBell';
-import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-import { Dialog, Transition } from '@headlessui/react';
-import IconPlus from '../../../components/Icon/IconPlus';
-import IconNotes from '../../../components/Icon/IconNotes';
-import axios from 'axios';
 import Swal from 'sweetalert2';
+import IconSend from '../../../components/Icon/IconSend';
+import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
 
 const rowData = [
     {
@@ -556,11 +552,37 @@ const showAlert = async (type: number) => {
                 }
             });
     }
+    if (type === 15) {
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+        });
+        toast.fire({
+            icon: 'success',
+            title: 'Berhasil Dikirim',
+            padding: '10px 20px',
+        });
+    }
+    if (type == 20) {
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+        });
+        toast.fire({
+            icon: 'success',
+            title: 'Data Berhasil Ditambah',
+            padding: '10px 20px',
+        });
+    }
 };
-const LaporanDistribusi = () => {
+const DetailDistribusi = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Laporan Distribusi'));
+        dispatch(setPageTitle('Restock'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -573,8 +595,8 @@ const LaporanDistribusi = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const [hapusCabang, setHapusCabang] = useState(false);
-    const [branch, setBranch] = useState([]);
+
+    //
 
     useEffect(() => {
         setPage(1);
@@ -593,12 +615,20 @@ const LaporanDistribusi = () => {
                     item.id.toString().includes(search.toLowerCase()) ||
                     item.firstName.toLowerCase().includes(search.toLowerCase()) ||
                     item.dob.toLowerCase().includes(search.toLowerCase()) ||
+                    item.email.toLowerCase().includes(search.toLowerCase()) ||
                     item.phone.toLowerCase().includes(search.toLowerCase())
                 );
             });
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search]);
+
+    useEffect(() => {
+        const data = sortBy(initialRecords, sortStatus.columnAccessor);
+        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        setPage(1);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sortStatus]);
     const formatDate = (date: string | number | Date) => {
         if (date) {
             const dt = new Date(date);
@@ -609,34 +639,38 @@ const LaporanDistribusi = () => {
         return '';
     };
 
-    useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sortStatus]);
+    // const [operasionalCost, setOperasionalCost] = useState('');
+    // const [cost, setCost] = useState('');
 
-    // get branch
-    useEffect(() => {
-        axios
-            .get('https://erp.digitalindustryagency.com/api/branches', {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer 236|MbxuMzgJNUwvwWRlbOBp8gWFF7EH3leqnc4iOfxf6ace0b04`,
-                },
-            })
-            .then((response) => {
-                const branch = response.data.data.resource.data;
-                setBranch(branch); // Set categories state with fetched data
-                setInitialRecords(branch);
-                setRecordsData(branch);
-                console.log('BRANCH', branch);
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error);
-            });
-    }, []);
+    // const handleOperasioanalCostChange = (e: { target: { value: any } }) => {
+    //     const inputValue = e.target.value;
+    //     let formattedValue = '';
 
+    //     // Remove non-numeric characters
+    //     const numericValue = inputValue.replace(/\D/g, '');
+
+    //     // Format the number with 'Rp.' prefix
+    //     if (numericValue !== '') {
+    //         formattedValue = `Rp. ${parseInt(numericValue, 10).toLocaleString('id-ID')}`;
+    //     }
+
+    //     setOperasionalCost(formattedValue);
+    // };
+
+    // const handleCostChange = (e: { target: { value: any } }) => {
+    //     const inputValue = e.target.value;
+    //     let formatValue = '';
+
+    //     // Remove non-numeric characters
+    //     const numValue = inputValue.replace(/\D/g, '');
+
+    //     // Format the number with 'Rp.' prefix
+    //     if (numValue !== '') {
+    //         formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
+    //     }
+
+    //     setCost(formatValue);
+    // };
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -649,23 +683,71 @@ const LaporanDistribusi = () => {
                     <span>Menu Penjualan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> Laporan Distribusi </span>
+                    <span> Distribusi </span>
                 </li>
             </ul>
-            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
-            </div> */}
             <div className="panel mt-6">
+                <h1 className="text-lg font-bold">Perkembangan Distribusi</h1>
+                <div className="flex mb-4 justify-end">
+                    {/* <button type="button" className="btn btn-outline-danger mr-4" onClick={() => showAlert(11)}>
+                        <IconTrashLines className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                        Batal
+                    </button> */}
+                    <Link to="/menupenjualan/distribution/laporandistribution">
+                        <button type="button" className="btn btn-outline-primary">
+                            <IconArrowBackward className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                            Kembali
+                        </button>
+                    </Link>
+                </div>
+                <form className="space-y-5">
+                    <div>
+                        <label htmlFor="gridState">Lokasi Tujuan</label>
+                        <select id="gridState" className="form-select text-white-dark">
+                            <option>Choose...</option>
+                            <option>...</option>
+                        </select>
+                    </div>
+                    {/* <div>
+                        <label htmlFor="Opcost">Operasional Cost</label>
+                        <input id="Opcost" type="text" value={operasionalCost} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
+                    </div> */}
+                    {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label htmlFor="Search">Search Produk</label>
+                            <input id="Search" type="text" className="form-input" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                        </div>
+                        <div>
+                            <label htmlFor="Qty">Qty</label>
+                            <input id="Qty" type="Text" placeholder="" className="form-input" />
+                        </div>
+                        <div>
+                            <label htmlFor="gridState">Satuan</label>
+                            <select id="gridState" className="form-select text-white-dark">
+                                <option>Choose...</option>
+                                <option>...</option>
+                            </select>
+                        </div>
+                    </div> */}
+                    {/* <div>
+                        <label className="flex items-center mt-1 cursor-pointer">
+                            <input type="checkbox" className="form-checkbox" />
+                            <span className="text-white-dark">Check me out</span>
+                        </label>
+                    </div> */}
+                    {/* <button type="submit" className="btn btn-outline-primary !mt-6 w-full mb-6" onClick={() => showAlert(20)}>
+                        Tambah
+                    </button> */}
+                </form>
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
                     {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
                         <button type="button" className=" px-2 btn btn-outline-info">
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
                     </Link> */}
-                    <div className="ltr:ml-auto rtl:mr-auto">
-                        <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
-                    </div>
                 </div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Laporan Distribution</h5>
+
+                <h5 className="font-semibold text-lg dark:text-white-light mb-4 mt-4 flex justify-center">Data Distribusi</h5>
                 <div className="datatables">
                     <DataTable
                         highlightOnHover
@@ -673,63 +755,51 @@ const LaporanDistribusi = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'branch_name', title: 'No Dokumen', sortable: true },
                             {
-                                accessor: 'branch_address',
-                                title: 'Tujuan Cabang',
+                                accessor: 'id',
+                                title: 'Barcode',
                                 sortable: true,
-                            },
-                            {
-                                accessor: 'dob',
-                                title: 'Harga',
-                                sortable: true,
-                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
-                            },
-                            { accessor: 'branch_contact', title: 'Jumlah Barang', sortable: true },
-                            {
-                                accessor: 'status',
-                                title: 'Status',
-                                sortable: true,
-                                render: (data) => (
-                                    <span
-                                        className={`badge whitespace-nowrap ${
-                                            data.status === 'completed'
-                                                ? 'bg-primary   '
-                                                : data.status === 'Pending'
-                                                ? 'bg-secondary'
-                                                : data.status === 'In Progress'
-                                                ? 'bg-success'
-                                                : data.status === 'Canceled'
-                                                ? 'bg-danger'
-                                                : 'bg-primary'
-                                        }`}
-                                    >
-                                        {data.status}
-                                    </span>
-                                ),
-                            },
-                            {
-                                accessor: 'action',
-                                title: 'Opsi',
-                                titleClassName: '!text-center',
-                                render: () => (
-                                    <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menupenjualan/distribution/detaildistribution">
-                                                <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
-                                        {/* <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/distribution/editdistribution">
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button> */}
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
+                                render: ({ id }) => (
+                                    <div className="flex items-center w-max">
+                                        <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
+                                        {/* <div>{firstName + ' ' + lastName}</div> */}
                                     </div>
                                 ),
                             },
+                            {
+                                accessor: 'firstName',
+                                title: 'Nama',
+                                sortable: true,
+                            },
+                            { accessor: 'age', title: 'Qty', sortable: true },
+                            // {
+                            //     accessor: 'status',
+                            //     title: 'Status',
+                            //     sortable: true,
+                            //     render: (data) => (
+                            //         <span
+                            //             className={`badge whitespace-nowrap ${
+                            //                 data.status === 'completed'
+                            //                     ? 'bg-primary   '
+                            //                     : data.status === 'Pending'
+                            //                     ? 'bg-secondary'
+                            //                     : data.status === 'In Progress'
+                            //                     ? 'bg-success'
+                            //                     : data.status === 'Canceled'
+                            //                     ? 'bg-danger'
+                            //                     : 'bg-primary'
+                            //             }`}
+                            //         >
+                            //             {data.status}
+                            //         </span>
+                            //     ),
+                            // },
+                            // {
+                            //     accessor: 'age',
+                            //     title: 'Distribution Qty',
+                            //     sortable: true,
+                            // },
+                            // 
                         ]}
                         totalRecords={initialRecords.length}
                         recordsPerPage={pageSize}
@@ -748,4 +818,4 @@ const LaporanDistribusi = () => {
     );
 };
 
-export default LaporanDistribusi;
+export default DetailDistribusi;
