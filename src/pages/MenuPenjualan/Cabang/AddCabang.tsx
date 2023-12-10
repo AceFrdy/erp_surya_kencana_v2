@@ -14,7 +14,7 @@ const AddCabang = () => {
         errors: {},
     });
 
-    const handleChange = (e) => {
+    const handleChange = (e: { target: { name: any; value: any; }; }) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
             ...prevData,
@@ -22,7 +22,7 @@ const AddCabang = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: { preventDefault: () => void; }) => {
         e.preventDefault();
 
         const data = {

@@ -3,12 +3,12 @@ import { useEffect, useState, Fragment } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-import IconBell from '../../../components/Icon/IconBell';
-import IconXCircle from '../../../components/Icon/IconXCircle';
+// import IconBell from '../../../components/Icon/IconBell';
+// import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-import { Dialog, Transition } from '@headlessui/react';
+// import { Dialog, Transition } from '@headlessui/react';
 import IconPlus from '../../../components/Icon/IconPlus';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -20,6 +20,9 @@ const rowData = [
         lastName: 'Jensen',
         email: 'carolinejensen@zidant.com',
         dob: '2004-05-28',
+        product_price: '',
+        product_image: '',
+        product_stock: '',
         address: {
             street: '529 Scholes Street',
             city: 'Temperanceville',
@@ -40,6 +43,8 @@ const rowData = [
         lastName: 'Grant',
         email: 'celestegrant@polarax.com',
         dob: '1989-11-19',
+        product_image: 'string',
+        product_price: 'string',
         address: {
             street: '639 Kimball Street',
             city: 'Bascom',
@@ -60,6 +65,8 @@ const rowData = [
         lastName: 'Forbes',
         email: 'tillmanforbes@manglo.com',
         dob: '2016-09-05',
+        product_price: 'string',
+        product_image: 'string',
         address: {
             street: '240 Vandalia Avenue',
             city: 'Thynedale',
@@ -80,6 +87,8 @@ const rowData = [
         lastName: 'Whitley',
         email: 'daisywhitley@applideck.com',
         dob: '1987-03-23',
+        product_price: 'string',
+        product_image: 'string',
         address: {
             street: '350 Pleasant Place',
             city: 'Idledale',
@@ -100,6 +109,8 @@ const rowData = [
         lastName: 'Bowman',
         email: 'weberbowman@volax.com',
         dob: '1983-02-24',
+        product_price: 'string',
+        product_image: 'string',
         address: {
             street: '154 Conway Street',
             city: 'Broadlands',
@@ -120,6 +131,8 @@ const rowData = [
         lastName: 'Townsend',
         email: 'buckleytownsend@orbaxter.com',
         dob: '2011-05-29',
+        product_price: 'string',
+        product_image: 'string',
         address: {
             street: '131 Guernsey Street',
             city: 'Vallonia',
@@ -140,6 +153,8 @@ const rowData = [
         lastName: 'Bradshaw',
         email: 'latoyabradshaw@opportech.com',
         dob: '2010-11-23',
+        product_price: 'string',
+        product_image: 'string',
         address: {
             street: '668 Lenox Road',
             city: 'Lowgap',
@@ -158,8 +173,10 @@ const rowData = [
         id: 8,
         firstName: 'Kate',
         lastName: 'Lindsay',
+        product_image: 'string',
         email: 'katelindsay@gorganic.com',
         dob: '1987-07-02',
+        product_price: 'string',
         address: {
             street: '773 Harrison Avenue',
             city: 'Carlton',
@@ -180,6 +197,8 @@ const rowData = [
         lastName: 'Sandoval',
         email: 'marvasandoval@avit.com',
         dob: '2010-11-02',
+        product_price: 'string',
+        product_image: 'string',
         address: {
             street: '200 Malta Street',
             city: 'Tuskahoma',
@@ -200,6 +219,8 @@ const rowData = [
         lastName: 'Russell',
         email: 'deckerrussell@quilch.com',
         dob: '1994-04-21',
+        product_price: 'string',
+        product_image: 'string',
         address: {
             street: '708 Bath Avenue',
             city: 'Coultervillle',
@@ -516,6 +537,24 @@ const rowData = [
     },
 ];
 
+// Example function that accepts number or bigint
+function processNumber(value: number | bigint): string {
+    return value.toString(); // Function logic
+  }
+  
+  // Sample variable that might be undefined
+  const myValue: string | undefined = "123"; // Or it could be undefined
+  
+  // Check if myValue is defined before passing it to the function
+  if (typeof myValue !== 'undefined') {
+    const parsedValue: number = parseInt(myValue, 10); // Parse the string value to number
+    const result = processNumber(parsedValue); // Use parsed value in the function
+    console.log(result);
+  } else {
+    // Handle the case where myValue is undefined
+    console.log("Value is undefined, cannot process");
+  }
+  
 const showAlert = async (type: number) => {
     if (type === 11) {
         const swalWithBootstrapButtons = Swal.mixin({
@@ -609,7 +648,7 @@ const Produk = () => {
     };
 
     // format currency
-    function formatCurrency(number) {
+    function formatCurrency(number: number | bigint) {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
@@ -711,9 +750,9 @@ const Produk = () => {
                                 accessor: 'product_price',
                                 title: 'Harga',
                                 sortable: true,
-                                render: ({ product_price }) => (
-                                    <span>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(product_price)}</span>
-                                ),
+                                // render: ({ product_price }) => (
+                                //     <span>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(product_price)}</span>
+                                // ),
                             },
                             {
                                 accessor: 'action',

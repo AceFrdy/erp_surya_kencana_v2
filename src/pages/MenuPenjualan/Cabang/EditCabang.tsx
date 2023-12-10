@@ -44,7 +44,7 @@ const EditCabang = () => {
             });
     }, [id, token]);
 
-    const handleInputChange = (label, value) => {
+    const handleInputChange = (label: string, value: string) => {
         setFormData((prevData) => ({
             ...prevData,
             [label]: value,
