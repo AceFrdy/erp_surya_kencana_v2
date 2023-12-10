@@ -258,7 +258,7 @@ const Sidebar = () => {
                                                     <NavLink to="/menupenjualan/penjualan/penjualan">{'Penjualan'}</NavLink>
                                                 </li>
                                                 <li>
-                                                    <NavLink to="/menupenjualan/penjualan/listpenjualan">{'List Penjualan'}</NavLink>
+                                                    <NavLink to="/menupenjualan/penjualan/laporanpenjualan">{'Laporan Penjualan'}</NavLink>
                                                 </li>
                                             </ul>
                                         </AnimateHeight>

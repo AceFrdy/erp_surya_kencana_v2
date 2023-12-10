@@ -10,7 +10,6 @@ const Index = lazy(() => import('../pages/Index'));
 const Ecommerce = lazy(() => import('../pages/Ecommerce'));
 const Kategoriproduk = lazy(() => import('../pages/MenuPenjualan/KategoriProduk/KategoriProduk'))
 const Produk = lazy(() => import('../pages/MenuPenjualan/Product/Produk'))
-// const OrderSorting = lazy(() => import('../pages/Basic'));
 const Unit = lazy(() => import('../pages/MenuPenjualan/Unit/Unit'))
 const AddUnit = lazy(() => import('../pages/MenuPenjualan/Unit/AddUnit'))
 const EditUnit = lazy(() => import('../pages/MenuPenjualan/Unit/EditUnit'))
@@ -23,6 +22,12 @@ const Supplier = lazy(() => import('../pages/MenuPenjualan/Supplier/Supplier'))
 const AddSupplier = lazy(() => import('../pages/MenuPenjualan/Supplier/AddSupplier'))
 const EditSupplier = lazy(() => import('../pages/MenuPenjualan/Supplier/EditSupplier'))
 const ListRestock = lazy(() => import('../pages/MenuPenjualan/Restock/ListRestock'))
+const Restock = lazy(() => import('../pages/MenuPenjualan/Restock/Restock'))
+const EditRestock = lazy(() => import('../pages/MenuPenjualan/Restock/EditRestock'))
+const DetailRestock = lazy(() => import('../pages/MenuPenjualan/Restock/DetailRestock'))
+const Penjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/Penjualan'))
+const LaporanPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/LaporanPenjualan'))
+const DetailPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/DetailPenjualan'))
 
 
 
@@ -143,6 +148,37 @@ const routes = [
     {
         path: '/menupenjualan/restock/listrestock',
         element: <ListRestock />,
+        layout: 'default',
+    },
+    {
+        path: '/menupenjualan/restock/restock',
+        element: <Restock />,
+        layout: 'default',
+    },
+    {
+        path: '/menupenjualan/restock/editrestock',
+        element: <EditRestock />,
+        layout: 'default',
+    },
+    {
+        path: '/menupenjualan/restock/detailrestock',
+        element: <DetailRestock />,
+        layout: 'default',
+    },
+    // Penjualan
+    {
+        path: '/menupenjualan/penjualan/penjualan',
+        element: <Penjualan />,
+        layout: 'default',
+    },
+    {
+        path: '/menupenjualan/penjualan/laporanpenjualan',
+        element: <LaporanPenjualan />,
+        layout: 'default',
+    },
+    {
+        path: '/menupenjualan/penjualan/detailpenjualan',
+        element: <DetailPenjualan />,
         layout: 'default',
     },
 ];

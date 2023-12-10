@@ -1,17 +1,18 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-import IconBell from '../../../components/Icon/IconBell';
-import IconXCircle from '../../../components/Icon/IconXCircle';
+// import IconBell from '../../../components/Icon/IconBell';
+// import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
+// import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-import { Dialog, Transition } from '@headlessui/react';
-import IconPlus from '../../../components/Icon/IconPlus';
+// import { Dialog, Transition } from '@headlessui/react';
+// import IconPlus from '../../../components/Icon/IconPlus';
 import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
+import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
 
 const rowData = [
     {
@@ -546,7 +547,7 @@ const showAlert = async (type: number) => {
             });
     }
 };
-const ListRestock = () => {
+const DetailRestock = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Multi Column Table'));
@@ -607,23 +608,23 @@ const ListRestock = () => {
                     <span>Menu Penjualan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> List Restock </span>
+                    <span> Detail Restock </span>
                 </li>
             </ul>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
+                    <Link to="/menupenjualan/restock/listrestock">
                         <button type="button" className=" px-2 btn btn-outline-info">
-                            <IconPlus className="flex mx-2" fill={true} /> Add
+                            <IconArrowBackward className="flex mx-2" fill={true} /> Kembali
                         </button>
-                    </Link> */}
+                    </Link>
                     <div className="ltr:ml-auto rtl:mr-auto">
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">List Restock</h5>
+                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Detail Restock</h5>
                 <div className="datatables">
                     <DataTable
                         highlightOnHover
@@ -631,36 +632,38 @@ const ListRestock = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'age', title: 'Kode Dokumen', sortable: true },
+                            { accessor: 'phone', title: 'Kode Dokumen', sortable: true },
                             {
                                 accessor: 'firstName',
                                 title: 'Supplier',
                                 sortable: true,
                             },
-                            { accessor: 'email', title: 'Operasional', sortable: true },
-                            { accessor: 'phone', title: 'Total', sortable: true },
-                            {
-                                accessor: 'action',
-                                title: 'Opsi',
-                                titleClassName: '!text-center',
-                                render: () => (
-                                    <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menupenjualan/restock/detailrestock">
-                                                <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
-                                        <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/restock/editrestock">
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
-                                    </div>
-                                ),
-                            },
+                            { accessor: 'email', title: 'Biaya Operasional', sortable: true },
+                            { accessor: 'age', title: 'Total', sortable: true },
+                            // { accessor: 'email', title: 'Table Barang', sortable: true },
+                            // { accessor: 'phone', title: 'Total', sortable: true },
+                            // {
+                            //     accessor: 'action',
+                            //     title: 'Opsi',
+                            //     titleClassName: '!text-center',
+                            //     render: () => (
+                            //         <div className="flex items-center w-max mx-auto gap-2">
+                            //             <button type="button" style={{ color: 'blue' }}>
+                            //                 <Link to="/menupenjualan/restock/detailrestock">
+                            //                     <IconNotes className="ltr:mr-2 rtl:ml-2 " />
+                            //                 </Link>
+                            //             </button>
+                            //             <button type="button" style={{ color: 'orange' }}>
+                            //                 <Link to="/menupenjualan/restock/editrestock">
+                            //                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                            //                 </Link>
+                            //             </button>
+                            //             {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                            //                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                            //             </button> */}
+                            //         </div>
+                            //     ),
+                            // },
                         ]}
                         totalRecords={initialRecords.length}
                         recordsPerPage={pageSize}
@@ -679,4 +682,4 @@ const ListRestock = () => {
     );
 };
 
-export default ListRestock;
+export default DetailRestock;

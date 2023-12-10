@@ -3,13 +3,8 @@ import { useEffect, useState, Fragment } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-import IconBell from '../../../components/Icon/IconBell';
-import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-import { Dialog, Transition } from '@headlessui/react';
-import IconPlus from '../../../components/Icon/IconPlus';
 import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
 
@@ -20,6 +15,7 @@ const rowData = [
         lastName: 'Jensen',
         email: 'carolinejensen@zidant.com',
         dob: '2004-05-28',
+        status: 'Completed',
         address: {
             street: '529 Scholes Street',
             city: 'Temperanceville',
@@ -40,6 +36,7 @@ const rowData = [
         lastName: 'Grant',
         email: 'celestegrant@polarax.com',
         dob: '1989-11-19',
+        status: 'Pending',
         address: {
             street: '639 Kimball Street',
             city: 'Bascom',
@@ -60,6 +57,7 @@ const rowData = [
         lastName: 'Forbes',
         email: 'tillmanforbes@manglo.com',
         dob: '2016-09-05',
+        status: 'In Progress',
         address: {
             street: '240 Vandalia Avenue',
             city: 'Thynedale',
@@ -80,6 +78,7 @@ const rowData = [
         lastName: 'Whitley',
         email: 'daisywhitley@applideck.com',
         dob: '1987-03-23',
+        status: 'Canceled',
         address: {
             street: '350 Pleasant Place',
             city: 'Idledale',
@@ -100,6 +99,7 @@ const rowData = [
         lastName: 'Bowman',
         email: 'weberbowman@volax.com',
         dob: '1983-02-24',
+        status: 'Completed',
         address: {
             street: '154 Conway Street',
             city: 'Broadlands',
@@ -120,6 +120,7 @@ const rowData = [
         lastName: 'Townsend',
         email: 'buckleytownsend@orbaxter.com',
         dob: '2011-05-29',
+        status: 'Completed',
         address: {
             street: '131 Guernsey Street',
             city: 'Vallonia',
@@ -140,6 +141,7 @@ const rowData = [
         lastName: 'Bradshaw',
         email: 'latoyabradshaw@opportech.com',
         dob: '2010-11-23',
+        status: 'Canceled',
         address: {
             street: '668 Lenox Road',
             city: 'Lowgap',
@@ -160,6 +162,7 @@ const rowData = [
         lastName: 'Lindsay',
         email: 'katelindsay@gorganic.com',
         dob: '1987-07-02',
+        status: 'Pending',
         address: {
             street: '773 Harrison Avenue',
             city: 'Carlton',
@@ -180,6 +183,7 @@ const rowData = [
         lastName: 'Sandoval',
         email: 'marvasandoval@avit.com',
         dob: '2010-11-02',
+        status: 'Completed',
         address: {
             street: '200 Malta Street',
             city: 'Tuskahoma',
@@ -200,6 +204,7 @@ const rowData = [
         lastName: 'Russell',
         email: 'deckerrussell@quilch.com',
         dob: '1994-04-21',
+        status: 'In Progress',
         address: {
             street: '708 Bath Avenue',
             city: 'Coultervillle',
@@ -546,7 +551,7 @@ const showAlert = async (type: number) => {
             });
     }
 };
-const ListRestock = () => {
+const LaporanPenjualan = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Multi Column Table'));
@@ -562,6 +567,18 @@ const ListRestock = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
+    
+    // const randomColor = () => {
+    //     const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
+    //     const random = Math.floor(Math.random() * color.length);
+    //     return color[random];
+    // };
+
+    // const randomStatus = () => {
+    //     const status = ['PAID', 'APPROVED', 'FAILED', 'CANCEL', 'SUCCESS', 'PENDING', 'COMPLETE'];
+    //     const random = Math.floor(Math.random() * status.length);
+    //     return status[random];
+    // };
 
     useEffect(() => {
         setPage(1);
@@ -579,6 +596,7 @@ const ListRestock = () => {
                 return (
                     item.id.toString().includes(search.toLowerCase()) ||
                     item.firstName.toLowerCase().includes(search.toLowerCase()) ||
+                    item.lastName.toLowerCase().includes(search.toLowerCase()) ||
                     item.dob.toLowerCase().includes(search.toLowerCase()) ||
                     item.email.toLowerCase().includes(search.toLowerCase()) ||
                     item.phone.toLowerCase().includes(search.toLowerCase())
@@ -607,7 +625,7 @@ const ListRestock = () => {
                     <span>Menu Penjualan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> List Restock </span>
+                    <span> Laporan Penjualan </span>
                 </li>
             </ul>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
@@ -623,7 +641,7 @@ const ListRestock = () => {
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">List Restock</h5>
+                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Laporan Penjualan</h5>
                 <div className="datatables">
                     <DataTable
                         highlightOnHover
@@ -631,14 +649,35 @@ const ListRestock = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'age', title: 'Kode Dokumen', sortable: true },
+                            { accessor: 'email', title: 'Kode Penjualan', sortable: true },
                             {
                                 accessor: 'firstName',
-                                title: 'Supplier',
+                                title: 'Customer',
                                 sortable: true,
                             },
-                            { accessor: 'email', title: 'Operasional', sortable: true },
-                            { accessor: 'phone', title: 'Total', sortable: true },
+                            { accessor: 'lastName', title: 'Cabang', sortable: true },
+                            { accessor: 'age', title: 'Qty Barang', sortable: true },
+                            { accessor: 'age', title: 'Total', sortable: true },
+                            {
+                                accessor: 'status',
+                                title: 'Status',
+                                sortable: true,
+                                render: (data) => <span
+                                className={`badge whitespace-nowrap ${
+                                    data.status === 'completed'
+                                        ? 'bg-primary   '
+                                        : data.status === 'Pending'
+                                        ? 'bg-secondary'
+                                        : data.status === 'In Progress'
+                                        ? 'bg-success'
+                                        : data.status === 'Canceled'
+                                        ? 'bg-danger'
+                                        : 'bg-primary'
+                                }`}
+                            >
+                                {data.status}
+                            </span>,
+                            },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
@@ -646,12 +685,12 @@ const ListRestock = () => {
                                 render: () => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menupenjualan/restock/detailrestock">
+                                            <Link to="/menupenjualan/penjualan/detailpenjualan">
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
                                         <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/restock/editrestock">
+                                            <Link to="/menupenjualan/penjualan/editpenjualan">
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
@@ -679,4 +718,4 @@ const ListRestock = () => {
     );
 };
 
-export default ListRestock;
+export default LaporanPenjualan;
