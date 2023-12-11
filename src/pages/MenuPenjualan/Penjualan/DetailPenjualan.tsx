@@ -593,18 +593,6 @@ const DetailPenjualan = () => {
         direction: 'asc',
     });
 
-    // const randomColor = () => {
-    //     const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
-    //     const random = Math.floor(Math.random() * color.length);
-    //     return color[random];
-    // };
-
-    // const randomStatus = () => {
-    //     const status = ['PAID', 'APPROVED', 'FAILED', 'CANCEL', 'SUCCESS', 'PENDING', 'COMPLETE'];
-    //     const random = Math.floor(Math.random() * status.length);
-    //     return status[random];
-    // };
-
     useEffect(() => {
         setPage(1);
     }, [pageSize]);
@@ -690,8 +678,8 @@ const DetailPenjualan = () => {
                         <IconSend className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
                         Kirim
                     </button>
-                </div>
-                <h1 className="text-lg font-bold mb-4">Kode:SK0012023</h1>
+                </div> */}
+                {/* <h1 className="text-lg font-bold mb-4">Kode:SK0012023</h1>
                 <form className="space-y-5">
                     <div>
                         <label htmlFor="gridState">Supplier</label>
@@ -738,70 +726,111 @@ const DetailPenjualan = () => {
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>
-
-                <div className="datatables">
-                    <DataTable
-                        highlightOnHover
-                        className="whitespace-nowrap table-hover"
-                        records={recordsData}
-                        columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
-                            {
-                                accessor: 'id',
-                                title: 'Barcode',
-                                sortable: true,
-                                render: ({ id }) => (
-                                    <div className="flex items-center w-max">
-                                        <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
-                                        {/* <div>{firstName + ' ' + lastName}</div> */}
-                                    </div>
-                                ),
-                            },
-                            { accessor: 'firstName', title: 'Nama', sortable: true },
-                            { accessor: 'age', title: 'Qty', sortable: true },
-                            {
-                                accessor: 'dob',
-                                title: 'Harga',
-                                sortable: true,
-                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
-                            },
-                            {
-                                accessor: 'age',
-                                title: 'Sub Total',
-                                sortable: true,
-                            },
-                            // {
-                            //     accessor: 'action',
-                            //     title: 'Opsi',
-                            //     titleClassName: '!text-center',
-                            //     render: () => (
-                            //         <div className="flex items-center w-max mx-auto gap-2">
-                            //             {/* <button type="button" style={{ color: 'blue' }}>
-                            //             <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                            //         </button> */}
-                            //             <button type="button" style={{ color: 'orange' }}>
-                            //                 <Link to="/menupenjualan/restock/editrestock">
-                            //                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                            //                 </Link>
-                            //             </button>
-                            //             <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                            //                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                            //             </button>
-                            //         </div>
-                            //     ),
-                            // },
-                        ]}
-                        totalRecords={initialRecords.length}
-                        recordsPerPage={pageSize}
-                        page={page}
-                        onPageChange={(p) => setPage(p)}
-                        recordsPerPageOptions={PAGE_SIZES}
-                        onRecordsPerPageChange={setPageSize}
-                        sortStatus={sortStatus}
-                        onSortStatusChange={setSortStatus}
-                        minHeight={200}
-                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
-                    />
+                <div className="grid xl:grid-cols-3 gap-6 grid-cols-1">
+                    <div className="datatables panel xl:col-span-2">
+                        <DataTable
+                            highlightOnHover
+                            className="whitespace-nowrap table-hover"
+                            records={recordsData}
+                            columns={[
+                                { accessor: 'id', title: 'No', sortable: true },
+                                {
+                                    accessor: 'age',
+                                    title: 'Barcode',
+                                    sortable: true,
+                                    render: ({ id }) => (
+                                        <div className="flex items-center w-max">
+                                            <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
+                                            {/* <div>{firstName + ' ' + lastName}</div> */}
+                                        </div>
+                                    ),
+                                },
+                                { accessor: 'firstName', title: 'Nama', sortable: true },
+                                { accessor: 'age', title: 'Qty', sortable: true },
+                                {
+                                    accessor: 'dob',
+                                    title: 'Harga',
+                                    sortable: true,
+                                    render: ({ dob }) => <div>{formatDate(dob)}</div>,
+                                },
+                                {
+                                    accessor: 'age',
+                                    title: 'Sub Total',
+                                    sortable: true,
+                                },
+                                // {
+                                //     accessor: 'action',
+                                //     title: 'Opsi',
+                                //     titleClassName: '!text-center',
+                                //     render: () => (
+                                //         <div className="flex items-center w-max mx-auto gap-2">
+                                //             {/* <button type="button" style={{ color: 'blue' }}>
+                                //             <IconNotes className="ltr:mr-2 rtl:ml-2 " />
+                                //         </button> */}
+                                //             <button type="button" style={{ color: 'orange' }}>
+                                //                 <Link to="/menupenjualan/restock/editrestock">
+                                //                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                //                 </Link>
+                                //             </button>
+                                //             <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                //                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                //             </button>
+                                //         </div>
+                                //     ),
+                                // },
+                            ]}
+                            totalRecords={initialRecords.length}
+                            recordsPerPage={pageSize}
+                            page={page}
+                            onPageChange={(p) => setPage(p)}
+                            recordsPerPageOptions={PAGE_SIZES}
+                            onRecordsPerPageChange={setPageSize}
+                            sortStatus={sortStatus}
+                            onSortStatusChange={setSortStatus}
+                            minHeight={200}
+                            paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
+                        />
+                    </div>
+                    <form className="space-y-5 panel xl:col-span-1">
+                        <h1 className="font-semibold text-xl dark:text-white-light mb-2 justify-center flex">Penjualan</h1>
+                        <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
+                            <div>
+                                <label htmlFor="gridCustomer">Customer</label>
+                                <select id="gridCustomer" className="form-select text-white-dark">
+                                    <option>Choose...</option>
+                                    <option>...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label htmlFor="gridCabang">Cabang</label>
+                                <select id="gridCabang" className="form-select text-white-dark">
+                                    <option>Choose...</option>
+                                    <option>...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="gridTotal">Total </label>
+                            <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="1234 Main St" className="form-input" />
+                        </div>
+                        <div>
+                            <label htmlFor="Cost">Cash</label>
+                            <input id="Cost" type="text" value={cost} onChange={handleCostChange} defaultValue="12.0000.000" placeholder="Rp." className="form-input" />
+                        </div>
+                        <div>
+                            <label htmlFor="gridTotal">Kembalian </label>
+                            <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="10.293.003" className="form-input" />
+                        </div>
+                        {/* <div>
+                            <label className="flex items-center mt-1 cursor-pointer">
+                                <input type="checkbox" className="form-checkbox" />
+                                <span className="text-white-dark">Check me out</span>
+                            </label>
+                        </div>
+                        <button type="submit" className="btn btn-primary !mt-6">
+                            Submit
+                        </button> */}
+                    </form>
                 </div>
             </div>
         </div>

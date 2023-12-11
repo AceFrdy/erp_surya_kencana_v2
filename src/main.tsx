@@ -22,7 +22,7 @@ import { MantineProvider } from '@mantine/core';
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
         <MantineProvider>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense>
                 <Provider store={store}>
                     <RouterProvider router={router} />
                 </Provider>

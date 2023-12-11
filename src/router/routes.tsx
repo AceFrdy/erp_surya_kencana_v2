@@ -32,9 +32,12 @@ const LaporanPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/Lap
 const DetailPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/DetailPenjualan'))
 const Distribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/Distribusi'))
 const LaporanDistribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/LaporanDistribusi'))
+const Login = lazy(() => import('../pages/Auth/Login'))
+const SignUp = lazy(() => import('../pages/Auth/SignUp'))
 
 
 const routes = [
+    
     // dashboard
     {
         path: '/',
@@ -204,6 +207,17 @@ const routes = [
         path: '/menupenjualan/distribution/detaildistribution',
         element: <DetailDistribusi />,
         layout: 'default',
+    },
+    //Auth
+    {
+        path: '/auth/boxed-signin',
+        element: <Login />,
+        layout: 'blank',
+    },
+    {
+        path: '/auth/boxed-signup',
+        element: <SignUp />,
+        layout: 'blank',
     },
 ];
 
