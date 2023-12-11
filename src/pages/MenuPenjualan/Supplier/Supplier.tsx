@@ -549,6 +549,7 @@ const showAlert = async (type: number) => {
 };
 const Suplier = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') || '';
     useEffect(() => {
         dispatch(setPageTitle('Multi Column Table'));
     });
@@ -603,7 +604,7 @@ const Suplier = () => {
             .get('https://erp.digitalindustryagency.com/api/supliers', {
                 headers: {
                     Accept: 'application/json',
-                    Authorization: `Bearer 245|u03k1d9G42s8BwZBjAXSx1tp5v8nkv4JTqwN4qXR7e5342af`,
+                    Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {

@@ -88,7 +88,7 @@ const InputProduk = () => {
             .post('https://erp.digitalindustryagency.com/api/products', data, {
                 headers: {
                     Accept: 'application/json',
-                    Authorization: `Bearer 245|u03k1d9G42s8BwZBjAXSx1tp5v8nkv4JTqwN4qXR7e5342af`,
+                    Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {

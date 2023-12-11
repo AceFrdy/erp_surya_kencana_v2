@@ -146,6 +146,7 @@ const Basic = () => {
     const currentItems = tableData.slice(indexOfFirstItem, indexOfLastItem);
     const [addKategori, setAddKategori] = useState(false);
     const [editKategori, setEditKategori] = useState(false);
+    const token = localStorage.getItem('accessToken') || '';
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page); // Memperbarui state currentPage saat halaman berubah
@@ -159,7 +160,7 @@ const Basic = () => {
             .get('https://erp.digitalindustryagency.com/api/product-categories', {
                 headers: {
                     Accept: 'application/json',
-                    Authorization: `Bearer 221|vMlocqeBvvlFFedU9SqwGTLGid6na3RhemkKauYd8d11453a`,
+                    Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {
