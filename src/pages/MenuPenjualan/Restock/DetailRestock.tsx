@@ -1,14 +1,18 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../store/themeConfigSlice';
+import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-import IconBell from '../../components/Icon/IconBell';
-import IconXCircle from '../../components/Icon/IconXCircle';
-import IconPencil from '../../components/Icon/IconPencil';
-import IconTrashLines from '../../components/Icon/IconTrashLines';
+// import IconBell from '../../../components/Icon/IconBell';
+// import IconXCircle from '../../../components/Icon/IconXCircle';
+import IconPencil from '../../../components/Icon/IconPencil';
+// import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-import IconPlus from '../../components/Icon/IconPlus';
+// import { Dialog, Transition } from '@headlessui/react';
+// import IconPlus from '../../../components/Icon/IconPlus';
+import IconNotes from '../../../components/Icon/IconNotes';
+import Swal from 'sweetalert2';
+import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
 
 const rowData = [
     {
@@ -513,7 +517,37 @@ const rowData = [
     },
 ];
 
-const MultiColumn = () => {
+const showAlert = async (type: number) => {
+    if (type === 11) {
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-secondary',
+                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
+                popup: 'sweet-alerts',
+            },
+            buttonsStyling: false,
+        });
+        swalWithBootstrapButtons
+            .fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true,
+                padding: '2em',
+            })
+            .then((result) => {
+                if (result.value) {
+                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
+                }
+            });
+    }
+};
+const DetailRestock = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Multi Column Table'));
@@ -526,7 +560,7 @@ const MultiColumn = () => {
 
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
-        columnAccessor: 'firstName',
+        columnAccessor: 'id',
         direction: 'asc',
     });
 
@@ -544,11 +578,10 @@ const MultiColumn = () => {
         setInitialRecords(() => {
             return rowData.filter((item) => {
                 return (
+                    item.id.toString().includes(search.toLowerCase()) ||
                     item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.company.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.age.toString().toLowerCase().includes(search.toLowerCase()) ||
                     item.dob.toLowerCase().includes(search.toLowerCase()) ||
+                    item.email.toLowerCase().includes(search.toLowerCase()) ||
                     item.phone.toLowerCase().includes(search.toLowerCase())
                 );
             });
@@ -563,16 +596,6 @@ const MultiColumn = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
 
-    const formatDate = (date: any) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
-        }
-        return '';
-    };
-
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -585,23 +608,23 @@ const MultiColumn = () => {
                     <span>Menu Penjualan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> Produk</span>
+                    <span> Detail Restock </span>
                 </li>
             </ul>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    <Link to="/formkategori">
+                    <Link to="/menupenjualan/restock/listrestock">
                         <button type="button" className=" px-2 btn btn-outline-info">
-                            <IconPlus className="flex mx-2" fill={true} /> Add
+                            <IconArrowBackward className="flex mx-2" fill={true} /> Kembali
                         </button>
                     </Link>
                     <div className="ltr:ml-auto rtl:mr-auto">
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Data Produk</h5>
+                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Detail Restock</h5>
                 <div className="datatables">
                     <DataTable
                         highlightOnHover
@@ -609,42 +632,38 @@ const MultiColumn = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
+                            { accessor: 'phone', title: 'Kode Dokumen', sortable: true },
                             {
                                 accessor: 'firstName',
-                                title: 'Product Image',
+                                title: 'Supplier',
                                 sortable: true,
-                                render: ({ id }) => (
-                                    <div className="flex items-center w-max">
-                                        <img className="w-16 h-16 ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
-                                    </div>
-                                ),
                             },
-                            { accessor: 'firstName', title: 'Product Name', sortable: true },
-                            { accessor: 'age', title: 'Product Price', sortable: true },
-                            {
-                                accessor: 'dob',
-                                title: 'Product Modal',
-                                sortable: true,
-                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
-                            },
-                            { accessor: 'email', title: 'Produc Barcode', sortable: true },
-                            { accessor: 'phone', title: 'Product IME.', sortable: true },
-                            { accessor: 'phone', title: 'Product Stock.', sortable: true },
-                            {
-                                accessor: 'action',
-                                title: 'Action',
-                                titleClassName: '!text-center',
-                                render: () => (
-                                    <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button">
-                                            <IconPencil />
-                                        </button>
-                                        <button type="button">
-                                            <IconTrashLines />
-                                        </button>
-                                    </div>
-                                ),
-                            },
+                            { accessor: 'email', title: 'Biaya Operasional', sortable: true },
+                            { accessor: 'age', title: 'Total', sortable: true },
+                            // { accessor: 'email', title: 'Table Barang', sortable: true },
+                            // { accessor: 'phone', title: 'Total', sortable: true },
+                            // {
+                            //     accessor: 'action',
+                            //     title: 'Opsi',
+                            //     titleClassName: '!text-center',
+                            //     render: () => (
+                            //         <div className="flex items-center w-max mx-auto gap-2">
+                            //             <button type="button" style={{ color: 'blue' }}>
+                            //                 <Link to="/menupenjualan/restock/detailrestock">
+                            //                     <IconNotes className="ltr:mr-2 rtl:ml-2 " />
+                            //                 </Link>
+                            //             </button>
+                            //             <button type="button" style={{ color: 'orange' }}>
+                            //                 <Link to="/menupenjualan/restock/editrestock">
+                            //                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                            //                 </Link>
+                            //             </button>
+                            //             {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                            //                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                            //             </button> */}
+                            //         </div>
+                            //     ),
+                            // },
                         ]}
                         totalRecords={initialRecords.length}
                         recordsPerPage={pageSize}
@@ -663,4 +682,4 @@ const MultiColumn = () => {
     );
 };
 
-export default MultiColumn;
+export default DetailRestock;

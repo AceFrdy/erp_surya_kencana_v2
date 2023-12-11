@@ -3,13 +3,14 @@ import { useEffect, useState, Fragment } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-// import IconBell from '../../../components/Icon/IconBell';
-// import IconXCircle from '../../../components/Icon/IconXCircle';
+import IconBell from '../../../components/Icon/IconBell';
+import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-// import { Dialog, Transition } from '@headlessui/react';
+import { Dialog, Transition } from '@headlessui/react';
 import IconPlus from '../../../components/Icon/IconPlus';
+import IconNotes from '../../../components/Icon/IconNotes';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
@@ -20,9 +21,7 @@ const rowData = [
         lastName: 'Jensen',
         email: 'carolinejensen@zidant.com',
         dob: '2004-05-28',
-        product_price: '',
-        product_image: '',
-        product_stock: '',
+        status: 'Completed',
         address: {
             street: '529 Scholes Street',
             city: 'Temperanceville',
@@ -43,8 +42,7 @@ const rowData = [
         lastName: 'Grant',
         email: 'celestegrant@polarax.com',
         dob: '1989-11-19',
-        product_image: 'string',
-        product_price: 'string',
+        status: 'Pending',
         address: {
             street: '639 Kimball Street',
             city: 'Bascom',
@@ -65,8 +63,7 @@ const rowData = [
         lastName: 'Forbes',
         email: 'tillmanforbes@manglo.com',
         dob: '2016-09-05',
-        product_price: 'string',
-        product_image: 'string',
+        status: 'In Progress',
         address: {
             street: '240 Vandalia Avenue',
             city: 'Thynedale',
@@ -87,8 +84,7 @@ const rowData = [
         lastName: 'Whitley',
         email: 'daisywhitley@applideck.com',
         dob: '1987-03-23',
-        product_price: 'string',
-        product_image: 'string',
+        status: 'Canceled',
         address: {
             street: '350 Pleasant Place',
             city: 'Idledale',
@@ -109,8 +105,7 @@ const rowData = [
         lastName: 'Bowman',
         email: 'weberbowman@volax.com',
         dob: '1983-02-24',
-        product_price: 'string',
-        product_image: 'string',
+        status: 'Completed',
         address: {
             street: '154 Conway Street',
             city: 'Broadlands',
@@ -131,8 +126,7 @@ const rowData = [
         lastName: 'Townsend',
         email: 'buckleytownsend@orbaxter.com',
         dob: '2011-05-29',
-        product_price: 'string',
-        product_image: 'string',
+        status: 'Completed',
         address: {
             street: '131 Guernsey Street',
             city: 'Vallonia',
@@ -153,8 +147,7 @@ const rowData = [
         lastName: 'Bradshaw',
         email: 'latoyabradshaw@opportech.com',
         dob: '2010-11-23',
-        product_price: 'string',
-        product_image: 'string',
+        status: 'Canceled',
         address: {
             street: '668 Lenox Road',
             city: 'Lowgap',
@@ -173,10 +166,9 @@ const rowData = [
         id: 8,
         firstName: 'Kate',
         lastName: 'Lindsay',
-        product_image: 'string',
         email: 'katelindsay@gorganic.com',
         dob: '1987-07-02',
-        product_price: 'string',
+        status: 'Pending',
         address: {
             street: '773 Harrison Avenue',
             city: 'Carlton',
@@ -197,8 +189,7 @@ const rowData = [
         lastName: 'Sandoval',
         email: 'marvasandoval@avit.com',
         dob: '2010-11-02',
-        product_price: 'string',
-        product_image: 'string',
+        status: 'Completed',
         address: {
             street: '200 Malta Street',
             city: 'Tuskahoma',
@@ -219,8 +210,7 @@ const rowData = [
         lastName: 'Russell',
         email: 'deckerrussell@quilch.com',
         dob: '1994-04-21',
-        product_price: 'string',
-        product_image: 'string',
+        status: 'In Progress',
         address: {
             street: '708 Bath Avenue',
             city: 'Coultervillle',
@@ -537,24 +527,6 @@ const rowData = [
     },
 ];
 
-// Example function that accepts number or bigint
-function processNumber(value: number | bigint): string {
-    return value.toString(); // Function logic
-  }
-  
-  // Sample variable that might be undefined
-  const myValue: string | undefined = "123"; // Or it could be undefined
-  
-  // Check if myValue is defined before passing it to the function
-  if (typeof myValue !== 'undefined') {
-    const parsedValue: number = parseInt(myValue, 10); // Parse the string value to number
-    const result = processNumber(parsedValue); // Use parsed value in the function
-    console.log(result);
-  } else {
-    // Handle the case where myValue is undefined
-    console.log("Value is undefined, cannot process");
-  }
-  
 const showAlert = async (type: number) => {
     if (type === 11) {
         const swalWithBootstrapButtons = Swal.mixin({
@@ -585,10 +557,10 @@ const showAlert = async (type: number) => {
             });
     }
 };
-const Produk = () => {
+const LaporanDistribusi = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Multi Column Table'));
+        dispatch(setPageTitle('Laporan Distribusi'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -601,10 +573,8 @@ const Produk = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const [hapusProduk, setHapusProduk] = useState(false);
-
-    // GET api
-    const [product, setProduct] = useState([]);
+    const [hapusCabang, setHapusCabang] = useState(false);
+    const [branch, setBranch] = useState([]);
 
     useEffect(() => {
         setPage(1);
@@ -620,8 +590,8 @@ const Produk = () => {
         setInitialRecords(() => {
             return rowData.filter((item) => {
                 return (
+                    item.id.toString().includes(search.toLowerCase()) ||
                     item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.age.toString().toLowerCase().includes(search.toLowerCase()) ||
                     item.dob.toLowerCase().includes(search.toLowerCase()) ||
                     item.phone.toLowerCase().includes(search.toLowerCase())
                 );
@@ -629,15 +599,7 @@ const Produk = () => {
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search]);
-
-    useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sortStatus]);
-
-    const formatDate = (date: any) => {
+    const formatDate = (date: string | number | Date) => {
         if (date) {
             const dt = new Date(date);
             const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
@@ -647,29 +609,28 @@ const Produk = () => {
         return '';
     };
 
-    // // format currency
-    // function formatCurrency(number) {
-    //     return new Intl.NumberFormat('id-ID', {
-    //         style: 'currency',
-    //         currency: 'IDR',
-    //     }).format(number);
-    // }
+    useEffect(() => {
+        const data = sortBy(initialRecords, sortStatus.columnAccessor);
+        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        setPage(1);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sortStatus]);
 
-    // get produk
+    // get branch
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/products', {
+            .get('https://erp.digitalindustryagency.com/api/branches', {
                 headers: {
                     Accept: 'application/json',
-                    Authorization: `Bearer 245|u03k1d9G42s8BwZBjAXSx1tp5v8nkv4JTqwN4qXR7e5342af`,
+                    Authorization: `Bearer 236|MbxuMzgJNUwvwWRlbOBp8gWFF7EH3leqnc4iOfxf6ace0b04`,
                 },
             })
             .then((response) => {
-                const product = response.data.data.resource.data;
-                setProduct(product); // Set categories state with fetched data
-                setInitialRecords(product);
-                setRecordsData(product);
-                console.log('PRODUCT', product);
+                const branch = response.data.data.resource.data;
+                setBranch(branch); // Set categories state with fetched data
+                setInitialRecords(branch);
+                setRecordsData(branch);
+                console.log('BRANCH', branch);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -688,23 +649,23 @@ const Produk = () => {
                     <span>Menu Penjualan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> Produk</span>
+                    <span> Laporan Distribusi </span>
                 </li>
             </ul>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    <Link to="/menupenjualan/product/produk/addproduk">
+                    {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
                         <button type="button" className=" px-2 btn btn-outline-info">
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
-                    </Link>
+                    </Link> */}
                     <div className="ltr:ml-auto rtl:mr-auto">
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Data Produk</h5>
+                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Laporan Distribution</h5>
                 <div className="datatables">
                     <DataTable
                         highlightOnHover
@@ -712,47 +673,40 @@ const Produk = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
+                            { accessor: 'branch_name', title: 'No Dokumen', sortable: true },
                             {
-                                accessor: 'product_image',
-                                title: 'Foto',
-                                sortable: true,
-                                render: ({ product_image }) => (
-                                    <div className="flex items-center w-max">
-                                        <img className="w-16 h-16 ltr:mr-2 rtl:ml-2 object-cover" src={`${product_image}`} alt="" />
-                                    </div>
-                                ),
-                            },
-                            {
-                                accessor: 'product_pos',
-                                title: 'Code',
+                                accessor: 'branch_address',
+                                title: 'Tujuan Cabang',
                                 sortable: true,
                             },
                             {
-                                accessor: 'product_name',
-                                title: 'Nama',
-                                sortable: true,
-                            },
-                            {
-                                accessor: 'product_stock',
-                                title: 'Qty',
-                                sortable: true,
-                                render: ({ product_stock }) => (
-                                    <span>
-                                        {Array.isArray(product_stock)
-                                            ? product_stock.length > 0
-                                                ? product_stock.reduce((totalQty, item) => totalQty + (item.qty || 0), 0)
-                                                : 0
-                                            : 0}
-                                    </span>
-                                ),
-                            },
-                            {
-                                accessor: 'product_price',
+                                accessor: 'dob',
                                 title: 'Harga',
                                 sortable: true,
-                                // render: ({ product_price }) => (
-                                //     <span>{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(product_price)}</span>
-                                // ),
+                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
+                            },
+                            { accessor: 'branch_contact', title: 'Jumlah Barang', sortable: true },
+                            {
+                                accessor: 'status',
+                                title: 'Status',
+                                sortable: true,
+                                render: (data) => (
+                                    <span
+                                        className={`badge whitespace-nowrap ${
+                                            data.status === 'completed'
+                                                ? 'bg-primary   '
+                                                : data.status === 'Pending'
+                                                ? 'bg-secondary'
+                                                : data.status === 'In Progress'
+                                                ? 'bg-success'
+                                                : data.status === 'Canceled'
+                                                ? 'bg-danger'
+                                                : 'bg-primary'
+                                        }`}
+                                    >
+                                        {data.status}
+                                    </span>
+                                ),
                             },
                             {
                                 accessor: 'action',
@@ -760,15 +714,19 @@ const Produk = () => {
                                 titleClassName: '!text-center',
                                 render: () => (
                                     <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/product/produk/editproduk">
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                        <button type="button" style={{ color: 'blue' }}>
+                                            <Link to="/menupenjualan/distribution/detaildistribution">
+                                                <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-
-                                        <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2" />
-                                        </button>
+                                        {/* <button type="button" style={{ color: 'orange' }}>
+                                            <Link to="/menupenjualan/distribution/editdistribution">
+                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                            </Link>
+                                        </button> */}
+                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                        </button> */}
                                     </div>
                                 ),
                             },
@@ -790,4 +748,4 @@ const Produk = () => {
     );
 };
 
-export default Produk;
+export default LaporanDistribusi;

@@ -10,4 +10,17 @@ export default defineConfig({
             '@': path.resolve(__dirname, './src'),
         },
     },
+    build: {
+        chunkSizeWarningLimit: 500, // Atur batas ukuran chunk
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    // Jika ingin menetapkan manual chunks berdasarkan kondisi tertentu
+                    if (id.includes('node_modules')) {
+                        return 'vendor'; // Menghasilkan chunk terpisah untuk node_modules
+                    }
+                },
+            },
+        },
+    },
 });
