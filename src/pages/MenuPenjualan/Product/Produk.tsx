@@ -670,7 +670,7 @@ const Produk = () => {
                 setProduct(product); // Set categories state with fetched data
                 setInitialRecords(product);
                 setRecordsData(product);
-                console.log('PRODUCT', product);
+                // console.log('PRODUCT', product);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
