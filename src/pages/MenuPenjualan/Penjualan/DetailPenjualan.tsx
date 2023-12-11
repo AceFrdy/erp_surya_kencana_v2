@@ -803,7 +803,7 @@ const DetailPenjualan = () => {
                             </div>
                             <div>
                                 <label htmlFor="gridCabang">Cabang</label>
-                                <select id="gridCabang" className="form-select text-white-dark">
+                                <select id="gridCabang" disabled={true} defaultValue="Cabang 1" className="form-select text-white-dark">
                                     <option>Choose...</option>
                                     <option>...</option>
                                 </select>
