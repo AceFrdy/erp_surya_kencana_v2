@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import DetailDistribusi from '../pages/MenuPenjualan/Distribusi/DetailDistribusi';
 import DetailCabang from '../pages/MenuPenjualan/Cabang/DetailCabang';
+import DetailCustomerOnline from '../pages/Customer/CustomerOnline/DetailCustomerOnline';
 // import MultipleTables from '../pages/Customer/CustomerOffline/CustomerOffline';
 const CustomerOffline = lazy(() => import('../pages/Customer/CustomerOffline/CustomerOffline'))
 const EditCustomer = lazy(() => import('../pages/Customer/CustomerOffline/EditCustomerOffline'))
@@ -116,6 +117,11 @@ const routes = [
     {
         path: '/customer/online/edit-customer-online',
         element: <EditCustomerOnline />,
+        layout: 'default',
+    },
+    {
+        path: '/customer/online/detail-customer-online',
+        element: <DetailCustomerOnline />,
         layout: 'default',
     },
     // Cabang

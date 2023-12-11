@@ -823,15 +823,20 @@ const Penjualan = () => {
                         </div>
                         <div>
                             <label htmlFor="gridTotal">Total :</label>
-                            {/* <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="1234 Main St" className="form-input" /> */}
+                            <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="1234 Main St" className="form-input" />
                         </div>
                         <div>
                             <label htmlFor="Cost">Cash</label>
                             <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input" />
                         </div>
                         <div>
+                            <button type="submit" className="btn btn-primary !mt-6 w-full">
+                                Submit
+                            </button>
+                        </div>
+                        <div>
                             <label htmlFor="gridTotal">Kembalian :</label>
-                            {/* <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="1234 Main St" className="form-input" /> */}
+                            <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="1234 Main St" className="form-input" />
                         </div>
                         {/* <div>
                             <label className="flex items-center mt-1 cursor-pointer">
