@@ -2,6 +2,13 @@ import { lazy } from 'react';
 import DetailDistribusi from '../pages/MenuPenjualan/Distribusi/DetailDistribusi';
 import DetailCabang from '../pages/MenuPenjualan/Cabang/DetailCabang';
 import DetailCustomerOnline from '../pages/Customer/CustomerOnline/DetailCustomerOnline';
+import Akun from '../pages/MenuKeuangan/Akun/Akun';
+import AddAkun from '../pages/MenuKeuangan/Akun/AddAkun';
+import EditAkun from '../pages/MenuKeuangan/Akun/EditAkun';
+import DetailAkun from '../pages/MenuKeuangan/DetailAkun/DetailAkun';
+import AddDetailAkun from '../pages/MenuKeuangan/DetailAkun/AddDetailAkun';
+import EditDetailAkun from '../pages/MenuKeuangan/DetailAkun/EditDetailAkun';
+import ControlPanel from '../pages/MenuKeuangan/ControlPanel/ControlPanel';
 // import MultipleTables from '../pages/Customer/CustomerOffline/CustomerOffline';
 const CustomerOffline = lazy(() => import('../pages/Customer/CustomerOffline/CustomerOffline'))
 const EditCustomer = lazy(() => import('../pages/Customer/CustomerOffline/EditCustomerOffline'))
@@ -224,6 +231,43 @@ const routes = [
         path: '/auth/boxed-signup',
         element: <SignUp />,
         layout: 'blank',
+    },
+    // Menu keuangan Akun
+    {
+        path: '/menukeuangan/akun/akun',
+        element: <Akun />,
+        layout: 'default',
+    },
+    {
+        path: '/menukeuangan/akun/addakun',
+        element: <AddAkun />,
+        layout: 'default',
+    },
+    {
+        path: '/menukeuangan/akun/editakun',
+        element: <EditAkun />,
+        layout: 'default',
+    },
+    {
+        path: '/menukeuangan/akun/detailakun',
+        element: <DetailAkun />,
+        layout: 'default',
+    },
+    {
+        path: '/menukeuangan/akun/adddetailakun',
+        element: <AddDetailAkun />,
+        layout: 'default',
+    },
+    {
+        path: '/menukeuangan/akun/editdetailakun',
+        element: <EditDetailAkun />,
+        layout: 'default',
+    },
+    // Control Panel
+    {
+        path: '/menukeuangan/controlpanel',
+        element: <ControlPanel />,
+        layout: 'default',
     },
 ];
 

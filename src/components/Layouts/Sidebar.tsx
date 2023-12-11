@@ -366,127 +366,19 @@ const Sidebar = () => {
                                 <AnimateHeight duration={300} height={currentMenu === 'akun' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
                                         <li>
-                                            <NavLink to="/menukeuangan/tabs">{t('tabs')}</NavLink>
+                                            <NavLink to="/menukeuangan/akun/akun">{t('Akun')}</NavLink>
                                         </li>
                                         <li>
-                                            <NavLink to="/components/accordions">{t('accordions')}</NavLink>
+                                            <NavLink to="/menukeuangan/akun/detailakun">{t('Akun Detail')}</NavLink>
                                         </li>
-                                        {/* <li>
-                                            <NavLink to="/components/modals">{t('modals')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/components/cards">{t('cards')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/components/carousel">{t('carousel')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/components/countdown">{t('countdown')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/components/counter">{t('counter')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/components/sweetalert">{t('sweet_alerts')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/components/timeline">{t('timeline')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/components/notifications">{t('notifications')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/components/media-object">{t('media_object')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/components/list-group">{t('list_group')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/components/pricing-table">{t('pricing_tables')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/components/lightbox">{t('lightbox')}</NavLink>
-                                        </li> */}
                                     </ul>
                                 </AnimateHeight>
                             </li>
 
-                            <li className="menu nav-item">
-                                <button type="button" className={`${currentMenu === 'detailakun' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('detailakun')}>
-                                    <div className="flex items-center">
-                                    <IconUser fill={true} />
-                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Detail Akun')}</span>
-                                    </div>
-
-                                    <div className={currentMenu === 'detailakun' ? 'rotate-90' : 'rtl:rotate-180'}>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M9 5L15 12L9 19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                    </div>
-                                </button>
-
-                                <AnimateHeight duration={300} height={currentMenu === 'detailakun' ? 'auto' : 0}>
-                                    <ul className="sub-menu text-gray-500">
-                                        <li>
-                                            <NavLink to="/detailakun/alerts">{t('alerts')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/detailakun/avatar">{t('avatar')}</NavLink>
-                                        </li>
-                                        {/* <li>
-                                            <NavLink to="/elements/badges">{t('badges')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/breadcrumbs">{t('breadcrumbs')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/buttons">{t('buttons')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/buttons-group">{t('button_groups')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/color-library">{t('color_library')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/dropdown">{t('dropdown')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/infobox">{t('infobox')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/jumbotron">{t('jumbotron')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/loader">{t('loader')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/pagination">{t('pagination')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/popovers">{t('popovers')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/progress-bar">{t('progress_bar')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/search">{t('search')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/tooltips">{t('tooltips')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/treeview">{t('treeview')}</NavLink>
-                                        </li>
-                                        <li>
-                                            <NavLink to="/elements/typography">{t('typography')}</NavLink>
-                                        </li> */}
-                                    </ul>
-                                </AnimateHeight>
-                            </li>
+                            
 
                             <li className="menu nav-item">
-                                <NavLink to="/panel" className="group">
+                                <NavLink to="/menukeuangan/controlpanel" className="group">
                                     <div className="flex items-center">
                                         <IconLock fill={true}/>
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Contol Panel')}</span>
@@ -504,37 +396,54 @@ const Sidebar = () => {
                             </li>
 
                             <li className="menu nav-item">
-                                <NavLink to="/uangmasuk" className="group">
+                                <button type="button" className={`${currentMenu === 'flowcash' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('flowcash')}>
                                     <div className="flex items-center">
-                                        <IconDollarSignCircle />
-                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Uang Masuk')}</span>
-                                    </div>
-                                </NavLink>
-                            </li>
-
-                            <li className="menu nav-item">
-                                <NavLink to="/uangkeluar" className="group">
-                                    <div className="flex items-center">
-                                        <IconDollarSignCircle />
+                                    <IconDollarSignCircle />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Uang Keluar')}</span>
                                     </div>
-                                </NavLink>
+
+                                    <div className={currentMenu === 'detailakun' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9 5L15 12L9 19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    </div>
+                                </button>
+
+                                <AnimateHeight duration={300} height={currentMenu === 'flowcash' ? 'auto' : 0}>
+                                    <ul className="sub-menu text-gray-500">
+                                        <li>
+                                            <NavLink to="/detailakun/alerts">{t('Uang Masuk')}</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/detailakun/avatar">{t('Uang Keluar')}</NavLink>
+                                        </li>
+                                    </ul>
+                                </AnimateHeight>
                             </li>
                             <li className="menu nav-item">
-                                <NavLink to="/piutang" className="group">
+                                <button type="button" className={`${currentMenu === 'hutang-piutang' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('hutang-piutang')}>
                                     <div className="flex items-center">
                                     <IconCashBanknotes fill={true} />
-                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Piutang')}</span>
+                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Hutang / Piutang')}</span>
                                     </div>
-                                </NavLink>
-                            </li>
-                            <li className="menu nav-item">
-                                <NavLink to="/hutang" className="group">
-                                    <div className="flex items-center">
-                                    <IconCashBanknotes fill={true} />
-                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Hutang')}</span>
+
+                                    <div className={currentMenu === 'detailakun' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9 5L15 12L9 19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
                                     </div>
-                                </NavLink>
+                                </button>
+
+                                <AnimateHeight duration={300} height={currentMenu === 'hutang-piutang' ? 'auto' : 0}>
+                                    <ul className="sub-menu text-gray-500">
+                                        <li>
+                                            <NavLink to="/detailakun/alerts">{t('Hutang')}</NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink to="/detailakun/avatar">{t('Piutang')}</NavLink>
+                                        </li>
+                                    </ul>
+                                </AnimateHeight>
                             </li>
                             <li className="menu nav-item">
                                 <NavLink to="/laporan" className="group">
