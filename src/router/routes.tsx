@@ -1,11 +1,13 @@
 import { lazy } from 'react';
+import DetailDistribusi from '../pages/MenuPenjualan/Distribusi/DetailDistribusi';
+import DetailCabang from '../pages/MenuPenjualan/Cabang/DetailCabang';
 // import MultipleTables from '../pages/Customer/CustomerOffline/CustomerOffline';
-import CustomerOffline from '../pages/Customer/CustomerOffline/CustomerOffline';
-import EditCustomer from '../pages/Customer/CustomerOffline/EditCustomerOffline';
-import AddCustomerOffline from '../pages/Customer/CustomerOffline/AddCustomerOffline';
-import CustomerOnline from '../pages/Customer/CustomerOnline/CustomerOnline';
-import AddCustomerOnline from '../pages/Customer/CustomerOnline/AddCustomerOnline';
-import EditCustomerOnline from '../pages/Customer/CustomerOnline/EditCustomerOnline';
+const CustomerOffline = lazy(() => import('../pages/Customer/CustomerOffline/CustomerOffline'))
+const EditCustomer = lazy(() => import('../pages/Customer/CustomerOffline/EditCustomerOffline'))
+const AddCustomerOffline = lazy(() => import('../pages/Customer/CustomerOffline/AddCustomerOffline'))
+const CustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/CustomerOnline'))
+const AddCustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/AddCustomerOnline'))
+const EditCustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/EditCustomerOnline'))
 const Index = lazy(() => import('../pages/Index'));
 const Ecommerce = lazy(() => import('../pages/Ecommerce'));
 const Kategoriproduk = lazy(() => import('../pages/MenuPenjualan/KategoriProduk/KategoriProduk'))
@@ -29,10 +31,13 @@ const Penjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/Penjualan'
 const LaporanPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/LaporanPenjualan'))
 const DetailPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/DetailPenjualan'))
 const Distribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/Distribusi'))
-
+const LaporanDistribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/LaporanDistribusi'))
+const Login = lazy(() => import('../pages/Auth/Login'))
+const SignUp = lazy(() => import('../pages/Auth/SignUp'))
 
 
 const routes = [
+    
     // dashboard
     {
         path: '/',
@@ -129,6 +134,11 @@ const routes = [
         element: <EditCabang />,
         layout: 'default',
     },
+    {
+        path: '/menupenjualan/cabang/detailcabang',
+        element: <DetailCabang />,
+        layout: 'default',
+    },
     // Suplier
     {
         path: '/menupenjualan/supplier',
@@ -187,6 +197,27 @@ const routes = [
         path: '/menupenjualan/distribution/distribution',
         element: <Distribusi />,
         layout: 'default',
+    },
+    {
+        path: '/menupenjualan/distribution/laporandistribution',
+        element: <LaporanDistribusi />,
+        layout: 'default',
+    },
+    {
+        path: '/menupenjualan/distribution/detaildistribution',
+        element: <DetailDistribusi />,
+        layout: 'default',
+    },
+    //Auth
+    {
+        path: '/auth/boxed-signin',
+        element: <Login />,
+        layout: 'blank',
+    },
+    {
+        path: '/auth/boxed-signup',
+        element: <SignUp />,
+        layout: 'blank',
     },
 ];
 
