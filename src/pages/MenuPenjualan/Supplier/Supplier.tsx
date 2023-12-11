@@ -12,6 +12,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import IconPlus from '../../../components/Icon/IconPlus';
 import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const rowData = [
     {
@@ -563,6 +564,7 @@ const Suplier = () => {
         direction: 'asc',
     });
     const [hapusSuplier, setHapusSuplier] = useState(false);
+    const [suplier, setSuplier] = useState([]);
 
     useEffect(() => {
         setPage(1);
@@ -594,6 +596,26 @@ const Suplier = () => {
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
+
+    // get supplier
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/supliers', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer 245|u03k1d9G42s8BwZBjAXSx1tp5v8nkv4JTqwN4qXR7e5342af`,
+                },
+            })
+            .then((response) => {
+                const suplier = response.data.data.resource.data;
+                setSuplier(suplier); // Set categories state with fetched data
+                setInitialRecords(suplier);
+                setRecordsData(suplier);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    }, []);
 
     return (
         <div>
@@ -631,10 +653,10 @@ const Suplier = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'firstName', title: 'Nama Supplier', sortable: true },
-                            { accessor: 'phone', title: 'No HP', sortable: true },
+                            { accessor: 'suplier_name', title: 'Nama Supplier', sortable: true },
+                            { accessor: 'suplier_contact', title: 'No HP', sortable: true },
                             {
-                                accessor: 'address.street',
+                                accessor: 'suplier_address',
                                 title: 'Address',
                                 sortable: true,
                             },
