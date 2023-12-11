@@ -587,6 +587,7 @@ const showAlert = async (type: number) => {
 };
 const Produk = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') || '';
     useEffect(() => {
         dispatch(setPageTitle('Multi Column Table'));
     });
@@ -647,13 +648,13 @@ const Produk = () => {
         return '';
     };
 
-    // format currency
-    function formatCurrency(number: number | bigint) {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-        }).format(number);
-    }
+    // // format currency
+    // function formatCurrency(number) {
+    //     return new Intl.NumberFormat('id-ID', {
+    //         style: 'currency',
+    //         currency: 'IDR',
+    //     }).format(number);
+    // }
 
     // get produk
     useEffect(() => {
@@ -661,7 +662,7 @@ const Produk = () => {
             .get('https://erp.digitalindustryagency.com/api/products', {
                 headers: {
                     Accept: 'application/json',
-                    Authorization: `Bearer 229|1nMJJNBpmOChJR9RTPtkNGDE5AfC8hChQLkgQSxu46924ef6`,
+                    Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {

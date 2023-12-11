@@ -23,7 +23,7 @@ const EditCabang = () => {
             .get(`https://erp.digitalindustryagency.com/api/branches/${id}`, {
                 headers: {
                     Accept: 'application/json',
-                    Authorization: `Bearer 237|kDy43Dvez6eLhN9GBJXRLsI4vGdxPE0xuUXXou2Dfcdfa830`,
+                    Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {
@@ -56,7 +56,7 @@ const EditCabang = () => {
             .put(`https://erp.digitalindustryagency.com/api/branches/${id}`, formData, {
                 headers: {
                     Accept: 'application/json',
-                    Authorization: `Bearer 237|kDy43Dvez6eLhN9GBJXRLsI4vGdxPE0xuUXXou2Dfcdfa8304`,
+                    Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {

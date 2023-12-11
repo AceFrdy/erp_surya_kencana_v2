@@ -7,7 +7,7 @@ import IconBell from '../../../components/Icon/IconBell';
 import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import IconPlus from '../../../components/Icon/IconPlus';
 import IconNotes from '../../../components/Icon/IconNotes';
@@ -549,6 +549,7 @@ const showAlert = async (type: number) => {
 };
 const ListCabang = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') || '';
     useEffect(() => {
         dispatch(setPageTitle('Multi Column Table'));
     });
@@ -603,7 +604,7 @@ const ListCabang = () => {
             .get('https://erp.digitalindustryagency.com/api/branches', {
                 headers: {
                     Accept: 'application/json',
-                    Authorization: `Bearer 236|MbxuMzgJNUwvwWRlbOBp8gWFF7EH3leqnc4iOfxf6ace0b04`,
+                    Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {

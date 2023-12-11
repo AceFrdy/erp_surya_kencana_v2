@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -14,7 +14,7 @@ const AddCabang = () => {
         errors: {},
     });
 
-    const handleChange = (e: { target: { name: any; value: any; }; }) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
             ...prevData,
@@ -22,10 +22,10 @@ const AddCabang = () => {
         }));
     };
 
-    const handleSubmit = (e: { preventDefault: () => void; }) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const data = {
+        const data = { 
             branch_name: formData.branch_name,
             branch_address: formData.branch_address,
             branch_contact: formData.branch_contact,
@@ -35,7 +35,7 @@ const AddCabang = () => {
             .post('https://erp.digitalindustryagency.com/api/branches', data, {
                 headers: {
                     Accept: 'application/json',
-                    Authorization: `Bearer 234|Fd9P70b28JUUDQS0F34F65RIQXMKzB90V4aXdtBs33734980`,
+                    Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {
