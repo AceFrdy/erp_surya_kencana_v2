@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import IconPlus from '../../../components/Icon/IconPlus';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const rowData = [
     {
@@ -547,6 +548,7 @@ const showAlert = async (type: number) => {
 };
 const Unit = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') || '';
     useEffect(() => {
         dispatch(setPageTitle('Multi Column Table'));
     });
@@ -562,6 +564,7 @@ const Unit = () => {
         direction: 'asc',
     });
     const [hapusProduk, setHapusProduk] = useState(false);
+    const [unit, setUnit] = useState([]);
 
     useEffect(() => {
         setPage(1);
@@ -594,6 +597,26 @@ const Unit = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
 
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/unit-stock', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const unit = response.data.data.resource.data;
+                setUnit(unit); // Set categories state with fetched data
+                setInitialRecords(unit);
+                setRecordsData(unit);
+                // console.log('UNIT', unit);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    }, []);
+
     return (
         <div>
             <Transition appear show={hapusProduk} as={Fragment}>
@@ -620,7 +643,7 @@ const Unit = () => {
                                         <div>
                                             <form className="space-y-5">
                                                 <div>
-                                                    <h1>Apakah Anda yakin ingin menghapus Kategori</h1>
+                                                    <h1>Apakah Anda yakin ingin menghapus Unit</h1>
                                                 </div>
                                             </form>
                                         </div>
@@ -674,11 +697,11 @@ const Unit = () => {
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
                             {
-                                accessor: 'firstName',
+                                accessor: 'unit_stock_name',
                                 title: 'Nama Unit',
                                 sortable: true,
                             },
-                            { accessor: 'age', title: 'Kapasitas Unit', sortable: true },
+                            { accessor: 'number_of_units', title: 'Kapasitas Unit', sortable: true },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',

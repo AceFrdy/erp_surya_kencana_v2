@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../store';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { setPageTitle, toggleRTL } from '../../store/themeConfigSlice';
 import Dropdown from '../../components/Dropdown';
 import i18next from 'i18next';
@@ -12,6 +12,7 @@ import IconInstagram from '../../components/Icon/IconInstagram';
 import IconFacebookCircle from '../../components/Icon/IconFacebookCircle';
 import IconTwitter from '../../components/Icon/IconTwitter';
 import IconGoogle from '../../components/Icon/IconGoogle';
+import axios from 'axios';
 
 const Login = () => {
     const dispatch = useDispatch();
@@ -22,6 +23,7 @@ const Login = () => {
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
+    const [loginMessage, setLoginMessage] = useState();
     const setLocale = (flag: string) => {
         setFlag(flag);
         if (flag.toLowerCase() === 'ae') {
@@ -32,8 +34,66 @@ const Login = () => {
     };
     const [flag, setFlag] = useState(themeConfig.locale);
 
-    const submitForm = () => {
-        navigate('/');
+    const [credentials, setCredentials] = useState({
+        email: '',
+        password: '',
+    });
+
+    const [errorMessages, setErrorMessages] = useState({
+        email: '',
+        password: '',
+    });
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>, field: string) => {
+        setCredentials({
+            ...credentials,
+            [field]: e.target.value,
+        });
+
+        setErrorMessages({
+            ...errorMessages,
+            [field]: '',
+        });
+    };
+
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (!credentials.email) {
+            setErrorMessages({
+                ...errorMessages,
+                email: 'Email is required.',
+            });
+            return;
+        }
+
+        if (!credentials.password) {
+            setErrorMessages({
+                ...errorMessages,
+                password: 'Password is required.',
+            });
+            return;
+        }
+
+        axios
+            .post('https://erp.digitalindustryagency.com/api/login', credentials)
+            .then((response) => {
+                if (response.data.data.status) {
+                    localStorage.setItem('accessToken', response.data.data.resource.token);
+                    navigate('/');
+                } else {
+                    setLoginMessage(response.data.message);
+                }
+            })
+            .catch((error) => {
+                console.error('Login failed', error);
+                console.error('Error Response:', error.response);
+                if (error.response && error.response.status === 401) {
+                    alert('Invalid email or password. Please try again.');
+                } else {
+                    alert('An error occurred. Please try again later.');
+                }
+            });
     };
 
     return (
@@ -95,11 +155,18 @@ const Login = () => {
                                 <h1 className="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Sign in</h1>
                                 <p className="text-base font-bold leading-normal text-white-dark">Enter your email and password to login</p>
                             </div>
-                            <form className="space-y-5 dark:text-white" onSubmit={submitForm}>
+                            <form className="space-y-5 dark:text-white" onSubmit={handleSubmit}>
                                 <div>
                                     <label htmlFor="Email">Email</label>
                                     <div className="relative text-white-dark">
-                                        <input id="Email" type="email" placeholder="Enter Email" className="form-input ps-10 placeholder:text-white-dark" />
+                                        <input
+                                            id="Email"
+                                            type="email"
+                                            placeholder="Enter Email"
+                                            className="form-input ps-10 placeholder:text-white-dark"
+                                            value={credentials.email}
+                                            onChange={(e) => handleChange(e, 'email')}
+                                        />
                                         <span className="absolute start-4 top-1/2 -translate-y-1/2">
                                             <IconMail fill={true} />
                                         </span>
@@ -108,7 +175,14 @@ const Login = () => {
                                 <div>
                                     <label htmlFor="Password">Password</label>
                                     <div className="relative text-white-dark">
-                                        <input id="Password" type="password" placeholder="Enter Password" className="form-input ps-10 placeholder:text-white-dark" />
+                                        <input
+                                            id="Password"
+                                            type="password"
+                                            placeholder="Enter Password"
+                                            className="form-input ps-10 placeholder:text-white-dark"
+                                            value={credentials.password}
+                                            onChange={(e) => handleChange(e, 'password')}
+                                        />
                                         <span className="absolute start-4 top-1/2 -translate-y-1/2">
                                             <IconLockDots fill={true} />
                                         </span>
