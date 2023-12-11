@@ -92,7 +92,7 @@ const Sidebar = () => {
                     </div>
                     <PerfectScrollbar className="h-[calc(100vh-80px)] relative">
                         <ul className="relative font-semibold space-y-0.5 p-4 py-0">
-                            <li className="menu nav-item">
+                            {/* <li className="menu nav-item">
                                 <NavLink to="/">
                                     <button type="button" className={`${currentMenu === 'dashboard' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('dashboard')}>
                                         <div className="flex items-center">
@@ -112,7 +112,7 @@ const Sidebar = () => {
                                     </button>
                                 </NavLink>
                                 <AnimateHeight duration={300} height={currentMenu === 'dashboard' ? 'auto' : 0}></AnimateHeight>
-                            </li>
+                            </li> */}
                             <h2 className="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
                                 <svg className="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -387,7 +387,7 @@ const Sidebar = () => {
                             </li>
 
                             <li className="menu nav-item">
-                                <NavLink to="/saldo" className="group">
+                                <NavLink to="/menukeuangan/saldo" className="group">
                                     <div className="flex items-center">
                                         <IconDollarSignCircle fill={true}/>
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Saldo')}</span>
@@ -399,10 +399,10 @@ const Sidebar = () => {
                                 <button type="button" className={`${currentMenu === 'flowcash' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('flowcash')}>
                                     <div className="flex items-center">
                                     <IconDollarSignCircle />
-                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Uang Keluar')}</span>
+                                        <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Flow Cash')}</span>
                                     </div>
 
-                                    <div className={currentMenu === 'detailakun' ? 'rotate-90' : 'rtl:rotate-180'}>
+                                    <div className={currentMenu === 'flowcash' ? 'rotate-90' : 'rtl:rotate-180'}>
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M9 5L15 12L9 19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
@@ -412,10 +412,10 @@ const Sidebar = () => {
                                 <AnimateHeight duration={300} height={currentMenu === 'flowcash' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
                                         <li>
-                                            <NavLink to="/detailakun/alerts">{t('Uang Masuk')}</NavLink>
+                                            <NavLink to="/menukeuangan/flowcash/uangmasuk">{t('Uang Masuk')}</NavLink>
                                         </li>
                                         <li>
-                                            <NavLink to="/detailakun/avatar">{t('Uang Keluar')}</NavLink>
+                                            <NavLink to="/menukeuangan/flowcash/uangkeluar">{t('Uang Keluar')}</NavLink>
                                         </li>
                                     </ul>
                                 </AnimateHeight>
@@ -437,16 +437,16 @@ const Sidebar = () => {
                                 <AnimateHeight duration={300} height={currentMenu === 'hutang-piutang' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
                                         <li>
-                                            <NavLink to="/detailakun/alerts">{t('Hutang')}</NavLink>
+                                            <NavLink to="/menukeuangan/hutang-piutang/hutang">{t('Hutang')}</NavLink>
                                         </li>
                                         <li>
-                                            <NavLink to="/detailakun/avatar">{t('Piutang')}</NavLink>
+                                            <NavLink to="/menukeuangan/hutang-piutang/piutang">{t('Piutang')}</NavLink>
                                         </li>
                                     </ul>
                                 </AnimateHeight>
                             </li>
                             <li className="menu nav-item">
-                                <NavLink to="/laporan" className="group">
+                                <NavLink to="/menukeuangan/laporan/laporan" className="group">
                                     <div className="flex items-center">
                                     <svg className="group-hover:!text-primary shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path

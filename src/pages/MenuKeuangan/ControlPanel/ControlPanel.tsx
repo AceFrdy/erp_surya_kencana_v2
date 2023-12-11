@@ -2,7 +2,7 @@ import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 // import IconBell from '../../../components/Icon/IconBell';
 // import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
@@ -13,6 +13,14 @@ import { Link } from 'react-router-dom';
 // import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
 import IconSend from '../../../components/Icon/IconSend';
+import IconPlus from '../../../components/Icon/IconPlus';
+import IconCircleCheck from '../../../components/Icon/IconCircleCheck';
+import IconTrendingUp from '../../../components/Icon/IconTrendingUp';
+import Dropdown from '../../../components/Dropdown';
+import IconHorizontalDots from '../../../components/Icon/IconHorizontalDots';
+import { IRootState } from '../../../store';
+import IconEye from '../../../components/Icon/IconEye';
+import IconCashBanknotes from '../../../components/Icon/IconCashBanknotes';
 // import * as Yup from 'yup';
 // import { Field, Form, Formik } from 'formik';
 
@@ -647,20 +655,21 @@ const ControlPanel = () => {
 
     const [cost, setCost] = useState('');
 
-    const handleCostChange = (e: { target: { value: any } }) => {
-        const inputValue = e.target.value;
-        let formatValue = '';
+    // const handleCostChange = (e: { target: { value: any } }) => {
+    //     const inputValue = e.target.value;
+    //     let formatValue = '';
 
-        // Remove non-numeric characters
-        const numValue = inputValue.replace(/\D/g, '');
+    //     // Remove non-numeric characters
+    //     const numValue = inputValue.replace(/\D/g, '');
 
-        // Format the number with 'Rp.' prefix
-        if (numValue !== '') {
-            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-        }
+    //     // Format the number with 'Rp.' prefix
+    //     if (numValue !== '') {
+    //         formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
+    //     }
 
-        setCost(formatValue);
-    };
+    //     setCost(formatValue);
+    // };
+    const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -670,63 +679,68 @@ const ControlPanel = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Menu Penjualan</span>
+                    <span>Menu Keuangan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> Penjualan </span>
+                    <span> Control Panel </span>
                 </li>
             </ul>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6">
-                <h1 className="text-lg font-bold flex justify-center">Data Penjualan</h1>
-                {/* <div className="flex mb-4 justify-end">
-                    <button type="button" className="btn btn-outline-danger mr-4" onClick={() => showAlert(11)}>
-                        <IconTrashLines className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                        Batal
-                    </button>
-                    <button type="button" className="btn btn-outline-primary" onClick={() => showAlert(15)}>
-                        <IconSend className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                        Kirim
-                    </button>
+                <h1 className="text-lg font-bold flex justify-start py-4">Data Penjualan</h1>
+                <div className="flex justify-center grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+                    <div className="panel bg-gradient-to-r col-span-4 from-cyan-500 to-blue-400">
+                        <div className='f'>
+                        {/* <IconCashBanknotes className='w-20 h-20' /> */}
+                        </div>
+                        <div className="flex">
+                            <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">Saldo Awal</div>
+                            <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold mx-2 ">-</div>
+                            <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">Dari Akun Bank BRI</div>
+                            <div className="dropdown"></div>
+                        </div>
+                        <div className="flex items-center mt-5">
+                            <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> Rp.2.170.460,- </div>
+                            {/* <div className="badge bg-white/30">+ 2.35% </div> */}
+                        </div>
+                        <div className="flex items-center font-semibold mt-5">
+                            <IconEye className="ltr:mr-2 rtl:ml-2 shrink-0" />
+                            Last Week Rp.644.700,-
+                        </div>
+                    </div>
+                    <div className="panel overflow-hidden col-span-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <div className="text-lg font-bold">Total Keseluruhan</div>
+                                <div className="text-success"> Berdasarkan Tahun 2022 </div>
+                            </div>
+                            
+                        </div>
+                        <div className="relative mt-10">
+                            <div className="absolute -bottom-12 ltr:-right-12 rtl:-left-12 w-24 h-24">
+                                <IconCircleCheck className="text-success opacity-20 w-full h-full" />
+                            </div>
+                            <div className="grid grid-cols-3 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 justify-between flex gap-6">
+                                <div className="panel bg-gray-400">
+                                    <div className="text-dark">Saldo Akhir</div>
+                                    <div className="mt-2 font-semibold text-2xl border-b border-b-gray-800">Rp.15.000.000,-</div>
+                                    <div className="mt-2 font-medium text-lg">Total Saldo Sampai Hari ini</div>
+                                </div>
+                                <div className="panel bg-gray-400">
+                                    <div className="text-dark">Pemasukan</div>
+                                    <div className="mt-2 font-semibold text-2xl border-b border-b-gray-800">Rp.6.009.435,-</div>
+                                    <div className="mt-2 font-medium text-lg">Total Saldo Sampai Hari ini</div>
+                                </div>
+                                <div className="panel bg-gray-400 ">
+                                    <div className="text-dark">Pengeluaran</div>
+                                    <div className="mt-2 font-semibold text-2xl border-b border-b-gray-800">Rp.4.000,245,-</div>
+                                    <div className="mt-2 font-medium text-lg">Total Saldo Sampai Hari ini</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h1 className="text-lg font-bold mb-4">Kode:SK0012023</h1>
-                <form className="space-y-5">
-                    <div>
-                        <label htmlFor="gridState">Supplier</label>
-                        <select id="gridState" className="form-select text-white-dark">
-                            <option>Choose...</option>
-                            <option>...</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label htmlFor="Opcost">Operasional Cost</label>
-                        <input id="Opcost" type="text" value={operasionalCost} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div>
-                            <label htmlFor="Produk">Produk</label>
-                            <input id="Produk" type="Text" placeholder="Produk" className="form-input" />
-                        </div>
-                        <div>
-                            <label htmlFor="Qty">Qty</label>
-                            <input id="Qty" type="Text" placeholder="" className="form-input" />
-                        </div>
-                        <div>
-                            <label htmlFor="Cost">Harga</label>
-                            <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input" />
-                        </div>
-                    </div>
-                    <div>
-                        <label className="flex items-center mt-1 cursor-pointer">
-                            <input type="checkbox" className="form-checkbox" />
-                            <span className="text-white-dark">Check me out</span>
-                        </label>
-                    </div>
-                    <button type="submit" className="btn btn-outline-primary !mt-6 w-full" onClick={() => showAlert(20)}>
-                        Tambah
-                    </button>
-                </form> */}
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
                     {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
                         <button type="button" className=" px-2 btn btn-outline-info">
@@ -734,7 +748,7 @@ const ControlPanel = () => {
                         </button>
                     </Link> */}
                     <div className="ltr:mr-auto rtl:ml-auto">
-                        <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                        {/* <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} /> */}
                     </div>
                 </div>
 
@@ -752,10 +766,10 @@ const ControlPanel = () => {
                                     title: 'Masuk',
                                     sortable: true,
                                     render: () => (
-                                        <div className='flex'>
-                                        <label className="">
-                                            <input type="checkbox" className="form-checkbox" defaultChecked />
-                                        </label>
+                                        <div className="flex">
+                                            <label className="inline-flex">
+                                                <input type="checkbox" className="form-checkbox outline-info w-8 h-8" defaultChecked />
+                                            </label>
                                         </div>
                                     ),
                                 },
@@ -764,10 +778,10 @@ const ControlPanel = () => {
                                     title: 'Keluar',
                                     sortable: true,
                                     render: () => (
-                                        <div className='flex justify-center'>
-                                        <label className="inline-flex">
-                                            <input type="checkbox" className="form-checkbox" defaultChecked />
-                                        </label>
+                                        <div className="flex">
+                                            <label className="inline-flex">
+                                                <input type="checkbox" className="form-checkbox outline-info w-8 h-8" defaultChecked />
+                                            </label>
                                         </div>
                                     ),
                                 },
@@ -776,10 +790,10 @@ const ControlPanel = () => {
                                     title: 'Pengajuan',
                                     sortable: true,
                                     render: () => (
-                                        <div className='flex justify-center'>
-                                        <label className="inline-flex">
-                                            <input type="checkbox" className="form-checkbox" defaultChecked />
-                                        </label>
+                                        <div className="flex ">
+                                            <label className="inline-flex">
+                                                <input type="checkbox" className="form-checkbox outline-info w-8 h-8" defaultChecked />
+                                            </label>
                                         </div>
                                     ),
                                 },
@@ -789,14 +803,6 @@ const ControlPanel = () => {
                                     titleClassName: '!text-center',
                                     render: () => (
                                         <div className="flex items-center w-max mx-auto gap-2">
-                                            {/* <button type="button" style={{ color: 'blue' }}>
-                                            <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
-                                            <button type="button" style={{ color: 'orange' }}>
-                                                <Link to="/menupenjualan/restock/editrestock">
-                                                    <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                                </Link>
-                                            </button>
                                             <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
                                                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                             </button>
@@ -817,49 +823,41 @@ const ControlPanel = () => {
                         />
                     </div>
                     <form className="space-y-5 panel xl:col-span-1">
-                        <h1 className="font-semibold text-xl dark:text-white-light mb-2 justify-center flex">Penjualan</h1>
+                        <h1 className="font-semibold text-xl dark:text-white-light mb-2 justify-center flex">Tambah Index</h1>
                         <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
-                            <div>
-                                <label htmlFor="gridCustomer">Customer</label>
-                                <select id="gridCustomer" className="form-select text-white-dark">
-                                    <option>Choose...</option>
-                                    <option>...</option>
-                                </select>
+                            <div className="">
+                                <label htmlFor="gridTotal" className="text-xl font-medium mr-8">
+                                    Keterangan:
+                                </label>
+                                <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="Nasi Goreng" className="form-input text-lg" />
                             </div>
-                            <div>
-                                <label htmlFor="gridCabang">Cabang</label>
-                                <select id="gridCabang" className="form-select text-white-dark">
-                                    <option>Choose...</option>
-                                    <option>...</option>
-                                </select>
+                            <div className="space-y-2">
+                                <div className="text-xl font-medium">Makan :</div>
+                                <div>
+                                    <label className="inline-flex">
+                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" />
+                                        <span className="text-lg">Pemasukan</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label className="inline-flex">
+                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" />
+                                        <span className="text-lg ">Pengeluaran</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label className="inline-flex">
+                                        <input type="checkbox" defaultChecked className="form-checkbox outline-info w-6 h-6" />
+                                        <span className="text-lg">Pengajuan</span>
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <label htmlFor="gridTotal">Total :</label>
-                            <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="1234 Main St" className="form-input" />
-                        </div>
-                        <div>
-                            <label htmlFor="Cost">Cash</label>
-                            <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input" />
                         </div>
                         <div>
                             <button type="submit" className="btn btn-primary !mt-6 w-full">
-                                Submit
+                                <IconPlus className="mr-2 " /> Tambah
                             </button>
                         </div>
-                        <div>
-                            <label htmlFor="gridTotal">Kembalian :</label>
-                            <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="1234 Main St" className="form-input" />
-                        </div>
-                        {/* <div>
-                            <label className="flex items-center mt-1 cursor-pointer">
-                                <input type="checkbox" className="form-checkbox" />
-                                <span className="text-white-dark">Check me out</span>
-                            </label>
-                        </div>
-                        <button type="submit" className="btn btn-primary !mt-6">
-                            Submit
-                        </button> */}
                     </form>
                 </div>
             </div>

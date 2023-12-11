@@ -11,7 +11,7 @@ const EditAkun = () => {
             });
             toast.fire({
                 icon: 'success',
-                title: 'Data Berhasil Ditambah',
+                title: 'Data Berhasil Diubah',
                 padding: '10px 20px',
             });
         }
@@ -32,15 +32,15 @@ const EditAkun = () => {
                 </li>
             </ul>
             <div className="panel">
-                <h1 className='text-xl font-bold mb-6'>Edit Akun</h1>
+                <h1 className="text-xl font-bold mb-6">Edit Akun</h1>
                 <form className="space-y-5">
                     <div>
                         <label htmlFor="gridState">Jenis Akun</label>
                         <select id="gridState" className="form-select text-white-dark">
+                            <option>Modal</option>
                             <option>Choose...</option>
                             <option>Asset/Harta</option>
                             <option>Kewajiban/Hutang</option>
-                            <option>Modal</option>
                             <option>Pendapatan</option>
                             <option>Biaya</option>
                         </select>
@@ -51,22 +51,24 @@ const EditAkun = () => {
                             {/* <div className="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-white-light dark:border-[#17263c] dark:bg-[#1b2e4b]">
                                 @
                             </div> */}
-                            <input id="actionEmail" type="email" placeholder="Group..." className="form-input ltr:rounded-l-none rtl:rounded-r-none" />
+                            <input id="actionEmail" type="text" defaultValue="Bank BRI" placeholder="Group..." className="form-input ltr:rounded-l-none rtl:rounded-r-none" />
                         </div>
                     </div>
                     <div>
                         <label htmlFor="actionWeb">Keterangan</label>
-                        <input id="actionWeb" type="text" placeholder="Keterangan..." className="form-input" />
+                        <input id="actionWeb" type="text" placeholder="Keterangan..." defaultValue="Akun Pribadi" className="form-input" />
                     </div>
-                    <div className='flex'>
-                    <button type="submit" className="btn btn-primary !mt-6 mr-8" onClick={() => showAlert(20)}>
-                        Update
-                    </button>
-                    <Link to="/menukeuangan/akun/akun">
-                    <button type="submit" className="btn btn-primary !mt-6">
-                        Kembali
-                    </button>
-                    </Link>
+                    <div className="flex">
+                        <Link to="/menukeuangan/akun/akun">
+                        <button type="submit" className="btn btn-primary !mt-6 mr-8" onClick={() => showAlert(20)}>
+                            Update
+                        </button>
+                        </Link>
+                        <Link to="/menukeuangan/akun/akun">
+                            <button type="submit" className="btn btn-primary !mt-6">
+                                Kembali
+                            </button>
+                        </Link>
                     </div>
                 </form>
             </div>

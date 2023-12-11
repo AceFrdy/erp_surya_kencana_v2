@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
-const EditDetailAkun = () => {
+const AddSaldo = () => {
     const showAlert = async (type: number) => {
         if (type == 20) {
             const toast = Swal.mixin({
@@ -11,10 +12,26 @@ const EditDetailAkun = () => {
             });
             toast.fire({
                 icon: 'success',
-                title: 'Data Berhasil Diubah',
+                title: 'Data Berhasil Ditambah',
                 padding: '10px 20px',
             });
         }
+    };
+    const [cost, setCost] = useState('');
+
+    const handleCostChange = (e: { target: { value: any } }) => {
+        const inputValue = e.target.value;
+        let formatValue = '';
+
+        // Remove non-numeric characters
+        const numValue = inputValue.replace(/\D/g, '');
+
+        // Format the number with 'Rp.' prefix
+        if (numValue !== '') {
+            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
+        }
+
+        setCost(formatValue);
     };
     return (
         <div>
@@ -28,43 +45,38 @@ const EditDetailAkun = () => {
                     <span>Akun</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Edit Detail Akun</span>
+                    <span>Add Akun</span>
                 </li>
             </ul>
             <div className="panel">
-                <h1 className="text-xl font-bold mb-6">Edit Detail Akun</h1>
+                <h1 className="text-xl font-bold mb-6">Add Akun</h1>
                 <form className="space-y-5">
                     <div>
-                        <label htmlFor="gridState">Akun</label>
+                        <label htmlFor="gridState">Jenis Akun</label>
                         <select id="gridState" className="form-select text-white-dark">
-                            <option>Kewajiban/Hutang</option>
                             <option>Choose...</option>
                             <option>Asset/Harta</option>
+                            <option>Kewajiban/Hutang</option>
                             <option>Modal</option>
                             <option>Pendapatan</option>
                             <option>Biaya</option>
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="actionEmail">Nama Detail</label>
-                        <div className="flex flex-1">
-                            {/* <div className="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-white-light dark:border-[#17263c] dark:bg-[#1b2e4b]">
-                                @
-                            </div> */}
-                            <input id="actionEmail" type="email" defaultValue="Bang BCA" placeholder="Group..." className="form-input ltr:rounded-l-none rtl:rounded-r-none" />
+                            <label htmlFor="Cost">Cash</label>
+                            <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input" />
                         </div>
-                    </div>
                     <div>
                         <label htmlFor="actionWeb">Keterangan</label>
-                        <input id="actionWeb" type="text" placeholder="Keterangan..." defaultValue="isi Keterangan" className="form-input" />
+                        <input id="actionWeb" type="text" placeholder="Keterangan..." className="form-input" />
                     </div>
                     <div className="flex">
-                        <Link to="/menukeuangan/akun/detailakun">
-                            <button type="submit" className="btn btn-primary !mt-6 mr-8" onClick={() => showAlert(20)}>
-                                Update
-                            </button>
+                        <Link to="/menukeuangan/saldo">
+                        <button type="submit" className="btn btn-primary !mt-6 mr-8" onClick={() => showAlert(20)}>
+                            Tambah
+                        </button>
                         </Link>
-                        <Link to="/menukeuangan/akun/detailakun">
+                        <Link to="/menukeuangan/saldo">
                             <button type="submit" className="btn btn-primary !mt-6">
                                 Kembali
                             </button>
@@ -75,4 +87,4 @@ const EditDetailAkun = () => {
         </div>
     );
 };
-export default EditDetailAkun;
+export default AddSaldo;

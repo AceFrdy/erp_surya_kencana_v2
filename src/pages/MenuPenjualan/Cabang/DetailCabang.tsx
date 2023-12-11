@@ -419,7 +419,7 @@ const DetailCabang = () => {
                     </div>
                 </div>
             </div>
-
+            <h1 className='text-lg font-semibold mb-6'>Detail Cabang</h1>
             <div className="mb-5">
                 <div className="flex justify-center grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
                     <div className="panel h-full mr-4 col-span-2">
@@ -609,7 +609,7 @@ const DetailCabang = () => {
                                             <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                         </button> */}
                                                     <button type="button" style={{ color: 'orange' }}>
-                                                        <Link to="/menupenjualan/distribution/editdistribution">
+                                                        <Link to="/menupenjualan/cabang/listcabang/editcabang/:id">
                                                             <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                                         </Link>
                                                     </button>
@@ -669,7 +669,7 @@ const DetailCabang = () => {
                                             <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                         </button> */}
                                                     <button type="button" style={{ color: 'orange' }}>
-                                                        <Link to="/menupenjualan/distribution/editdistribution">
+                                                        <Link to="/menupenjualan/cabang/listcabang/editcabang/:id">
                                                             <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                                         </Link>
                                                     </button>

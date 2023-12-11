@@ -1,13 +1,17 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import ImageUploading, { ImageListType } from 'react-images-uploading';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
+import { setPageTitle } from '../../../../store/themeConfigSlice';
+// import 'file-upload-with-preview/dist/file-upload-with-preview.min.css';
+import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { IRootState } from '../../../../store';
 import Swal from 'sweetalert2';
+import 'flatpickr/dist/flatpickr.css';
+import Flatpickr from 'react-flatpickr';
 
-const InputProduk = () => {
+const AddUangKeluar = () => {
     const options = [
         { value: 'orange', label: 'Orange' },
         { value: 'white', label: 'White' },
@@ -19,6 +23,16 @@ const InputProduk = () => {
         dispatch(setPageTitle('File Upload Preview'));
     });
 
+
+    const [images, setImages] = useState<any>([]);
+    const maxNumber = 69;
+
+    const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
+        setImages(imageList as never[]);
+    };
+
+    const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
+    const [date1, setDate1] = useState<any>('2022-07-05');
     const showAlert = async (type: number) => {
         if (type == 20) {
             const toast = Swal.mixin({
@@ -34,12 +48,21 @@ const InputProduk = () => {
             });
         }
     };
+    const [cost, setCost] = useState('');
 
-    const [images, setImages] = useState<any>([]);
-    const maxNumber = 69;
+    const handleCostChange = (e: { target: { value: any } }) => {
+        const inputValue = e.target.value;
+        let formatValue = '';
 
-    const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
-        setImages(imageList as never[]);
+        // Remove non-numeric characters
+        const numValue = inputValue.replace(/\D/g, '');
+
+        // Format the number with 'Rp.' prefix
+        if (numValue !== '') {
+            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
+        }
+
+        setCost(formatValue);
     };
 
     const navigate = useNavigate();
@@ -129,113 +152,63 @@ const InputProduk = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Add Produk</span>
+                    <span>Add Uang Keluar</span>
                 </li>
             </ul>
             <div className="pt-5 space-y-8 ">
                 {/* Single File */}
                 <div className="grid lg:grid-cols-1 grid-cols-1 gap-6">
-                    <div className="panel " id="single_file">
-                        <h1 className="text-lg font-bold mb-12">Tambah Produk</h1>
-                        <div className="flex items-center justify-between mb-5">
-                            <form className="space-y-5" onSubmit={handleSubmit}>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label htmlFor="gridEmail">Nama Produk</label>
-                                        <input 
-                                        id="gridEmail" 
-                                        type="text" 
-                                        placeholder="Nama Produk..." 
-                                        className="form-input" 
-                                        value={formData.product_name}
-                                        onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="gridPassword">Harga</label>
-                                        <input 
-                                        id="gridPassword" 
-                                        type="Password" 
-                                        placeholder="Masukan Harga..." 
-                                        className="form-input" 
-                                        value={formData.product_price}
-                                        onChange={handleChange}
-                                        />
-                                    </div>
-                                </div>
+                    <div className="panel" id="single_file">
+                        <h1 className="text-lg font-bold mb-12">Add Uang Keluar</h1>
+                        <div className=" mb-5">
+                            <form className='space-y-5'>
                                 <div>
                                     <div>
-                                        <label htmlFor="gridState">Kategori Produk</label>
-                                        <select 
-                                        id="gridState" 
-                                        className="form-select text-white-dark"
-                                        // value={formData.product_category_id}
-                                        // onChange={handleChange}
-                                        >
+                                        <label htmlFor="gridState">Pilih Akun</label>
+                                        <select id="gridState" className="form-select text-white-dark w-full mb-4">
                                             <option>Choose...</option>
-                                            <option>1</option>
-                                            <option>2</option>
-                                            <option>3</option>
-                                            <option>4</option>
+                                            <option>Asset/Harta</option>
+                                            <option>Kewajiban/Hutang</option>
+                                            <option>Modal</option>
+                                            <option>Pendapatan</option>
+                                            <option>Biaya</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div>
-                                    <label htmlFor="gridState">Suplier</label>
-                                    <select 
-                                    id="gridState" 
-                                    className="form-select text-white-dark">
-                                        <option>Choose...</option>
-                                        <option>...</option>
-                                    </select>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                    <div className="md:col-span-2">
-                                        <label htmlFor="gridCity">Modal</label>
-                                        <input 
-                                        id="gridCity" 
-                                        type="text" 
-                                        placeholder="Masukan Modal..." 
-                                        className="form-input" 
-                                        value={formData.product_modal}
-                                        onChange={handleChange}
-                                        />
+                                    <div>
+                                        <label htmlFor="Cost">Index</label>
+                                        <input id="Cost" type="text" placeholder="Index..." className="form-input mb-4" />
                                     </div>
-                                    <div className="md:col-span-2">
-                                        <label htmlFor="gridCity">Penanggung Jawab</label>
-                                        <input 
-                                        id="gridCity" 
-                                        type="text" 
-                                        placeholder="Penanggung Jawab..." 
-                                        className="form-input" 
-                                        // value={formData.product_responsibility}
-                                        // onChange={handleChange}
-                                        />
+                                    <div>
+                                        <label htmlFor="Cost">Cash</label>
+                                        <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input mb-4" />
                                     </div>
-                                    <div className="md:col-span-2">
-                                        <label htmlFor="gridZip">Barcode</label>
-                                        <input id="gridZip" type="text" placeholder="Masukan Barcode..." className="form-input" />
+                                    <div>
+                                        <label htmlFor="Cost">Keterangan</label>
+                                        <input id="Cost" type="text" placeholder="Keterangan..." className="form-input mb-4" />
                                     </div>
-                                    <div className="md:col-span-1">
-                                        <label htmlFor="gridZip">Imei</label>
-                                        <input id="gridZip" type="text" placeholder="Masukan Imei..." className="form-input" />
+                                    <label htmlFor="Tanggal">Tanggal</label>
+                                    <Flatpickr
+                                        id="Tanggal"
+                                        value={date1}
+                                        options={{ dateFormat: 'Y-m-d', position: isRtl ? 'auto right' : 'auto left' }}
+                                        className="form-input mb-4"
+                                        onChange={(date) => setDate1(date)}
+                                    />
+                                    <div>
+                                        <label htmlFor="gridState">Index</label>
+                                        <select id="gridState" className="form-select text-white-dark mb-4">
+                                            <option>Choose...</option>
+                                            <option>Asset/Harta</option>
+                                            <option>Kewajiban/Hutang</option>
+                                            <option>Modal</option>
+                                            <option>Pendapatan</option>
+                                            <option>Biaya</option>
+                                        </select>
                                     </div>
-                                    <div className="md:col-span-1">
-                                        <label htmlFor="gridZip">Product Weight</label>
-                                        <input id="gridZip" type="text" placeholder="Masukan Berat..." className="form-input" />
+                                    <div>
+                                        <label htmlFor="Cost">Keterangan</label>
+                                        <input id="Cost" type="text" placeholder="Keterangan..." className="form-input" />
                                     </div>
-                                </div>
-                                <div>
-                                    <label className="flex items-center mt-1 cursor-pointer">
-                                        <input type="checkbox" className="form-checkbox" />
-                                        <span className="text-white-dark">POS</span>
-                                    </label>
-                                </div>
-                                <div>
-                                    <label className="flex items-center mt-1 cursor-pointer">
-                                        <input type="checkbox" className="form-checkbox" />
-                                        <span className="text-white-dark">E-Commerce</span>
-                                    </label>
                                 </div>
                             </form>
                         </div>
@@ -274,12 +247,12 @@ const InputProduk = () => {
                                 </ImageUploading>
                                 {images.length === 0 ? <img src="/assets/images/file-preview.svg" className="max-w-md w-full m-auto" alt="" /> : ''}
                                 <div className="flex">
-                                    <Link to="/menupenjualan/product/produk" >
+                                    <Link to="/menukeuangan/flowcash/uangkeluar" >
                                     <button type="submit" className="btn btn-primary !mt-6" onClick={() => showAlert(20)}>
-                                        Tambah
+                                        Submit
                                     </button>
                                     </Link>
-                                    <Link to="/menupenjualan/product/produk" >
+                                    <Link to="/menukeuangan/flowcash/uangkeluar">
                                     <button type="submit" className="btn btn-primary !mt-6 ml-6" onClick={handleCancel}>
                                         Cancel
                                     </button>
@@ -294,4 +267,4 @@ const InputProduk = () => {
     );
 };
 
-export default InputProduk;
+export default AddUangKeluar;

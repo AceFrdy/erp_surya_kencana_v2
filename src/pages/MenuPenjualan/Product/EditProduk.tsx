@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import ImageUploading, { ImageListType } from 'react-images-uploading';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
+import Swal from 'sweetalert2';
 
 const EditProduk = () => {
     const dispatch = useDispatch();
@@ -16,6 +17,21 @@ const EditProduk = () => {
             setCodeArr((value) => value.filter((d) => d !== name));
         } else {
             setCodeArr([...codeArr, name]);
+        }
+    };
+    const showAlert = async (type: number) => {
+        if (type == 20) {
+            const toast = Swal.mixin({
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 3000,
+            });
+            toast.fire({
+                icon: 'success',
+                title: 'Data Berhasil Diubah',
+                padding: '10px 20px',
+            });
         }
     };
 
@@ -143,7 +159,7 @@ const EditProduk = () => {
                                 {images.length === 0 ? <img src="/assets/images/file-preview.svg" className="max-w-md w-full m-auto" alt="" /> : ''}
                                 <div className='flex'>
                                 <Link to="/menupenjualan/product/produk">
-                                <button type="submit" className="btn btn-primary !mt-6">
+                                <button type="submit" className="btn btn-primary !mt-6" onClick={() => showAlert(20)}>
                                     Submit
                                 </button>
                                 </Link>
