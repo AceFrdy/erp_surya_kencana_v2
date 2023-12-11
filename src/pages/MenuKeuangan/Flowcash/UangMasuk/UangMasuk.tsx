@@ -1,14 +1,22 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
+import { setPageTitle } from '../../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-import IconPencil from '../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
+// import IconBell from '../../../components/Icon/IconBell';
+// import IconXCircle from '../../../components/Icon/IconXCircle';
+import IconPencil from '../../../../components/Icon/IconPencil';
+import IconTrashLines from '../../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
+// import { Dialog, Transition } from '@headlessui/react';
+// import IconPlus from '../../../components/Icon/IconPlus';
+// import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
-import IconSend from '../../../components/Icon/IconSend';
-import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
+import IconSend from '../../../../components/Icon/IconSend';
+import IconNotes from '../../../../components/Icon/IconNotes';
+import IconPlus from '../../../../components/Icon/IconPlus';
+// import * as Yup from 'yup';
+// import { Field, Form, Formik } from 'formik';
 
 const rowData = [
     {
@@ -17,7 +25,6 @@ const rowData = [
         lastName: 'Jensen',
         email: 'carolinejensen@zidant.com',
         dob: '2004-05-28',
-        status: 'Completed',
         address: {
             street: '529 Scholes Street',
             city: 'Temperanceville',
@@ -38,7 +45,6 @@ const rowData = [
         lastName: 'Grant',
         email: 'celestegrant@polarax.com',
         dob: '1989-11-19',
-        status: 'Pending',
         address: {
             street: '639 Kimball Street',
             city: 'Bascom',
@@ -59,7 +65,6 @@ const rowData = [
         lastName: 'Forbes',
         email: 'tillmanforbes@manglo.com',
         dob: '2016-09-05',
-        status: 'In Progress',
         address: {
             street: '240 Vandalia Avenue',
             city: 'Thynedale',
@@ -80,7 +85,6 @@ const rowData = [
         lastName: 'Whitley',
         email: 'daisywhitley@applideck.com',
         dob: '1987-03-23',
-        status: 'Canceled',
         address: {
             street: '350 Pleasant Place',
             city: 'Idledale',
@@ -101,7 +105,6 @@ const rowData = [
         lastName: 'Bowman',
         email: 'weberbowman@volax.com',
         dob: '1983-02-24',
-        status: 'Completed',
         address: {
             street: '154 Conway Street',
             city: 'Broadlands',
@@ -122,7 +125,6 @@ const rowData = [
         lastName: 'Townsend',
         email: 'buckleytownsend@orbaxter.com',
         dob: '2011-05-29',
-        status: 'Completed',
         address: {
             street: '131 Guernsey Street',
             city: 'Vallonia',
@@ -143,7 +145,6 @@ const rowData = [
         lastName: 'Bradshaw',
         email: 'latoyabradshaw@opportech.com',
         dob: '2010-11-23',
-        status: 'Canceled',
         address: {
             street: '668 Lenox Road',
             city: 'Lowgap',
@@ -164,7 +165,6 @@ const rowData = [
         lastName: 'Lindsay',
         email: 'katelindsay@gorganic.com',
         dob: '1987-07-02',
-        status: 'Pending',
         address: {
             street: '773 Harrison Avenue',
             city: 'Carlton',
@@ -185,7 +185,6 @@ const rowData = [
         lastName: 'Sandoval',
         email: 'marvasandoval@avit.com',
         dob: '2010-11-02',
-        status: 'Completed',
         address: {
             street: '200 Malta Street',
             city: 'Tuskahoma',
@@ -206,7 +205,6 @@ const rowData = [
         lastName: 'Russell',
         email: 'deckerrussell@quilch.com',
         dob: '1994-04-21',
-        status: 'In Progress',
         address: {
             street: '708 Bath Avenue',
             city: 'Coultervillle',
@@ -579,7 +577,7 @@ const showAlert = async (type: number) => {
         });
     }
 };
-const DetailDistribusi = () => {
+const UangMasuk = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Restock'));
@@ -595,8 +593,6 @@ const DetailDistribusi = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-
-    //
 
     useEffect(() => {
         setPage(1);
@@ -639,23 +635,7 @@ const DetailDistribusi = () => {
         return '';
     };
 
-    // const [operasionalCost, setOperasionalCost] = useState('');
-    // const [cost, setCost] = useState('');
-
-    // const handleOperasioanalCostChange = (e: { target: { value: any } }) => {
-    //     const inputValue = e.target.value;
-    //     let formattedValue = '';
-
-    //     // Remove non-numeric characters
-    //     const numericValue = inputValue.replace(/\D/g, '');
-
-    //     // Format the number with 'Rp.' prefix
-    //     if (numericValue !== '') {
-    //         formattedValue = `Rp. ${parseInt(numericValue, 10).toLocaleString('id-ID')}`;
-    //     }
-
-    //     setOperasionalCost(formattedValue);
-    // };
+    const [cost, setCost] = useState('');
 
     // const handleCostChange = (e: { target: { value: any } }) => {
     //     const inputValue = e.target.value;
@@ -680,75 +660,27 @@ const DetailDistribusi = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Menu Penjualan</span>
+                    <span>Menu Keuangan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> Distribusi </span>
+                    <span> Flow Cash </span>
                 </li>
             </ul>
+            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
+            </div> */}
             <div className="panel mt-6">
-                <h1 className="text-lg font-bold">Perkembangan Distribusi</h1>
-                <div className="flex mb-4 justify-end">
-                    {/* <button type="button" className="btn btn-outline-danger mr-4" onClick={() => showAlert(11)}>
-                        <IconTrashLines className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                        Batal
-                    </button> */}
-                    <Link to="/menupenjualan/distribution/laporandistribution">
-                        <button type="button" className="btn btn-outline-primary">
-                            <IconArrowBackward className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                            Kembali
-                        </button>
-                    </Link>
-                </div>
-                <form className="space-y-5">
-                    <div>
-                        <label htmlFor="gridState">Lokasi Tujuan</label>
-                        <select id="gridState" disabled className="form-select text-white-dark">
-                            <option>Gedung Utama</option>
-                            <option>...</option>
-                        </select>
-                    </div>
-                    {/* <div>
-                        <label htmlFor="Opcost">Operasional Cost</label>
-                        <input id="Opcost" type="text" value={operasionalCost} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
-                    </div> */}
-                    {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div>
-                            <label htmlFor="Search">Search Produk</label>
-                            <input id="Search" type="text" className="form-input" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
-                        </div>
-                        <div>
-                            <label htmlFor="Qty">Qty</label>
-                            <input id="Qty" type="Text" placeholder="" className="form-input" />
-                        </div>
-                        <div>
-                            <label htmlFor="gridState">Satuan</label>
-                            <select id="gridState" className="form-select text-white-dark">
-                                <option>Choose...</option>
-                                <option>...</option>
-                            </select>
-                        </div>
-                    </div> */}
-                    {/* <div>
-                        <label className="flex items-center mt-1 cursor-pointer">
-                            <input type="checkbox" className="form-checkbox" />
-                            <span className="text-white-dark">Check me out</span>
-                        </label>
-                    </div> */}
-                    {/* <button type="submit" className="btn btn-outline-primary !mt-6 w-full mb-6" onClick={() => showAlert(20)}>
-                        Tambah
-                    </button> */}
-                </form>
+                <h1 className="text-lg font-bold flex justify-center">Data Uang Masuk</h1>
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
+                    <Link to="/menukeuangan/flowcash/adduangmasuk">
                         <button type="button" className=" px-2 btn btn-outline-info">
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
-                    </Link> */}
+                    </Link>
+                    <div className="ltr:ml-auto rtl:mr-auto">
+                        <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                    </div>
                 </div>
-
-                <h5 className="font-semibold text-lg dark:text-white-light mb-4 mt-4 flex justify-center">Data Distribusi</h5>
-                <div className="datatables">
+                <div className="datatables panel xl:col-span-2">
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
@@ -756,50 +688,42 @@ const DetailDistribusi = () => {
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
                             {
-                                accessor: 'id',
-                                title: 'Barcode',
+                                accessor: 'age',
+                                title: 'No Dokumen',
                                 sortable: true,
-                                render: ({ id }) => (
-                                    <div className="flex items-center w-max">
-                                        <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
-                                        {/* <div>{firstName + ' ' + lastName}</div> */}
+                            },
+                            { accessor: 'firstName', title: 'Index', sortable: true },
+                            { accessor: 'email', title: 'Keterangan', sortable: true },
+                            { accessor: 'phone', title: 'Cash', sortable: true },
+                            {
+                                accessor: 'dob',
+                                title: 'Tanggal',
+                                sortable: true,
+                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
+                            },
+
+                            {
+                                accessor: 'action',
+                                title: 'Opsi',
+                                titleClassName: '!text-center',
+                                render: () => (
+                                    <div className="flex items-center w-max mx-auto gap-2">
+                                        <button type="button" style={{ color: 'blue' }}>
+                                            <Link to="/menukeuangan/flowcash/detailuangmasuk">
+                                                <IconNotes className="ltr:mr-2 rtl:ml-2 " />
+                                            </Link>
+                                        </button>
+                                        {/* <button type="button" style={{ color: 'orange' }}>
+                                                <Link to="/menupenjualan/restock/editrestock">
+                                                    <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                                </Link>
+                                            </button> */}
+                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                            </button> */}
                                     </div>
                                 ),
                             },
-                            {
-                                accessor: 'firstName',
-                                title: 'Nama',
-                                sortable: true,
-                            },
-                            { accessor: 'age', title: 'Qty', sortable: true },
-                            // {
-                            //     accessor: 'status',
-                            //     title: 'Status',
-                            //     sortable: true,
-                            //     render: (data) => (
-                            //         <span
-                            //             className={`badge whitespace-nowrap ${
-                            //                 data.status === 'completed'
-                            //                     ? 'bg-primary   '
-                            //                     : data.status === 'Pending'
-                            //                     ? 'bg-secondary'
-                            //                     : data.status === 'In Progress'
-                            //                     ? 'bg-success'
-                            //                     : data.status === 'Canceled'
-                            //                     ? 'bg-danger'
-                            //                     : 'bg-primary'
-                            //             }`}
-                            //         >
-                            //             {data.status}
-                            //         </span>
-                            //     ),
-                            // },
-                            // {
-                            //     accessor: 'age',
-                            //     title: 'Distribution Qty',
-                            //     sortable: true,
-                            // },
-                            // 
                         ]}
                         totalRecords={initialRecords.length}
                         recordsPerPage={pageSize}
@@ -818,4 +742,4 @@ const DetailDistribusi = () => {
     );
 };
 
-export default DetailDistribusi;
+export default UangMasuk;

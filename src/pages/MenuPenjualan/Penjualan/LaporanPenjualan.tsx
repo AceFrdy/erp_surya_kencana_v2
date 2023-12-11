@@ -689,11 +689,6 @@ const LaporanPenjualan = () => {
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/penjualan/editpenjualan">
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
                                         {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button> */}

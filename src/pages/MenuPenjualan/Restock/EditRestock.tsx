@@ -12,7 +12,7 @@ const showAlert = async (type: number) => {
         });
         toast.fire({
             icon: 'success',
-            title: 'Data Berhasil Ditambah',
+            title: 'Data Berhasil Diubah',
             padding: '10px 20px',
         });
     }
@@ -62,37 +62,37 @@ const EditRestock = () => {
                     <span>Menu Penjualan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <Link to="/menupenjualan/restock/restock" className="text-primary hover:underline"> 
-                    Restock 
+                    <Link to="/menupenjualan/restock/restock" className="text-primary hover:underline">
+                        Restock
                     </Link>
                 </li>
             </ul>
-            <div className='panel mt-6'>
+            <div className="panel mt-6">
                 <h1 className="text-xl font-bold mb-4">Edit Data</h1>
                 <form className="space-y-5">
                     <div>
                         <label htmlFor="gridState">Supplier</label>
                         <select id="gridState" className="form-select text-white-dark">
-                            <option>Choose...</option>
-                            <option>...</option>
+                            <option>Trickster</option>
+                            <option>Chose...</option>
                         </select>
                     </div>
                     <div>
                         <label htmlFor="Opcost">Operasional Cost</label>
-                        <input id="Opcost" type="text" value={operasionalCost} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
+                        <input id="Opcost" type="text" value={1028237} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label htmlFor="Produk">Produk</label>
-                            <input id="Produk" type="Text" placeholder="Produk" className="form-input" />
+                            <input id="Produk" type="Text" placeholder="Produk..." value="Baju" className="form-input" />
                         </div>
                         <div>
                             <label htmlFor="Qty">Qty</label>
-                            <input id="Qty" type="Text" placeholder="" className="form-input" />
+                            <input id="Qty" type="Text" placeholder="Qty..." value="224" className="form-input" />
                         </div>
                         <div>
                             <label htmlFor="Cost">Harga</label>
-                            <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input" />
+                            <input id="Cost" type="text" value={224456} onChange={handleCostChange} placeholder="Rp." className="form-input" />
                         </div>
                     </div>
                     <div>
@@ -101,15 +101,17 @@ const EditRestock = () => {
                             <span className="text-white-dark">Check me out</span>
                         </label>
                     </div>
-                    <div className='flex'>
-                    <button type="submit" className="btn btn-outline-primary !mt-6" onClick={() => showAlert(20)}>
-                        Update
-                    </button>
-                    <Link to="/menupenjualan/restock/listrestock">
-                    <button type="submit" className="btn btn-outline-danger !mt-6 ml-6">
-                        Kembali
-                    </button>
-                    </Link>
+                    <div className="flex">
+                        <Link to="/menupenjualan/restock/listrestock">
+                            <button type="submit" className="btn btn-outline-primary !mt-6" onClick={() => showAlert(20)}>
+                                Update
+                            </button>
+                        </Link>
+                        <Link to="/menupenjualan/restock/listrestock">
+                            <button type="submit" className="btn btn-outline-danger !mt-6 ml-6">
+                                Kembali
+                            </button>
+                        </Link>
                     </div>
                 </form>
             </div>

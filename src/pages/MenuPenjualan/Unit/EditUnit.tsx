@@ -11,7 +11,7 @@ const submitForm = () => {
     });
     toast.fire({
         icon: 'success',
-        title: 'Unit Berhasil Ditambah',
+        title: 'Unit Berhasil Diubah',
         padding: '10px 20px',
     });
 };

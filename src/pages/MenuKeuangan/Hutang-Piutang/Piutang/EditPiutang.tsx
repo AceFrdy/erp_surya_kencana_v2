@@ -1,14 +1,14 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
+import { setPageTitle } from '../../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-import IconPencil from '../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
+import IconPencil from '../../../../components/Icon/IconPencil';
+import IconTrashLines from '../../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import IconSend from '../../../components/Icon/IconSend';
-import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
+import IconSend from '../../../../components/Icon/IconSend';
+import IconArrowBackward from '../../../../components/Icon/IconArrowBackward';
 
 const rowData = [
     {
@@ -524,47 +524,6 @@ const rowData = [
 ];
 
 const showAlert = async (type: number) => {
-    if (type === 11) {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
-                popup: 'sweet-alerts',
-            },
-            buttonsStyling: false,
-        });
-        swalWithBootstrapButtons
-            .fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true,
-                padding: '2em',
-            })
-            .then((result) => {
-                if (result.value) {
-                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
-                }
-            });
-    }
-    if (type === 15) {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-        });
-        toast.fire({
-            icon: 'success',
-            title: 'Berhasil Dikirim',
-            padding: '10px 20px',
-        });
-    }
     if (type == 20) {
         const toast = Swal.mixin({
             toast: true,
@@ -574,12 +533,12 @@ const showAlert = async (type: number) => {
         });
         toast.fire({
             icon: 'success',
-            title: 'Data Berhasil Ditambah',
+            title: 'Data Berhasil Diubah',
             padding: '10px 20px',
         });
     }
 };
-const DetailDistribusi = () => {
+const EditPiutang = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Restock'));
@@ -639,38 +598,38 @@ const DetailDistribusi = () => {
         return '';
     };
 
-    // const [operasionalCost, setOperasionalCost] = useState('');
-    // const [cost, setCost] = useState('');
+    const [operasionalCost, setOperasionalCost] = useState('');
+    const [cost, setCost] = useState('');
 
-    // const handleOperasioanalCostChange = (e: { target: { value: any } }) => {
-    //     const inputValue = e.target.value;
-    //     let formattedValue = '';
+    const handleOperasioanalCostChange = (e: { target: { value: any } }) => {
+        const inputValue = e.target.value;
+        let formattedValue = '';
 
-    //     // Remove non-numeric characters
-    //     const numericValue = inputValue.replace(/\D/g, '');
+        // Remove non-numeric characters
+        const numericValue = inputValue.replace(/\D/g, '');
 
-    //     // Format the number with 'Rp.' prefix
-    //     if (numericValue !== '') {
-    //         formattedValue = `Rp. ${parseInt(numericValue, 10).toLocaleString('id-ID')}`;
-    //     }
+        // Format the number with 'Rp.' prefix
+        if (numericValue !== '') {
+            formattedValue = `Rp. ${parseInt(numericValue, 10).toLocaleString('id-ID')}`;
+        }
 
-    //     setOperasionalCost(formattedValue);
-    // };
+        setOperasionalCost(formattedValue);
+    };
 
-    // const handleCostChange = (e: { target: { value: any } }) => {
-    //     const inputValue = e.target.value;
-    //     let formatValue = '';
+    const handleCostChange = (e: { target: { value: any } }) => {
+        const inputValue = e.target.value;
+        let formatValue = '';
 
-    //     // Remove non-numeric characters
-    //     const numValue = inputValue.replace(/\D/g, '');
+        // Remove non-numeric characters
+        const numValue = inputValue.replace(/\D/g, '');
 
-    //     // Format the number with 'Rp.' prefix
-    //     if (numValue !== '') {
-    //         formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-    //     }
+        // Format the number with 'Rp.' prefix
+        if (numValue !== '') {
+            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
+        }
 
-    //     setCost(formatValue);
-    // };
+        setCost(formatValue);
+    };
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -680,64 +639,49 @@ const DetailDistribusi = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Menu Penjualan</span>
+                    <span>Menu Keuangan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> Distribusi </span>
+                    <span> Edit Data Piutang </span>
                 </li>
             </ul>
+            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
+            </div> */}
             <div className="panel mt-6">
-                <h1 className="text-lg font-bold">Perkembangan Distribusi</h1>
+                <h1 className="text-lg font-bold">Edit Data Piutang</h1>
                 <div className="flex mb-4 justify-end">
                     {/* <button type="button" className="btn btn-outline-danger mr-4" onClick={() => showAlert(11)}>
                         <IconTrashLines className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
                         Batal
                     </button> */}
-                    <Link to="/menupenjualan/distribution/laporandistribution">
-                        <button type="button" className="btn btn-outline-primary">
-                            <IconArrowBackward className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                            Kembali
-                        </button>
+                    <Link to="/menukeuangan/hutang-piutang/piutang">
+                    <button type="button" className="btn btn-outline-primary">
+                        <IconArrowBackward className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                        Kembali
+                    </button>
                     </Link>
                 </div>
+                {/* <h1 className="text-lg font-bold mb-4">Kode:SK0012023</h1> */}
                 <form className="space-y-5">
                     <div>
-                        <label htmlFor="gridState">Lokasi Tujuan</label>
-                        <select id="gridState" disabled className="form-select text-white-dark">
-                            <option>Gedung Utama</option>
-                            <option>...</option>
-                        </select>
+                        <label htmlFor="Opcost">Total : </label>
+                        <input id="Opcost" disabled type="text" defaultValue={121212} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
                     </div>
-                    {/* <div>
-                        <label htmlFor="Opcost">Operasional Cost</label>
-                        <input id="Opcost" type="text" value={operasionalCost} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
-                    </div> */}
-                    {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div>
-                            <label htmlFor="Search">Search Produk</label>
-                            <input id="Search" type="text" className="form-input" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
-                        </div>
-                        <div>
-                            <label htmlFor="Qty">Qty</label>
-                            <input id="Qty" type="Text" placeholder="" className="form-input" />
-                        </div>
-                        <div>
-                            <label htmlFor="gridState">Satuan</label>
-                            <select id="gridState" className="form-select text-white-dark">
-                                <option>Choose...</option>
-                                <option>...</option>
-                            </select>
-                        </div>
-                    </div> */}
-                    {/* <div>
-                        <label className="flex items-center mt-1 cursor-pointer">
-                            <input type="checkbox" className="form-checkbox" />
-                            <span className="text-white-dark">Check me out</span>
-                        </label>
-                    </div> */}
-                    {/* <button type="submit" className="btn btn-outline-primary !mt-6 w-full mb-6" onClick={() => showAlert(20)}>
+                    <div>
+                        <label htmlFor="Opcost">Terbayar : </label>
+                        <input id="Opcost" disabled type="text" defaultValue={121246} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
+                    </div>
+                    <div>
+                        <label htmlFor="Opcost">Sisa</label>
+                        <input id="Opcost" disabled type="text" defaultValue={562} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
+                    </div>
+                    <div>
+                        <label htmlFor="Cost">Bayar</label>
+                        <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input" />
+                    </div>
+                    <button type="submit" className="btn btn-outline-primary !mt-6 w-full" onClick={() => showAlert(20)}>
                         Tambah
-                    </button> */}
+                    </button>
                 </form>
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
                     {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
@@ -745,9 +689,12 @@ const DetailDistribusi = () => {
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
                     </Link> */}
+                    <div className="ltr:ml-auto rtl:mr-auto mt-8">
+                        <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                    </div>
                 </div>
 
-                <h5 className="font-semibold text-lg dark:text-white-light mb-4 mt-4 flex justify-center">Data Distribusi</h5>
+                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Data Hutang</h5>
                 <div className="datatables">
                     <DataTable
                         highlightOnHover
@@ -755,51 +702,15 @@ const DetailDistribusi = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
+                            { accessor: 'age', title: 'Bayar', sortable: true },
                             {
-                                accessor: 'id',
-                                title: 'Barcode',
+                                accessor: 'dob',
+                                title: 'Tanggal',
                                 sortable: true,
-                                render: ({ id }) => (
-                                    <div className="flex items-center w-max">
-                                        <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
-                                        {/* <div>{firstName + ' ' + lastName}</div> */}
-                                    </div>
-                                ),
+                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
                             },
-                            {
-                                accessor: 'firstName',
-                                title: 'Nama',
-                                sortable: true,
-                            },
-                            { accessor: 'age', title: 'Qty', sortable: true },
-                            // {
-                            //     accessor: 'status',
-                            //     title: 'Status',
-                            //     sortable: true,
-                            //     render: (data) => (
-                            //         <span
-                            //             className={`badge whitespace-nowrap ${
-                            //                 data.status === 'completed'
-                            //                     ? 'bg-primary   '
-                            //                     : data.status === 'Pending'
-                            //                     ? 'bg-secondary'
-                            //                     : data.status === 'In Progress'
-                            //                     ? 'bg-success'
-                            //                     : data.status === 'Canceled'
-                            //                     ? 'bg-danger'
-                            //                     : 'bg-primary'
-                            //             }`}
-                            //         >
-                            //             {data.status}
-                            //         </span>
-                            //     ),
-                            // },
-                            // {
-                            //     accessor: 'age',
-                            //     title: 'Distribution Qty',
-                            //     sortable: true,
-                            // },
-                            // 
+                            { accessor: 'age', title: 'Sisa', sortable: true },
+                            
                         ]}
                         totalRecords={initialRecords.length}
                         recordsPerPage={pageSize}
@@ -818,4 +729,4 @@ const DetailDistribusi = () => {
     );
 };
 
-export default DetailDistribusi;
+export default EditPiutang;

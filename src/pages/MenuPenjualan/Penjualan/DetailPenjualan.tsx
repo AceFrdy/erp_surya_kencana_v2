@@ -669,55 +669,9 @@ const DetailPenjualan = () => {
             </div> */}
             <div className="panel mt-6">
                 <h1 className="text-lg font-bold flex justify-center">Detail Penjualan</h1>
-                {/* <div className="flex mb-4 justify-end">
-                    <button type="button" className="btn btn-outline-danger mr-4" onClick={() => showAlert(11)}>
-                        <IconTrashLines className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                        Batal
-                    </button>
-                    <button type="button" className="btn btn-outline-primary" onClick={() => showAlert(15)}>
-                        <IconSend className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                        Kirim
-                    </button>
-                </div> */}
-                {/* <h1 className="text-lg font-bold mb-4">Kode:SK0012023</h1>
-                <form className="space-y-5">
-                    <div>
-                        <label htmlFor="gridState">Supplier</label>
-                        <select id="gridState" className="form-select text-white-dark">
-                            <option>Choose...</option>
-                            <option>...</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label htmlFor="Opcost">Operasional Cost</label>
-                        <input id="Opcost" type="text" value={operasionalCost} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div>
-                            <label htmlFor="Produk">Produk</label>
-                            <input id="Produk" type="Text" placeholder="Produk" className="form-input" />
-                        </div>
-                        <div>
-                            <label htmlFor="Qty">Qty</label>
-                            <input id="Qty" type="Text" placeholder="" className="form-input" />
-                        </div>
-                        <div>
-                            <label htmlFor="Cost">Harga</label>
-                            <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input" />
-                        </div>
-                    </div>
-                    <div>
-                        <label className="flex items-center mt-1 cursor-pointer">
-                            <input type="checkbox" className="form-checkbox" />
-                            <span className="text-white-dark">Check me out</span>
-                        </label>
-                    </div>
-                    <button type="submit" className="btn btn-outline-primary !mt-6 w-full" onClick={() => showAlert(20)}>
-                        Tambah
-                    </button>
-                </form> */}
+                
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    <Link to="/menupenjualan/penjualan/penjualan">
+                    <Link to="/menupenjualan/penjualan/laporanpenjualan">
                         <button type="button" className=" px-2 btn btn-outline-info">
                             <IconArrowBackward className="flex mx-2" fill={true} /> Kembali
                         </button>
@@ -796,30 +750,30 @@ const DetailPenjualan = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
                             <div>
                                 <label htmlFor="gridCustomer">Customer</label>
-                                <select id="gridCustomer" className="form-select text-white-dark">
+                                <select id="gridCustomer" disabled className="form-select text-white-dark">
+                                    <option>Trickster</option>
                                     <option>Choose...</option>
-                                    <option>...</option>
                                 </select>
                             </div>
                             <div>
                                 <label htmlFor="gridCabang">Cabang</label>
-                                <select id="gridCabang" disabled={true} defaultValue="Cabang 1" className="form-select text-white-dark">
+                                <select id="gridCabang" disabled className="form-select text-white-dark">
+                                    <option>Gedung Utama</option>
                                     <option>Choose...</option>
-                                    <option>...</option>
                                 </select>
                             </div>
                         </div>
                         <div>
                             <label htmlFor="gridTotal">Total </label>
-                            <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="1234 Main St" className="form-input" />
+                            <input id="gridTotal" type="text" disabled placeholder="Enter Total" defaultValue="2.234.445" className="form-input" />
                         </div>
                         <div>
                             <label htmlFor="Cost">Cash</label>
-                            <input id="Cost" type="text" value={cost} onChange={handleCostChange} defaultValue="12.0000.000" placeholder="Rp." className="form-input" />
+                            <input id="Cost" type="text" disabled value="2.335.000" onChange={handleCostChange} defaultValue="12.0000.000" placeholder="Rp." className="form-input" />
                         </div>
                         <div>
                             <label htmlFor="gridTotal">Kembalian </label>
-                            <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="10.293.003" className="form-input" />
+                            <input id="gridTotal" disabled type="text" placeholder="Enter Kembalian" defaultValue="10.293.003" className="form-input" />
                         </div>
                         {/* <div>
                             <label className="flex items-center mt-1 cursor-pointer">
