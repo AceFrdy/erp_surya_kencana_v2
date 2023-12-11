@@ -515,7 +515,7 @@ const rowData = [
     },
 ];
 
-const CustomerOnline = () => {
+const DetailCustomerOnline = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Multi Column Table'));
@@ -650,28 +650,28 @@ const CustomerOnline = () => {
                                 sortable: true,
                             },
                             { accessor: 'phone', title: 'No HP', sortable: true },
-                            // {
-                            //     accessor: 'action',
-                            //     title: 'Opsi',
-                            //     titleClassName: '!text-center',
-                            //     render: () => (
-                            //         <div className="flex items-center w-max mx-auto gap-2">
-                            //             <button type="button" style={{ color: 'orange' }}>
-                            //                 <Link to="/customer/online/edit-customer-online">
-                            //                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                            //                 </Link>
-                            //             </button>
-                            //             <button type="button" style={{ color: 'blue' }}>
-                            //                 <Link to="customer/online/detail-customer-online">
-                            //                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                            //                 </Link>
-                            //             </button>
-                            //             <button type="button" style={{ color: 'red' }} onClick={() => setHapusCustomer(true)}>
-                            //                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                            //             </button>
-                            //         </div>
-                            //     ),
-                            // },
+                            {
+                                accessor: 'action',
+                                title: 'Opsi',
+                                titleClassName: '!text-center',
+                                render: () => (
+                                    <div className="flex items-center w-max mx-auto gap-2">
+                                        {/* <button type="button" style={{ color: 'orange' }}>
+                                            <Link to="/customer/online/edit-customer-online">
+                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                            </Link>
+                                        </button> */}
+                                        <button type="button" style={{ color: 'blue' }}>
+                                            <Link to="customer/online/detail-customer-online">
+                                            <IconNotes className="ltr:mr-2 rtl:ml-2 " />
+                                            </Link>
+                                        </button>
+                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => setHapusCustomer(true)}>
+                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                        </button> */}
+                                    </div>
+                                ),
+                            },
                         ]}
                         totalRecords={initialRecords.length}
                         recordsPerPage={pageSize}
@@ -690,4 +690,4 @@ const CustomerOnline = () => {
     );
 };
 
-export default CustomerOnline;
+export default DetailCustomerOnline;

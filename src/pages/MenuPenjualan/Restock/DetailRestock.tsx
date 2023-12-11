@@ -13,6 +13,8 @@ import { Link } from 'react-router-dom';
 import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
 import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
+import IconTrashLines from '../../../components/Icon/IconTrashLines';
+import IconSend from '../../../components/Icon/IconSend';
 
 const rowData = [
     {
@@ -595,6 +597,38 @@ const DetailRestock = () => {
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
+    const [operasionalCost, setOperasionalCost] = useState('');
+    const [cost, setCost] = useState('');
+
+    const handleOperasioanalCostChange = (e: { target: { value: any } }) => {
+        const inputValue = e.target.value;
+        let formattedValue = '';
+
+        // Remove non-numeric characters
+        const numericValue = inputValue.replace(/\D/g, '');
+
+        // Format the number with 'Rp.' prefix
+        if (numericValue !== '') {
+            formattedValue = `Rp. ${parseInt(numericValue, 10).toLocaleString('id-ID')}`;
+        }
+
+        setOperasionalCost(formattedValue);
+    };
+
+    const handleCostChange = (e: { target: { value: any } }) => {
+        const inputValue = e.target.value;
+        let formatValue = '';
+
+        // Remove non-numeric characters
+        const numValue = inputValue.replace(/\D/g, '');
+
+        // Format the number with 'Rp.' prefix
+        if (numValue !== '') {
+            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
+        }
+
+        setCost(formatValue);
+    };
 
     return (
         <div>
@@ -624,6 +658,54 @@ const DetailRestock = () => {
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>
+                {/* <h1 className="text-lg font-bold">Data Restock</h1> */}
+                {/* <div className="flex mb-4 justify-end">
+                    <button type="button" className="btn btn-outline-danger mr-4" onClick={() => showAlert(11)}>
+                        <IconTrashLines className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                        Batal
+                    </button>
+                    <button type="button" className="btn btn-outline-primary" onClick={() => showAlert(15)}>
+                        <IconSend className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                        Kirim
+                    </button>
+                </div> */}
+                <h1 className="text-lg font-bold mb-4">Kode:SK0012023</h1>
+                <form className="space-y-5 mb-6">
+                    <div>
+                        <label htmlFor="gridState">Supplier</label>
+                        <select id="gridState" disabled={true} className="form-select text-white-dark">
+                            <option>Choose...</option>
+                            <option>...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor="Opcost">Operasional Cost</label>
+                        <input id="Opcost" type="text" disabled={true} value={operasionalCost} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
+                    </div>
+                    {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label htmlFor="Produk">Produk</label>
+                            <input id="Produk" type="Text" placeholder="Produk" className="form-input" />
+                        </div>
+                        <div>
+                            <label htmlFor="Qty">Qty</label>
+                            <input id="Qty" type="Text" placeholder="" className="form-input" />
+                        </div>
+                        <div>
+                            <label htmlFor="Cost">Harga</label>
+                            <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input" />
+                        </div>
+                    </div> */}
+                    {/* <div>
+                        <label className="flex items-center mt-1 cursor-pointer">
+                            <input type="checkbox" className="form-checkbox" />
+                            <span className="text-white-dark">Check me out</span>
+                        </label>
+                    </div>
+                    <button type="submit" className="btn btn-outline-primary !mt-6 w-full" onClick={() => showAlert(20)}>
+                        Tambah
+                    </button> */}
+                </form>
                 <h5 className="font-semibold text-lg dark:text-white-light mb-2">Detail Restock</h5>
                 <div className="datatables">
                     <DataTable
