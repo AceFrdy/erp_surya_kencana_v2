@@ -10,6 +10,7 @@ import IconPlus from '../../../components/Icon/IconPlus';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { orderBy } from 'lodash';
+import { useModal } from '../../../hooks/use-modal';
 
 const rowData = [
     {
@@ -539,11 +540,23 @@ const CustomerOffline = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const [hapusCustomer, setHapusCustomer] = useState(false);
+    // const [hapusCustomer, setHapusCustomer] = useState(false);
     const token = localStorage.getItem('accessToken') ?? '';
     const [initialRecords, setInitialRecords] = useState<CustomersDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
     const navigate = useNavigate();
+    const { onOpen } = useModal();
+
+    const handleModal = (id: number) => {
+        toast('Apakah Anda yakin ingin menghapus Customer?', {
+            position: 'top-center',
+            autoClose: false,
+            hideProgressBar: false,
+            draggable: true,
+            progress: undefined,
+            theme: 'light',
+        });
+    };
 
     const handleDelete = (id: number) => {
         axios
@@ -576,7 +589,7 @@ const CustomerOffline = () => {
             .catch((err) => {
                 console.log(err.message);
             });
-    }, []);
+    }, [initialRecords]);
 
     useEffect(() => {
         setPage(1);
@@ -661,10 +674,10 @@ const CustomerOffline = () => {
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        <button type="button" style={{ color: 'red' }} onClick={() => setHapusCustomer(true)}>
+                                        <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete', e.id)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
-                                        <Transition appear show={hapusCustomer} as={Fragment}>
+                                        {/* <Transition appear show={hapusCustomer} as={Fragment}>
                                             <Dialog as="div" open={hapusCustomer} onClose={() => setHapusCustomer(false)}>
                                                 <Transition.Child
                                                     as={Fragment}
@@ -704,7 +717,7 @@ const CustomerOffline = () => {
                                                                         <button type="button" className="btn btn-outline-danger" onClick={() => setHapusCustomer(false)}>
                                                                             Kembali
                                                                         </button>
-                                                                        <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => handleDelete(e.id)}>
+                                                                        <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => alert('hapus')}>
                                                                             Hapus
                                                                         </button>
                                                                     </div>
@@ -714,7 +727,7 @@ const CustomerOffline = () => {
                                                     </div>
                                                 </div>
                                             </Dialog>
-                                        </Transition>
+                                        </Transition> */}
                                     </div>
                                 ),
                             },
