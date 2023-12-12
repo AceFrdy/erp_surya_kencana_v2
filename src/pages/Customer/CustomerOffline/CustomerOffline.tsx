@@ -1,16 +1,15 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useEffect, useState, Fragment } from 'react';
-import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-import IconBell from '../../../components/Icon/IconBell';
-import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import IconPlus from '../../../components/Icon/IconPlus';
-import IconNotes from '../../../components/Icon/IconNotes';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { orderBy } from 'lodash';
 
 const rowData = [
     {
@@ -515,6 +514,17 @@ const rowData = [
     },
 ];
 
+interface CustomersDataProps {
+    id: number;
+    name: string;
+    contact: number;
+    address: string;
+    privilage: {
+        id: number;
+        privilage_name: string;
+    };
+}
+
 const CustomerOffline = () => {
     const dispatch = useDispatch();
     useEffect(() => {
@@ -523,8 +533,6 @@ const CustomerOffline = () => {
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
 
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
@@ -532,6 +540,43 @@ const CustomerOffline = () => {
         direction: 'asc',
     });
     const [hapusCustomer, setHapusCustomer] = useState(false);
+    const token = localStorage.getItem('accessToken') ?? '';
+    const [initialRecords, setInitialRecords] = useState<CustomersDataProps[]>([]);
+    const [recordsData, setRecordsData] = useState(initialRecords);
+    const navigate = useNavigate();
+
+    const handleDelete = (id: number) => {
+        axios
+            .delete(`https://erp.digitalindustryagency.com/api/users/${id}`, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then(() => {
+                toast.success('Customer Offline Berhasil Dihapus.');
+                navigate(0);
+            })
+            .catch((err) => {
+                console.log('DELETE CUSTOMER', err);
+            });
+    };
+
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/customers-offline', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setInitialRecords(orderBy(response.data.data.resource, 'created_at', 'desc'));
+            })
+            .catch((err) => {
+                console.log(err.message);
+            });
+    }, []);
 
     useEffect(() => {
         setPage(1);
@@ -543,72 +588,28 @@ const CustomerOffline = () => {
         setRecordsData([...initialRecords.slice(from, to)]);
     }, [page, pageSize, initialRecords]);
 
+    console.log(search);
     useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
-                return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
-                );
+        if (!initialRecords) {
+            return;
+        }
+        setRecordsData(() => {
+            return initialRecords.filter((item) => {
+                return item.name.toLowerCase().includes(search.toLowerCase()) || item.address.toLowerCase().includes(search.toLowerCase()) || item.contact.toString().includes(search.toLowerCase());
             });
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search]);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        const data = orderBy(initialRecords, sortStatus.columnAccessor, 'desc');
+        setInitialRecords(sortStatus.direction === 'desc' ? data.toReversed() : data);
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
 
     return (
         <div>
-            <Transition appear show={hapusCustomer} as={Fragment}>
-                <Dialog as="div" open={hapusCustomer} onClose={() => setHapusCustomer(false)}>
-                    <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
-                        <div className="fixed inset-0" />
-                    </Transition.Child>
-                    <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
-                        <div className="flex items-start justify-center min-h-screen px-4">
-                            <Transition.Child
-                                as={Fragment}
-                                enter="ease-out duration-300"
-                                enterFrom="opacity-0 scale-95"
-                                enterTo="opacity-100 scale-100"
-                                leave="ease-in duration-200"
-                                leaveFrom="opacity-100 scale-100"
-                                leaveTo="opacity-0 scale-95"
-                            >
-                                <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
-                                    <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                        <div className="text-lg font-bold">Hapus Customer</div>
-                                    </div>
-                                    <div className="p-5">
-                                        <div>
-                                            <form className="space-y-5">
-                                                <div>
-                                                    <h1>Apakah Anda yakin ingin menghapus Customer</h1>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <div className="flex justify-end items-center mt-8">
-                                            <button type="button" className="btn btn-outline-danger" onClick={() => setHapusCustomer(false)}>
-                                                Kembali
-                                            </button>
-                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setHapusCustomer(false)}>
-                                                Hapus
-                                            </button>
-                                        </div>
-                                    </div>
-                                </Dialog.Panel>
-                            </Transition.Child>
-                        </div>
-                    </div>
-                </Dialog>
-            </Transition>
             <ul className="flex space-x-2 rtl:space-x-reverse">
                 <li>
                     <Link to="/" className="text-primary hover:underline">
@@ -642,28 +643,78 @@ const CustomerOffline = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'firstName', title: 'Nama Customer', sortable: true },
+                            { accessor: 'name', title: 'Nama Customer', sortable: true },
                             {
-                                accessor: 'address.street',
+                                accessor: 'address',
                                 title: 'Address',
                                 sortable: true,
                             },
-                            { accessor: 'phone', title: 'No HP', sortable: true },
+                            { accessor: 'contact', title: 'No HP', sortable: true },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
-                                render: () => (
+                                render: (e) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/customer/offline/edit-customer-offline">
+                                            <Link to={`/customer/offline/edit-customer-offline/${e.id}`}>
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
                                         <button type="button" style={{ color: 'red' }} onClick={() => setHapusCustomer(true)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
+                                        <Transition appear show={hapusCustomer} as={Fragment}>
+                                            <Dialog as="div" open={hapusCustomer} onClose={() => setHapusCustomer(false)}>
+                                                <Transition.Child
+                                                    as={Fragment}
+                                                    enter="ease-out duration-300"
+                                                    enterFrom="opacity-0"
+                                                    enterTo="opacity-100"
+                                                    leave="ease-in duration-200"
+                                                    leaveFrom="opacity-100"
+                                                    leaveTo="opacity-0"
+                                                >
+                                                    <div className="fixed inset-0" />
+                                                </Transition.Child>
+                                                <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
+                                                    <div className="flex items-start justify-center min-h-screen px-4">
+                                                        <Transition.Child
+                                                            as={Fragment}
+                                                            enter="ease-out duration-300"
+                                                            enterFrom="opacity-0 scale-95"
+                                                            enterTo="opacity-100 scale-100"
+                                                            leave="ease-in duration-200"
+                                                            leaveFrom="opacity-100 scale-100"
+                                                            leaveTo="opacity-0 scale-95"
+                                                        >
+                                                            <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
+                                                                <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                                                                    <div className="text-lg font-bold">Hapus Customer</div>
+                                                                </div>
+                                                                <div className="p-5">
+                                                                    <div>
+                                                                        <form className="space-y-5">
+                                                                            <div>
+                                                                                <h1>Apakah Anda yakin ingin menghapus Customer</h1>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                    <div className="flex justify-end items-center mt-8">
+                                                                        <button type="button" className="btn btn-outline-danger" onClick={() => setHapusCustomer(false)}>
+                                                                            Kembali
+                                                                        </button>
+                                                                        <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => handleDelete(e.id)}>
+                                                                            Hapus
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </Dialog.Panel>
+                                                        </Transition.Child>
+                                                    </div>
+                                                </div>
+                                            </Dialog>
+                                        </Transition>
                                     </div>
                                 ),
                             },

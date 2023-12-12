@@ -1,31 +1,31 @@
 import { lazy } from 'react';
 const Index = lazy(() => import('../pages/Index'));
 const Ecommerce = lazy(() => import('../pages/Ecommerce'));
-const Kategoriproduk = lazy(() => import('../pages/MenuPenjualan/KategoriProduk/KategoriProduk'))
-const Produk = lazy(() => import('../pages/MenuPenjualan/Product/Produk'))
-const Unit = lazy(() => import('../pages/MenuPenjualan/Unit/Unit'))
-const AddUnit = lazy(() => import('../pages/MenuPenjualan/Unit/AddUnit'))
-const EditUnit = lazy(() => import('../pages/MenuPenjualan/Unit/EditUnit'))
-const AddProduk = lazy(() => import('../pages/MenuPenjualan/Product/InputProduk'))
-const EditProduk = lazy(() => import('../pages/MenuPenjualan/Product/EditProduk'))
-const ListCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/ListCabang'))
-const AddCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/AddCabang'))
-const EditCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/EditCabang'))
-const Supplier = lazy(() => import('../pages/MenuPenjualan/Supplier/Supplier'))
-const AddSupplier = lazy(() => import('../pages/MenuPenjualan/Supplier/AddSupplier'))
-const EditSupplier = lazy(() => import('../pages/MenuPenjualan/Supplier/EditSupplier'))
-const ListRestock = lazy(() => import('../pages/MenuPenjualan/Restock/ListRestock'))
-const Restock = lazy(() => import('../pages/MenuPenjualan/Restock/Restock'))
-const EditRestock = lazy(() => import('../pages/MenuPenjualan/Restock/EditRestock'))
-const DetailRestock = lazy(() => import('../pages/MenuPenjualan/Restock/DetailRestock'))
-const Penjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/Penjualan'))
-const LaporanPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/LaporanPenjualan'))
-const DetailPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/DetailPenjualan'))
-const Distribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/Distribusi'))
-const EditDistribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/EditDistribusi'))
-const LaporanDistribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/LaporanDistribusi'))
-const Login = lazy(() => import('../pages/Auth/Login'))
-const SignUp = lazy(() => import('../pages/Auth/SignUp'))
+const Kategoriproduk = lazy(() => import('../pages/MenuPenjualan/KategoriProduk/KategoriProduk'));
+const Produk = lazy(() => import('../pages/MenuPenjualan/Product/Produk'));
+const Unit = lazy(() => import('../pages/MenuPenjualan/Unit/Unit'));
+const AddUnit = lazy(() => import('../pages/MenuPenjualan/Unit/AddUnit'));
+const EditUnit = lazy(() => import('../pages/MenuPenjualan/Unit/EditUnit'));
+const AddProduk = lazy(() => import('../pages/MenuPenjualan/Product/InputProduk'));
+const EditProduk = lazy(() => import('../pages/MenuPenjualan/Product/EditProduk'));
+const ListCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/ListCabang'));
+const AddCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/AddCabang'));
+const EditCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/EditCabang'));
+const Supplier = lazy(() => import('../pages/MenuPenjualan/Supplier/Supplier'));
+const AddSupplier = lazy(() => import('../pages/MenuPenjualan/Supplier/AddSupplier'));
+const EditSupplier = lazy(() => import('../pages/MenuPenjualan/Supplier/EditSupplier'));
+const ListRestock = lazy(() => import('../pages/MenuPenjualan/Restock/ListRestock'));
+const Restock = lazy(() => import('../pages/MenuPenjualan/Restock/Restock'));
+const EditRestock = lazy(() => import('../pages/MenuPenjualan/Restock/EditRestock'));
+const DetailRestock = lazy(() => import('../pages/MenuPenjualan/Restock/DetailRestock'));
+const Penjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/Penjualan'));
+const LaporanPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/LaporanPenjualan'));
+const DetailPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/DetailPenjualan'));
+const Distribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/Distribusi'));
+const EditDistribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/EditDistribusi'));
+const LaporanDistribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/LaporanDistribusi'));
+const Login = lazy(() => import('../pages/Auth/Login'));
+const SignUp = lazy(() => import('../pages/Auth/SignUp'));
 const DetailDistribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/DetailDistribusi'));
 const DetailCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/DetailCabang'));
 const DetailCustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/DetailCustomerOnline'));
@@ -55,16 +55,14 @@ const EditPiutang = lazy(() => import('../pages/MenuKeuangan/Hutang-Piutang/Piut
 const Laporan = lazy(() => import('../pages/MenuKeuangan/Laporan/Laporan'));
 const DetailLaporan = lazy(() => import('../pages/MenuKeuangan/Laporan/DetailLaporan'));
 const EditPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/EditPenjualan'));
-const CustomerOffline = lazy(() => import('../pages/Customer/CustomerOffline/CustomerOffline'))
-const EditCustomer = lazy(() => import('../pages/Customer/CustomerOffline/EditCustomerOffline'))
-const AddCustomerOffline = lazy(() => import('../pages/Customer/CustomerOffline/AddCustomerOffline'))
-const CustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/CustomerOnline'))
-const AddCustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/AddCustomerOnline'))
-const EditCustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/EditCustomerOnline'))
-
+const CustomerOffline = lazy(() => import('../pages/Customer/CustomerOffline/CustomerOffline'));
+const EditCustomer = lazy(() => import('../pages/Customer/CustomerOffline/EditCustomerOffline'));
+const AddCustomerOffline = lazy(() => import('../pages/Customer/CustomerOffline/AddCustomerOffline'));
+const CustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/CustomerOnline'));
+const AddCustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/AddCustomerOnline'));
+const EditCustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/EditCustomerOnline'));
 
 const routes = [
-    
     // dashboard
     {
         path: '/',
@@ -84,12 +82,12 @@ const routes = [
     },
     {
         path: '/menupenjualan/product/produk/addproduk',
-        element: <AddProduk/>,
+        element: <AddProduk />,
         layout: 'default',
     },
     {
         path: '/menupenjualan/product/produk/editproduk',
-        element: <EditProduk/>,
+        element: <EditProduk />,
         layout: 'default',
     },
     // Kategori Produk
@@ -126,7 +124,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/customer/offline/edit-customer-offline',
+        path: '/customer/offline/edit-customer-offline/:id',
         element: <EditCustomer />,
         layout: 'default',
     },
