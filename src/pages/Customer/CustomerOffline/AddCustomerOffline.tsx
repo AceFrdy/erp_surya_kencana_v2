@@ -20,9 +20,7 @@ const AddCustomerOffline = () => {
         address: '',
     });
 
-    const handleAddData = (e: FormEvent) => {
-        e.preventDefault();
-
+    const handleAddData = () => {
         const data = {
             name: formData.name,
             contact: formData.contact,

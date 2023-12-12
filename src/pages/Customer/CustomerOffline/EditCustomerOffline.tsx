@@ -21,9 +21,7 @@ const EditCustomerOffline = () => {
         address: '',
     });
 
-    const handleAddData = (e: FormEvent) => {
-        e.preventDefault();
-
+    const handleAddData = () => {
         const data = {
             name: formData.name,
             contact: formData.contact,
@@ -107,11 +105,11 @@ const EditCustomerOffline = () => {
                         <input type="text" name="address" onChange={handleChange} value={formData.address} placeholder="Alamat" className="form-input" />
                     </div>
                     <div className="flex justify-center">
-                        <button onClick={handleCancel} className="btn btn-primary !mt-6 mr-8">
-                            Back
-                        </button>
-                        <button type="submit" className="btn btn-primary !mt-6 ">
+                        <button type="submit" className="btn btn-primary !mt-6 mr-8">
                             Update
+                        </button>
+                        <button onClick={handleCancel} className="btn btn-primary !mt-6 ">
+                            Back
                         </button>
                     </div>
                 </form>
