@@ -593,17 +593,6 @@ const Akun = () => {
         direction: 'asc',
     });
 
-    // const randomColor = () => {
-    //     const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
-    //     const random = Math.floor(Math.random() * color.length);
-    //     return color[random];
-    // };
-
-    // const randomStatus = () => {
-    //     const status = ['PAID', 'APPROVED', 'FAILED', 'CANCEL', 'SUCCESS', 'PENDING', 'COMPLETE'];
-    //     const random = Math.floor(Math.random() * status.length);
-    //     return status[random];
-    // };
 
     useEffect(() => {
         setPage(1);
