@@ -7,11 +7,12 @@ import IconBell from '../../../components/Icon/IconBell';
 import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import IconPlus from '../../../components/Icon/IconPlus';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const rowData = [
     {
@@ -516,86 +517,50 @@ const rowData = [
     },
 ];
 
-const showAlert = async (type: number) => {
-    if (type === 11) {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
-                popup: 'sweet-alerts',
-            },
-            buttonsStyling: false,
-        });
-        swalWithBootstrapButtons
-            .fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true,
-                padding: '2em',
-            })
-            .then((result) => {
-                if (result.value) {
-                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
-                }
-            });
-    }
-};
+interface UnitsDataProps {
+    id: number;
+    unit_stock_name: string;
+    number_of_units: number;
+}
+
 const Unit = () => {
     const dispatch = useDispatch();
-    const token = localStorage.getItem('accessToken') || '';
     useEffect(() => {
         dispatch(setPageTitle('Multi Column Table'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
 
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const [hapusProduk, setHapusProduk] = useState(false);
+
+    const [hapusUnit, setHapusUnit] = useState(false);
+    const token = localStorage.getItem('accessToken') || '';
+    const [initialRecords, setInitialRecords] = useState<UnitsDataProps[]>([]);
+    const [recordsData, setRecordsData] = useState(initialRecords);
+    const navigate = useNavigate();
     const [unit, setUnit] = useState([]);
 
-    useEffect(() => {
-        setPage(1);
-    }, [pageSize]);
-
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
-
-    useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
-                return (
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.age.toString().toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
-                );
+    const handleDelete = (id: number) => {
+        axios
+            .delete(`https://erp.digitalindustryagency.com/api/unit-stock/${id}`, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then(() => {
+                toast.success('Unit Berhasil Dihapus.');
+                navigate(0);
+            })
+            .catch((err) => {
+                console.log('DELETE UNIT', err);
             });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search]);
-
-    useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sortStatus]);
+    };
 
     useEffect(() => {
         axios
@@ -617,51 +582,38 @@ const Unit = () => {
             });
     }, []);
 
+    useEffect(() => {
+        setPage(1);
+    }, [pageSize]);
+
+    useEffect(() => {
+        const from = (page - 1) * pageSize;
+        const to = from + pageSize;
+        setRecordsData([...initialRecords.slice(from, to)]);
+    }, [page, pageSize, initialRecords]);
+
+    console.log(search);
+    useEffect(() => {
+        if (!initialRecords) {
+            return;
+        }
+        setRecordsData(() => {
+            return initialRecords.filter((item) => {
+                return item.unit_stock_name.toLowerCase().includes(search.toLowerCase()) || item.number_of_units.toString().includes(search.toLowerCase());
+            });
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [search]);
+
+    useEffect(() => {
+        const data = sortBy(initialRecords, sortStatus.columnAccessor);
+        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        setPage(1);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sortStatus]);
+
     return (
         <div>
-            <Transition appear show={hapusProduk} as={Fragment}>
-                <Dialog as="div" open={hapusProduk} onClose={() => setHapusProduk(false)}>
-                    <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
-                        <div className="fixed inset-0" />
-                    </Transition.Child>
-                    <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
-                        <div className="flex items-start justify-center min-h-screen px-4">
-                            <Transition.Child
-                                as={Fragment}
-                                enter="ease-out duration-300"
-                                enterFrom="opacity-0 scale-95"
-                                enterTo="opacity-100 scale-100"
-                                leave="ease-in duration-200"
-                                leaveFrom="opacity-100 scale-100"
-                                leaveTo="opacity-0 scale-95"
-                            >
-                                <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
-                                    <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                        <div className="text-lg font-bold">Hapus Unit</div>
-                                    </div>
-                                    <div className="p-5">
-                                        <div>
-                                            <form className="space-y-5">
-                                                <div>
-                                                    <h1>Apakah Anda yakin ingin menghapus Unit</h1>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <div className="flex justify-end items-center mt-8">
-                                            <button type="button" className="btn btn-outline-danger" onClick={() => setHapusProduk(false)}>
-                                                Kembali
-                                            </button>
-                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setHapusProduk(false)}>
-                                                Hapus
-                                            </button>
-                                        </div>
-                                    </div>
-                                </Dialog.Panel>
-                            </Transition.Child>
-                        </div>
-                    </div>
-                </Dialog>
-            </Transition>
             <ul className="flex space-x-2 rtl:space-x-reverse">
                 <li>
                     <Link to="/" className="text-primary hover:underline">
@@ -706,16 +658,67 @@ const Unit = () => {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
-                                render: () => (
+                                render: (e) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/product/unit/editunit">
+                                            <Link to={`/menupenjualan/product/unit/editunit/${e.id}`}>
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                        <button type="button" style={{ color: 'red' }} onClick={() => setHapusUnit(true)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2" />
                                         </button>
+                                        <Transition appear show={hapusUnit} as={Fragment}>
+                                            <Dialog as="div" open={hapusUnit} onClose={() => setHapusUnit(false)}>
+                                                <Transition.Child
+                                                    as={Fragment}
+                                                    enter="ease-out duration-300"
+                                                    enterFrom="opacity-0"
+                                                    enterTo="opacity-100"
+                                                    leave="ease-in duration-200"
+                                                    leaveFrom="opacity-100"
+                                                    leaveTo="opacity-0"
+                                                >
+                                                    <div className="fixed inset-0" />
+                                                </Transition.Child>
+                                                <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
+                                                    <div className="flex items-start justify-center min-h-screen px-4">
+                                                        <Transition.Child
+                                                            as={Fragment}
+                                                            enter="ease-out duration-300"
+                                                            enterFrom="opacity-0 scale-95"
+                                                            enterTo="opacity-100 scale-100"
+                                                            leave="ease-in duration-200"
+                                                            leaveFrom="opacity-100 scale-100"
+                                                            leaveTo="opacity-0 scale-95"
+                                                        >
+                                                            <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
+                                                                <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                                                                    <div className="text-lg font-bold">Hapus Unit</div>
+                                                                </div>
+                                                                <div className="p-5">
+                                                                    <div>
+                                                                        <form className="space-y-5">
+                                                                            <div>
+                                                                                <h1>Apakah Anda yakin ingin menghapus Unit</h1>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                    <div className="flex justify-end items-center mt-8">
+                                                                        <button type="button" className="btn btn-outline-danger" onClick={() => setHapusUnit(false)}>
+                                                                            Kembali
+                                                                        </button>
+                                                                        <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => handleDelete(e.id)}>
+                                                                            Hapus
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </Dialog.Panel>
+                                                        </Transition.Child>
+                                                    </div>
+                                                </div>
+                                            </Dialog>
+                                        </Transition>
                                     </div>
                                 ),
                             },

@@ -13,6 +13,7 @@ import IconPlus from '../../../components/Icon/IconPlus';
 import IconNotes from '../../../components/Icon/IconNotes';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 
 const rowData = [
     {
@@ -564,7 +565,6 @@ const ListCabang = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const [hapusCabang, setHapusCabang] = useState(false);
     const [branch, setBranch] = useState([]);
 
     useEffect(() => {
@@ -666,7 +666,7 @@ const ListCabang = () => {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
-                                render: () => (
+                                render: (row) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'blue' }}>
                                             <Link to="/menupenjualan/cabang/detailcabang" >
@@ -674,7 +674,7 @@ const ListCabang = () => {
                                             </Link>
                                         </button>
                                         <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/cabang/listcabang/editcabang/:id">
+                                            <Link to={`/menupenjualan/cabang/listcabang/editcabang/${row.id}`}>
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
