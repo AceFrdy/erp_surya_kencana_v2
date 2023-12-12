@@ -21,35 +21,37 @@ const EditCustomerOffline = () => {
         address: '',
     });
 
-    const handleAddData = () => {
-        const data = {
-            name: formData.name,
-            contact: formData.contact,
-            address: formData.address,
-        };
+    const handleAddData = (e: FormEvent) => {
+        try {
+            e.preventDefault();
+            const data = {
+                name: formData.name,
+                contact: formData.contact,
+                address: formData.address,
+            };
 
-        axios
-            .put(`https://erp.digitalindustryagency.com/api/customers/${id}`, data, {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                navigate('/customer/offline');
-                toast.success('Data berhasil ditambahkan', {
-                    position: 'top-right',
-                    autoClose: 3000,
+            axios
+                .put(`https://erp.digitalindustryagency.com/api/customers/${id}`, data, {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                .then((response) => {
+                    navigate('/customer/offline');
+                    toast.success('Data berhasil ditambahkan', {
+                        position: 'top-right',
+                        autoClose: 3000,
+                    });
                 });
-            })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    console.error('Server Response Data:', error.response.data);
-                    // ... your existing error handling code
-                }
-                console.error('Error adding customer data:', error);
-                toast.error('Error adding data');
-            });
+        } catch (error: any) {
+            if (error.response && error.response.data) {
+                console.error('Server Response Data:', error.response.data);
+                // ... your existing error handling code
+            }
+            console.error('Error adding customer data:', error);
+            toast.error('Error adding data');
+        }
     };
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -105,11 +107,11 @@ const EditCustomerOffline = () => {
                         <input type="text" name="address" onChange={handleChange} value={formData.address} placeholder="Alamat" className="form-input" />
                     </div>
                     <div className="flex justify-center">
-                        <button type="submit" className="btn btn-primary !mt-6 mr-8">
-                            Update
-                        </button>
-                        <button onClick={handleCancel} className="btn btn-primary !mt-6 ">
+                        <button onClick={handleCancel} className="btn btn-primary !mt-6 mr-8">
                             Back
+                        </button>
+                        <button type="submit" className="btn btn-primary !mt-6 ">
+                            Update
                         </button>
                     </div>
                 </form>

@@ -20,36 +20,38 @@ const AddCustomerOffline = () => {
         address: '',
     });
 
-    const handleAddData = () => {
-        const data = {
-            name: formData.name,
-            contact: formData.contact,
-            address: formData.address,
-        };
+    const handleAddData = (e: FormEvent) => {
+        try {
+            e.preventDefault();
+            const data = {
+                name: formData.name,
+                contact: formData.contact,
+                address: formData.address,
+            };
 
-        axios
-            .post('https://erp.digitalindustryagency.com/api/customers', data, {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                console.log('Customer data successfully added:', response.data);
-                navigate('/customer/offline');
-                toast.success('Data berhasil ditambahkan', {
-                    position: 'top-right',
-                    autoClose: 3000,
+            axios
+                .post('https://erp.digitalindustryagency.com/api/customers', data, {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                .then((response) => {
+                    console.log('Customer data successfully added:', response.data);
+                    navigate('/customer/offline');
+                    toast.success('Data berhasil ditambahkan', {
+                        position: 'top-right',
+                        autoClose: 3000,
+                    });
                 });
-            })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    console.error('Server Response Data:', error.response.data);
-                    // ... your existing error handling code
-                }
-                console.error('Error adding customer data:', error);
-                toast.error('Error adding data');
-            });
+        } catch (error: any) {
+            if (error.response && error.response.data) {
+                console.error('Server Response Data:', error.response.data);
+                // ... your existing error handling code
+            }
+            console.error('Error adding customer data:', error);
+            toast.error('Error adding data');
+        }
     };
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
