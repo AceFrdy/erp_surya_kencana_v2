@@ -616,7 +616,7 @@ const CustomerOffline = () => {
 
     useEffect(() => {
         const data = orderBy(initialRecords, sortStatus.columnAccessor, 'desc');
-        setInitialRecords(sortStatus.direction === 'desc' ? data.toReversed() : data);
+        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
