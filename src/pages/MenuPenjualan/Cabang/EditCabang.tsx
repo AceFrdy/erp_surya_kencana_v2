@@ -56,6 +56,7 @@ const EditCabang = () => {
             .put(`https://erp.digitalindustryagency.com/api/branches/${id}`, formData, {
                 headers: {
                     Accept: 'application/json',
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
@@ -70,6 +71,7 @@ const EditCabang = () => {
             .catch((error) => {
                 if (error.response && error.response.data) {
                     setErrors(error.response.data);
+                    console.log('Validation Errors:', error.response.data);
                 }
                 console.error('Error updating branch data:', error);
                 toast.error('Error updating data');
