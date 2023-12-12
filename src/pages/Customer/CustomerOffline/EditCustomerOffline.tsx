@@ -22,36 +22,36 @@ const EditCustomerOffline = () => {
     });
 
     const handleAddData = (e: FormEvent) => {
-        e.preventDefault();
+        try {
+            e.preventDefault();
+            const data = {
+                name: formData.name,
+                contact: formData.contact,
+                address: formData.address,
+            };
 
-        const data = {
-            name: formData.name,
-            contact: formData.contact,
-            address: formData.address,
-        };
-
-        axios
-            .put(`https://erp.digitalindustryagency.com/api/customers/${id}`, data, {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                navigate('/customer/offline');
-                toast.success('Data berhasil ditambahkan', {
-                    position: 'top-right',
-                    autoClose: 3000,
+            axios
+                .put(`https://erp.digitalindustryagency.com/api/customers/${id}`, data, {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                .then((response) => {
+                    navigate('/customer/offline');
+                    toast.success('Data berhasil ditambahkan', {
+                        position: 'top-right',
+                        autoClose: 3000,
+                    });
                 });
-            })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    console.error('Server Response Data:', error.response.data);
-                    // ... your existing error handling code
-                }
-                console.error('Error adding customer data:', error);
-                toast.error('Error adding data');
-            });
+        } catch (error: any) {
+            if (error.response && error.response.data) {
+                console.error('Server Response Data:', error.response.data);
+                // ... your existing error handling code
+            }
+            console.error('Error adding customer data:', error);
+            toast.error('Error adding data');
+        }
     };
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
