@@ -588,7 +588,7 @@ const CustomerOffline = () => {
         setRecordsData([...initialRecords.slice(from, to)]);
     }, [page, pageSize, initialRecords]);
 
-    console.log(search);
+    // console.log(search);
     useEffect(() => {
         if (!initialRecords) {
             return;
