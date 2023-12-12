@@ -12,6 +12,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import IconPlus from '../../../components/Icon/IconPlus';
 import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const rowData = [
     {
@@ -562,6 +563,24 @@ const ListRestock = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
+    const token = localStorage.getItem('accessToken') ?? '';
+    const [listRestok, setListRestok] = useState({});
+
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/distribution-restok', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setListRestok(response.data.data.resource.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, []);
 
     useEffect(() => {
         setPage(1);
