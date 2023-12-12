@@ -1,21 +1,28 @@
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+interface FormState {
+    name: string;
+    contact: string;
+    address: string;
+}
+
 const AddCustomerOffline = () => {
     const navigate = useNavigate();
-    const token = localStorage.getItem('accessToken') || '';
+    const token = localStorage.getItem('accessToken') ?? '';
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<FormState>({
         name: '',
         contact: '',
         address: '',
-        errors: {},
     });
 
-    const handleAddData = () => {
+    const handleAddData = (e: FormEvent) => {
+        e.preventDefault();
+
         const data = {
             name: formData.name,
             contact: formData.contact,
@@ -47,6 +54,14 @@ const AddCustomerOffline = () => {
             });
     };
 
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
     const handleCancel = () => {
         navigate('/customer/offline');
     };
@@ -64,23 +79,23 @@ const AddCustomerOffline = () => {
                 </li>
             </ul>
             <div className="panel " id="single_file">
-                <form className="space-y-5">
+                <form onSubmit={handleAddData} className="space-y-5">
                     <h1 className="text-lg font-bold mb-12">Tambah Customer</h1>
                     <div>
-                        <input type="text" placeholder="Nama Customer" className="form-input" />
+                        <input type="text" name="name" onChange={handleChange} value={formData.name} placeholder="Nama Customer" className="form-input" />
                     </div>
                     <div>
-                        <input type="text" placeholder="No. Hp" className="form-input" />
+                        <input type="text" name="contact" onChange={handleChange} value={formData.contact} placeholder="No. Hp" className="form-input" />
                     </div>
                     <div>
-                        <input type="text" placeholder="Alamat" className="form-input" />
+                        <input type="text" name="address" onChange={handleChange} value={formData.address} placeholder="Alamat" className="form-input" />
                     </div>
                     <div className="flex justify-center">
-                        <button type="submit" onClick={handleAddData} className="btn btn-primary !mt-6 mr-8">
-                            <Link to="/customer/offline">Back</Link>
+                        <button onClick={handleCancel} className="btn btn-primary !mt-6 mr-8">
+                            Back
                         </button>
-                        <button type="submit" onClick={handleCancel} className="btn btn-primary !mt-6">
-                            <Link to="/customer/offline">Add</Link>
+                        <button type="submit" className="btn btn-primary !mt-6 ">
+                            Add
                         </button>
                     </div>
                 </form>
