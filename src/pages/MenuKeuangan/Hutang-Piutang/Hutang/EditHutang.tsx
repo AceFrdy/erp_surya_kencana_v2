@@ -1,18 +1,14 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
+import { setPageTitle } from '../../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-import IconBell from '../../../components/Icon/IconBell';
-import IconXCircle from '../../../components/Icon/IconXCircle';
-import IconPencil from '../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
+import IconPencil from '../../../../components/Icon/IconPencil';
+import IconTrashLines from '../../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-import { Dialog, Transition } from '@headlessui/react';
-import IconPlus from '../../../components/Icon/IconPlus';
-import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
-import axios from 'axios';
+import IconSend from '../../../../components/Icon/IconSend';
+import IconArrowBackward from '../../../../components/Icon/IconArrowBackward';
 
 const rowData = [
     {
@@ -21,6 +17,7 @@ const rowData = [
         lastName: 'Jensen',
         email: 'carolinejensen@zidant.com',
         dob: '2004-05-28',
+        status: 'Completed',
         address: {
             street: '529 Scholes Street',
             city: 'Temperanceville',
@@ -41,6 +38,7 @@ const rowData = [
         lastName: 'Grant',
         email: 'celestegrant@polarax.com',
         dob: '1989-11-19',
+        status: 'Pending',
         address: {
             street: '639 Kimball Street',
             city: 'Bascom',
@@ -61,6 +59,7 @@ const rowData = [
         lastName: 'Forbes',
         email: 'tillmanforbes@manglo.com',
         dob: '2016-09-05',
+        status: 'In Progress',
         address: {
             street: '240 Vandalia Avenue',
             city: 'Thynedale',
@@ -81,6 +80,7 @@ const rowData = [
         lastName: 'Whitley',
         email: 'daisywhitley@applideck.com',
         dob: '1987-03-23',
+        status: 'Canceled',
         address: {
             street: '350 Pleasant Place',
             city: 'Idledale',
@@ -101,6 +101,7 @@ const rowData = [
         lastName: 'Bowman',
         email: 'weberbowman@volax.com',
         dob: '1983-02-24',
+        status: 'Completed',
         address: {
             street: '154 Conway Street',
             city: 'Broadlands',
@@ -121,6 +122,7 @@ const rowData = [
         lastName: 'Townsend',
         email: 'buckleytownsend@orbaxter.com',
         dob: '2011-05-29',
+        status: 'Completed',
         address: {
             street: '131 Guernsey Street',
             city: 'Vallonia',
@@ -141,6 +143,7 @@ const rowData = [
         lastName: 'Bradshaw',
         email: 'latoyabradshaw@opportech.com',
         dob: '2010-11-23',
+        status: 'Canceled',
         address: {
             street: '668 Lenox Road',
             city: 'Lowgap',
@@ -161,6 +164,7 @@ const rowData = [
         lastName: 'Lindsay',
         email: 'katelindsay@gorganic.com',
         dob: '1987-07-02',
+        status: 'Pending',
         address: {
             street: '773 Harrison Avenue',
             city: 'Carlton',
@@ -181,6 +185,7 @@ const rowData = [
         lastName: 'Sandoval',
         email: 'marvasandoval@avit.com',
         dob: '2010-11-02',
+        status: 'Completed',
         address: {
             street: '200 Malta Street',
             city: 'Tuskahoma',
@@ -201,6 +206,7 @@ const rowData = [
         lastName: 'Russell',
         email: 'deckerrussell@quilch.com',
         dob: '1994-04-21',
+        status: 'In Progress',
         address: {
             street: '708 Bath Avenue',
             city: 'Coultervillle',
@@ -546,11 +552,37 @@ const showAlert = async (type: number) => {
                 }
             });
     }
+    if (type === 15) {
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+        });
+        toast.fire({
+            icon: 'success',
+            title: 'Berhasil Dikirim',
+            padding: '10px 20px',
+        });
+    }
+    if (type == 20) {
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+        });
+        toast.fire({
+            icon: 'success',
+            title: 'Data Berhasil Diubah',
+            padding: '10px 20px',
+        });
+    }
 };
-const ListRestock = () => {
+const EditHutang = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Multi Column Table'));
+        dispatch(setPageTitle('Restock'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -563,24 +595,8 @@ const ListRestock = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const token = localStorage.getItem('accessToken') ?? '';
-    const [listRestok, setListRestok] = useState({});
 
-    useEffect(() => {
-        axios
-            .get('https://erp.digitalindustryagency.com/api/distribution-restok', {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                setListRestok(response.data.data.resource.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }, []);
+    //
 
     useEffect(() => {
         setPage(1);
@@ -613,7 +629,48 @@ const ListRestock = () => {
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
+    const formatDate = (date: string | number | Date) => {
+        if (date) {
+            const dt = new Date(date);
+            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
+            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
+            return day + '/' + month + '/' + dt.getFullYear();
+        }
+        return '';
+    };
 
+    const [operasionalCost, setOperasionalCost] = useState('');
+    const [cost, setCost] = useState('');
+
+    const handleOperasioanalCostChange = (e: { target: { value: any } }) => {
+        const inputValue = e.target.value;
+        let formattedValue = '';
+
+        // Remove non-numeric characters
+        const numericValue = inputValue.replace(/\D/g, '');
+
+        // Format the number with 'Rp.' prefix
+        if (numericValue !== '') {
+            formattedValue = `Rp. ${parseInt(numericValue, 10).toLocaleString('id-ID')}`;
+        }
+
+        setOperasionalCost(formattedValue);
+    };
+
+    const handleCostChange = (e: { target: { value: any } }) => {
+        const inputValue = e.target.value;
+        let formatValue = '';
+
+        // Remove non-numeric characters
+        const numValue = inputValue.replace(/\D/g, '');
+
+        // Format the number with 'Rp.' prefix
+        if (numValue !== '') {
+            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
+        }
+
+        setCost(formatValue);
+    };
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -623,26 +680,62 @@ const ListRestock = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Menu Penjualan</span>
+                    <span>Menu Keuangan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> List Restock </span>
+                    <span> Edit Data Hutang </span>
                 </li>
             </ul>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6">
+                <h1 className="text-lg font-bold">Edit Data Hutang</h1>
+                <div className="flex mb-4 justify-end">
+                    {/* <button type="button" className="btn btn-outline-danger mr-4" onClick={() => showAlert(11)}>
+                        <IconTrashLines className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                        Batal
+                    </button> */}
+                    <Link to="/menukeuangan/hutang-piutang/hutang">
+                    <button type="button" className="btn btn-outline-primary">
+                        <IconArrowBackward className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                        Kembali
+                    </button>
+                    </Link>
+                </div>
+                {/* <h1 className="text-lg font-bold mb-4">Kode:SK0012023</h1> */}
+                <form className="space-y-5">
+                    <div>
+                        <label htmlFor="Opcost">Total : </label>
+                        <input id="Opcost" disabled type="text" defaultValue={121212} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
+                    </div>
+                    <div>
+                        <label htmlFor="Opcost">Terbayar : </label>
+                        <input id="Opcost" disabled type="text" defaultValue={121246} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
+                    </div>
+                    <div>
+                        <label htmlFor="Opcost">Sisa</label>
+                        <input id="Opcost" disabled type="text" defaultValue={562} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
+                    </div>
+                    <div>
+                        <label htmlFor="Cost">Bayar</label>
+                        <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input" />
+                    </div>
+                    <button type="submit" className="btn btn-outline-primary !mt-6 w-full" onClick={() => showAlert(20)}>
+                        Tambah
+                    </button>
+                </form>
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
                     {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
                         <button type="button" className=" px-2 btn btn-outline-info">
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
                     </Link> */}
-                    <div className="ltr:ml-auto rtl:mr-auto">
+                    <div className="ltr:ml-auto rtl:mr-auto mt-8">
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">List Restock</h5>
+
+                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Data Hutang</h5>
                 <div className="datatables">
                     <DataTable
                         highlightOnHover
@@ -650,36 +743,15 @@ const ListRestock = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'age', title: 'Kode Dokumen', sortable: true },
+                            { accessor: 'age', title: 'Bayar', sortable: true },
                             {
-                                accessor: 'firstName',
-                                title: 'Supplier',
+                                accessor: 'dob',
+                                title: 'Tanggal',
                                 sortable: true,
+                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
                             },
-                            { accessor: 'email', title: 'Operasional', sortable: true },
-                            { accessor: 'phone', title: 'Total', sortable: true },
-                            {
-                                accessor: 'action',
-                                title: 'Opsi',
-                                titleClassName: '!text-center',
-                                render: () => (
-                                    <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menupenjualan/restock/detailrestock">
-                                                <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
-                                        <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/restock/editrestock">
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
-                                    </div>
-                                ),
-                            },
+                            { accessor: 'age', title: 'Sisa', sortable: true },
+                            
                         ]}
                         totalRecords={initialRecords.length}
                         recordsPerPage={pageSize}
@@ -698,4 +770,4 @@ const ListRestock = () => {
     );
 };
 
-export default ListRestock;
+export default EditHutang;

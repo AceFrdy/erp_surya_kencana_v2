@@ -669,7 +669,9 @@ const ListCabang = () => {
                                 render: (row) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'blue' }}>
+                                            <Link to="/menupenjualan/cabang/detailcabang" >
                                             <IconNotes className="ltr:mr-2 rtl:ml-2 " />
+                                            </Link>
                                         </button>
                                         <button type="button" style={{ color: 'orange' }}>
                                             <Link to={`/menupenjualan/cabang/listcabang/editcabang/${row.id}`}>

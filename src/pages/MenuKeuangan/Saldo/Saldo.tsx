@@ -1,18 +1,21 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-import IconBell from '../../../components/Icon/IconBell';
-import IconXCircle from '../../../components/Icon/IconXCircle';
+// import IconBell from '../../../components/Icon/IconBell';
+// import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-import { Dialog, Transition } from '@headlessui/react';
-import IconPlus from '../../../components/Icon/IconPlus';
-import IconNotes from '../../../components/Icon/IconNotes';
+// import { Dialog, Transition } from '@headlessui/react';
+// import IconPlus from '../../../components/Icon/IconPlus';
+// import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
-import axios from 'axios';
+import IconSend from '../../../components/Icon/IconSend';
+import IconPlus from '../../../components/Icon/IconPlus';
+// import * as Yup from 'yup';
+// import { Field, Form, Formik } from 'formik';
 
 const rowData = [
     {
@@ -546,11 +549,37 @@ const showAlert = async (type: number) => {
                 }
             });
     }
+    if (type === 15) {
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+        });
+        toast.fire({
+            icon: 'success',
+            title: 'Berhasil Dikirim',
+            padding: '10px 20px',
+        });
+    }
+    if (type == 20) {
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+        });
+        toast.fire({
+            icon: 'success',
+            title: 'Data Berhasil Ditambah',
+            padding: '10px 20px',
+        });
+    }
 };
-const ListRestock = () => {
+const Saldo = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Multi Column Table'));
+        dispatch(setPageTitle('Restock'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -563,24 +592,18 @@ const ListRestock = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const token = localStorage.getItem('accessToken') ?? '';
-    const [listRestok, setListRestok] = useState({});
 
-    useEffect(() => {
-        axios
-            .get('https://erp.digitalindustryagency.com/api/distribution-restok', {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                setListRestok(response.data.data.resource.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }, []);
+    // const randomColor = () => {
+    //     const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
+    //     const random = Math.floor(Math.random() * color.length);
+    //     return color[random];
+    // };
+
+    // const randomStatus = () => {
+    //     const status = ['PAID', 'APPROVED', 'FAILED', 'CANCEL', 'SUCCESS', 'PENDING', 'COMPLETE'];
+    //     const random = Math.floor(Math.random() * status.length);
+    //     return status[random];
+    // };
 
     useEffect(() => {
         setPage(1);
@@ -613,7 +636,32 @@ const ListRestock = () => {
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
+    const formatDate = (date: string | number | Date) => {
+        if (date) {
+            const dt = new Date(date);
+            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
+            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
+            return day + '/' + month + '/' + dt.getFullYear();
+        }
+        return '';
+    };
 
+    const [cost, setCost] = useState('');
+
+    const handleCostChange = (e: { target: { value: any } }) => {
+        const inputValue = e.target.value;
+        let formatValue = '';
+
+        // Remove non-numeric characters
+        const numValue = inputValue.replace(/\D/g, '');
+
+        // Format the number with 'Rp.' prefix
+        if (numValue !== '') {
+            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
+        }
+
+        setCost(formatValue);
+    };
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -623,60 +671,65 @@ const ListRestock = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Menu Penjualan</span>
+                    <span>Menu Keuangan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> List Restock </span>
+                    <span> Saldo </span>
                 </li>
             </ul>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6">
-                <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
+                <h1 className="text-lg font-bold flex justify-center">Data Saldo</h1>
+                <Link to="/menukeuangan/saldo/addsaldo">
                         <button type="button" className=" px-2 btn btn-outline-info">
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
-                    </Link> */}
+                    </Link>
+                <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
+                    
                     <div className="ltr:ml-auto rtl:mr-auto">
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">List Restock</h5>
-                <div className="datatables">
+                <div className="datatables panel xl:col-span-2">
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'age', title: 'Kode Dokumen', sortable: true },
                             {
-                                accessor: 'firstName',
-                                title: 'Supplier',
+                                accessor: 'age',
+                                title: 'Kode Akun',
                                 sortable: true,
+                                
                             },
-                            { accessor: 'email', title: 'Operasional', sortable: true },
-                            { accessor: 'phone', title: 'Total', sortable: true },
+                            { accessor: 'lastName', title: 'Jenis Akun', sortable: true },
+                            { accessor: 'firstName', title: 'Nama Akun', sortable: true },
+                            {
+                                accessor: 'phone',
+                                title: 'Saldo Akhir',
+                                sortable: true,
+                                // render: ({ dob }) => <div>{formatDate(dob)}</div>,
+                            },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
                                 render: () => (
                                     <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menupenjualan/restock/detailrestock">
-                                                <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
-                                        <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/restock/editrestock">
+                                        {/* <button type="button" style={{ color: 'blue' }}>
+                                            <IconNotes className="ltr:mr-2 rtl:ml-2 " />
+                                        </button> */}
+                                        {/* <button type="button" style={{ color: 'orange' }}>
+                                            <Link to="/menukeuangan/akun/editakun">
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
-                                        </button>
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button> */}
+                                        <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                        </button>
                                     </div>
                                 ),
                             },
@@ -698,4 +751,4 @@ const ListRestock = () => {
     );
 };
 
-export default ListRestock;
+export default Saldo;

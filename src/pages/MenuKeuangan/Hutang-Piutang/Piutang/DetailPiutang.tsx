@@ -1,18 +1,17 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import IconBell from '../../../components/Icon/IconBell';
-import IconXCircle from '../../../components/Icon/IconXCircle';
-import IconPencil from '../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
+import { setPageTitle } from '../../../../store/themeConfigSlice';
+import { useDispatch, useSelector } from 'react-redux';
+// import IconPencil from '../../../../components/Icon/IconPencil';
+import IconTrashLines from '../../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-import { Dialog, Transition } from '@headlessui/react';
-import IconPlus from '../../../components/Icon/IconPlus';
-import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
-import axios from 'axios';
+import IconSend from '../../../../components/Icon/IconSend';
+import { IRootState } from '../../../../store';
+import Flatpickr from 'react-flatpickr';
+import 'flatpickr/dist/flatpickr.css';
+import IconArrowBackward from '../../../../components/Icon/IconArrowBackward';
 
 const rowData = [
     {
@@ -21,6 +20,7 @@ const rowData = [
         lastName: 'Jensen',
         email: 'carolinejensen@zidant.com',
         dob: '2004-05-28',
+        status: 'Completed',
         address: {
             street: '529 Scholes Street',
             city: 'Temperanceville',
@@ -41,6 +41,7 @@ const rowData = [
         lastName: 'Grant',
         email: 'celestegrant@polarax.com',
         dob: '1989-11-19',
+        status: 'Pending',
         address: {
             street: '639 Kimball Street',
             city: 'Bascom',
@@ -61,6 +62,7 @@ const rowData = [
         lastName: 'Forbes',
         email: 'tillmanforbes@manglo.com',
         dob: '2016-09-05',
+        status: 'In Progress',
         address: {
             street: '240 Vandalia Avenue',
             city: 'Thynedale',
@@ -81,6 +83,7 @@ const rowData = [
         lastName: 'Whitley',
         email: 'daisywhitley@applideck.com',
         dob: '1987-03-23',
+        status: 'Canceled',
         address: {
             street: '350 Pleasant Place',
             city: 'Idledale',
@@ -101,6 +104,7 @@ const rowData = [
         lastName: 'Bowman',
         email: 'weberbowman@volax.com',
         dob: '1983-02-24',
+        status: 'Completed',
         address: {
             street: '154 Conway Street',
             city: 'Broadlands',
@@ -121,6 +125,7 @@ const rowData = [
         lastName: 'Townsend',
         email: 'buckleytownsend@orbaxter.com',
         dob: '2011-05-29',
+        status: 'Completed',
         address: {
             street: '131 Guernsey Street',
             city: 'Vallonia',
@@ -141,6 +146,7 @@ const rowData = [
         lastName: 'Bradshaw',
         email: 'latoyabradshaw@opportech.com',
         dob: '2010-11-23',
+        status: 'Canceled',
         address: {
             street: '668 Lenox Road',
             city: 'Lowgap',
@@ -161,6 +167,7 @@ const rowData = [
         lastName: 'Lindsay',
         email: 'katelindsay@gorganic.com',
         dob: '1987-07-02',
+        status: 'Pending',
         address: {
             street: '773 Harrison Avenue',
             city: 'Carlton',
@@ -181,6 +188,7 @@ const rowData = [
         lastName: 'Sandoval',
         email: 'marvasandoval@avit.com',
         dob: '2010-11-02',
+        status: 'Completed',
         address: {
             street: '200 Malta Street',
             city: 'Tuskahoma',
@@ -201,6 +209,7 @@ const rowData = [
         lastName: 'Russell',
         email: 'deckerrussell@quilch.com',
         dob: '1994-04-21',
+        status: 'In Progress',
         address: {
             street: '708 Bath Avenue',
             city: 'Coultervillle',
@@ -517,40 +526,10 @@ const rowData = [
     },
 ];
 
-const showAlert = async (type: number) => {
-    if (type === 11) {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
-                popup: 'sweet-alerts',
-            },
-            buttonsStyling: false,
-        });
-        swalWithBootstrapButtons
-            .fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true,
-                padding: '2em',
-            })
-            .then((result) => {
-                if (result.value) {
-                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
-                }
-            });
-    }
-};
-const ListRestock = () => {
+const DetailPiutang = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Multi Column Table'));
+        dispatch(setPageTitle('Restock'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -563,24 +542,24 @@ const ListRestock = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const token = localStorage.getItem('accessToken') ?? '';
-    const [listRestok, setListRestok] = useState({});
 
-    useEffect(() => {
-        axios
-            .get('https://erp.digitalindustryagency.com/api/distribution-restok', {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                setListRestok(response.data.data.resource.data);
-            })
-            .catch((err) => {
-                console.log(err);
+    const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
+    const [date1, setDate1] = useState<any>('2022-07-05');
+    const showAlert = async (type: number) => {
+        if (type == 20) {
+            const toast = Swal.mixin({
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 3000,
             });
-    }, []);
+            toast.fire({
+                icon: 'success',
+                title: 'Data Berhasil Ditambah',
+                padding: '10px 20px',
+            });
+        }
+    };
 
     useEffect(() => {
         setPage(1);
@@ -613,6 +592,16 @@ const ListRestock = () => {
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
+    const formatDate = (date: string | number | Date) => {
+        if (date) {
+            const dt = new Date(date);
+            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
+            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
+            return day + '/' + month + '/' + dt.getFullYear();
+        }
+        return '';
+    };
+
 
     return (
         <div>
@@ -623,63 +612,80 @@ const ListRestock = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Menu Penjualan</span>
+                    <span>Menu Keuangan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> List Restock </span>
+                    <span> Detail Piutang </span>
                 </li>
             </ul>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6">
-                <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
-                        <button type="button" className=" px-2 btn btn-outline-info">
-                            <IconPlus className="flex mx-2" fill={true} /> Add
-                        </button>
-                    </Link> */}
-                    <div className="ltr:ml-auto rtl:mr-auto">
+                {/* <h1 className="text-lg font-bold">Detail Piutang</h1> */}
+                <div className="flex mb-4 justify-end">
+                    <Link to="/menukeuangan/hutang-piutang/piutang">
+                    <button type="button" className="btn btn-outline-primary">
+                        <IconArrowBackward className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                        Kembali
+                    </button>
+                    </Link>
+                </div>
+                <div className="panel">
+                <h1 className="text-xl font-bold mb-6">Detail Data Piutang</h1>
+                <form className="space-y-5">
+                    <div>
+                        <label htmlFor="Cost">Akun Asal</label>
+                        <input id="Cost" disabled type="text" defaultValue="Iya Cuy" placeholder="Keterangan..." className="form-input" />
+                    </div>
+                    <div>
+                        <label htmlFor="Cost">Akun Tujuan</label>
+                        <input id="Cost" disabled type="text" defaultValue="Ke Bank" placeholder="Keterangan..." className="form-input" />
+                    </div>
+                    <div>
+                        <label htmlFor="Cost">Total Nominal</label>
+                        <input id="Cost" disabled type="text" defaultValue={1203944} placeholder="Rp." className="form-input" />
+                    </div>
+                    <div>
+                        <label htmlFor="Cost">Kreditur</label>
+                        <input id="Cost" disabled type="text" defaultValue="Trickster" placeholder="Keterangan..." className="form-input" />
+                    </div>
+                    <div>
+                        <label htmlFor="Tanggal">Tanggal</label>
+                        <Flatpickr
+                            id="Tanggal"
+                            value={date1}
+                            options={{ dateFormat: 'Y-m-d', position: isRtl ? 'auto right' : 'auto left' }}
+                            className="form-input"
+                            disabled
+                            onChange={(date) => setDate1(date)}
+                        />
+                    </div>
+                </form>
+            </div>
+                {/* <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
+                    
+                    <div className="ltr:ml-auto rtl:mr-auto mt-8">
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
-                </div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">List Restock</h5>
+                </div> */}
+
+                {/* <h5 className="font-semibold text-lg dark:text-white-light mb-2">Restock</h5>
                 <div className="datatables">
-                    <DataTable
+                <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'age', title: 'Kode Dokumen', sortable: true },
+                            { accessor: 'age', title: 'Bayar', sortable: true },
                             {
-                                accessor: 'firstName',
-                                title: 'Supplier',
+                                accessor: 'dob',
+                                title: 'Tanggal',
                                 sortable: true,
+                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
                             },
-                            { accessor: 'email', title: 'Operasional', sortable: true },
-                            { accessor: 'phone', title: 'Total', sortable: true },
-                            {
-                                accessor: 'action',
-                                title: 'Opsi',
-                                titleClassName: '!text-center',
-                                render: () => (
-                                    <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menupenjualan/restock/detailrestock">
-                                                <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
-                                        <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/restock/editrestock">
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
-                                    </div>
-                                ),
-                            },
+                            { accessor: 'age', title: 'Sisa', sortable: true },
+                            
                         ]}
                         totalRecords={initialRecords.length}
                         recordsPerPage={pageSize}
@@ -692,10 +698,10 @@ const ListRestock = () => {
                         minHeight={200}
                         paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                     />
-                </div>
+                </div> */}
             </div>
         </div>
     );
 };
 
-export default ListRestock;
+export default DetailPiutang;

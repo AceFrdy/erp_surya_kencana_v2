@@ -703,8 +703,8 @@ const DetailDistribusi = () => {
                 <form className="space-y-5">
                     <div>
                         <label htmlFor="gridState">Lokasi Tujuan</label>
-                        <select id="gridState" className="form-select text-white-dark">
-                            <option>Choose...</option>
+                        <select id="gridState" disabled className="form-select text-white-dark">
+                            <option>Gedung Utama</option>
                             <option>...</option>
                         </select>
                     </div>

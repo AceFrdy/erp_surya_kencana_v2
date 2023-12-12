@@ -1,18 +1,28 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import IconBell from '../../../components/Icon/IconBell';
-import IconXCircle from '../../../components/Icon/IconXCircle';
+import { useDispatch, useSelector } from 'react-redux';
+// import IconBell from '../../../components/Icon/IconBell';
+// import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-import { Dialog, Transition } from '@headlessui/react';
-import IconPlus from '../../../components/Icon/IconPlus';
-import IconNotes from '../../../components/Icon/IconNotes';
+// import { Dialog, Transition } from '@headlessui/react';
+// import IconPlus from '../../../components/Icon/IconPlus';
+// import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
-import axios from 'axios';
+import IconSend from '../../../components/Icon/IconSend';
+import IconPlus from '../../../components/Icon/IconPlus';
+import IconCircleCheck from '../../../components/Icon/IconCircleCheck';
+import IconTrendingUp from '../../../components/Icon/IconTrendingUp';
+import Dropdown from '../../../components/Dropdown';
+import IconHorizontalDots from '../../../components/Icon/IconHorizontalDots';
+import { IRootState } from '../../../store';
+import IconEye from '../../../components/Icon/IconEye';
+import IconCashBanknotes from '../../../components/Icon/IconCashBanknotes';
+// import * as Yup from 'yup';
+// import { Field, Form, Formik } from 'formik';
 
 const rowData = [
     {
@@ -546,11 +556,37 @@ const showAlert = async (type: number) => {
                 }
             });
     }
+    if (type === 15) {
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+        });
+        toast.fire({
+            icon: 'success',
+            title: 'Berhasil Dikirim',
+            padding: '10px 20px',
+        });
+    }
+    if (type == 20) {
+        const toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+        });
+        toast.fire({
+            icon: 'success',
+            title: 'Data Berhasil Ditambah',
+            padding: '10px 20px',
+        });
+    }
 };
-const ListRestock = () => {
+const ControlPanel = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Multi Column Table'));
+        dispatch(setPageTitle('Restock'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -563,24 +599,18 @@ const ListRestock = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const token = localStorage.getItem('accessToken') ?? '';
-    const [listRestok, setListRestok] = useState({});
 
-    useEffect(() => {
-        axios
-            .get('https://erp.digitalindustryagency.com/api/distribution-restok', {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                setListRestok(response.data.data.resource.data);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }, []);
+    // const randomColor = () => {
+    //     const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
+    //     const random = Math.floor(Math.random() * color.length);
+    //     return color[random];
+    // };
+
+    // const randomStatus = () => {
+    //     const status = ['PAID', 'APPROVED', 'FAILED', 'CANCEL', 'SUCCESS', 'PENDING', 'COMPLETE'];
+    //     const random = Math.floor(Math.random() * status.length);
+    //     return status[random];
+    // };
 
     useEffect(() => {
         setPage(1);
@@ -613,7 +643,33 @@ const ListRestock = () => {
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
+    const formatDate = (date: string | number | Date) => {
+        if (date) {
+            const dt = new Date(date);
+            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
+            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
+            return day + '/' + month + '/' + dt.getFullYear();
+        }
+        return '';
+    };
 
+    const [cost, setCost] = useState('');
+
+    // const handleCostChange = (e: { target: { value: any } }) => {
+    //     const inputValue = e.target.value;
+    //     let formatValue = '';
+
+    //     // Remove non-numeric characters
+    //     const numValue = inputValue.replace(/\D/g, '');
+
+    //     // Format the number with 'Rp.' prefix
+    //     if (numValue !== '') {
+    //         formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
+    //     }
+
+    //     setCost(formatValue);
+    // };
+    const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -623,79 +679,190 @@ const ListRestock = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Menu Penjualan</span>
+                    <span>Menu Keuangan</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> List Restock </span>
+                    <span> Control Panel </span>
                 </li>
             </ul>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6">
+                <h1 className="text-lg font-bold flex justify-start py-4">Data Penjualan</h1>
+                <div className="flex justify-center grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+                    <div className="panel bg-gradient-to-r col-span-4 from-cyan-500 to-blue-400">
+                        <div className='f'>
+                        {/* <IconCashBanknotes className='w-20 h-20' /> */}
+                        </div>
+                        <div className="flex">
+                            <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">Saldo Awal</div>
+                            <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold mx-2 ">-</div>
+                            <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">Dari Akun Bank BRI</div>
+                            <div className="dropdown"></div>
+                        </div>
+                        <div className="flex items-center mt-5">
+                            <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> Rp.2.170.460,- </div>
+                            {/* <div className="badge bg-white/30">+ 2.35% </div> */}
+                        </div>
+                        <div className="flex items-center font-semibold mt-5">
+                            <IconEye className="ltr:mr-2 rtl:ml-2 shrink-0" />
+                            Last Week Rp.644.700,-
+                        </div>
+                    </div>
+                    <div className="panel overflow-hidden col-span-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <div className="text-lg font-bold">Total Keseluruhan</div>
+                                <div className="text-success"> Berdasarkan Tahun 2022 </div>
+                            </div>
+                            
+                        </div>
+                        <div className="relative mt-10">
+                            <div className="absolute -bottom-12 ltr:-right-12 rtl:-left-12 w-24 h-24">
+                                <IconCircleCheck className="text-success opacity-20 w-full h-full" />
+                            </div>
+                            <div className="grid grid-cols-3 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 justify-between flex gap-6">
+                                <div className="panel bg-gray-400">
+                                    <div className="text-dark">Saldo Akhir</div>
+                                    <div className="mt-2 font-semibold text-2xl border-b border-b-gray-800">Rp.15.000.000,-</div>
+                                    <div className="mt-2 font-medium text-lg">Total Saldo Sampai Hari ini</div>
+                                </div>
+                                <div className="panel bg-gray-400">
+                                    <div className="text-dark">Pemasukan</div>
+                                    <div className="mt-2 font-semibold text-2xl border-b border-b-gray-800">Rp.6.009.435,-</div>
+                                    <div className="mt-2 font-medium text-lg">Total Saldo Sampai Hari ini</div>
+                                </div>
+                                <div className="panel bg-gray-400 ">
+                                    <div className="text-dark">Pengeluaran</div>
+                                    <div className="mt-2 font-semibold text-2xl border-b border-b-gray-800">Rp.4.000,245,-</div>
+                                    <div className="mt-2 font-medium text-lg">Total Saldo Sampai Hari ini</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
                     {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
                         <button type="button" className=" px-2 btn btn-outline-info">
                             <IconPlus className="flex mx-2" fill={true} /> Add
                         </button>
                     </Link> */}
-                    <div className="ltr:ml-auto rtl:mr-auto">
-                        <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                    <div className="ltr:mr-auto rtl:ml-auto">
+                        {/* <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} /> */}
                     </div>
                 </div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">List Restock</h5>
-                <div className="datatables">
-                    <DataTable
-                        highlightOnHover
-                        className="whitespace-nowrap table-hover"
-                        records={recordsData}
-                        columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'age', title: 'Kode Dokumen', sortable: true },
-                            {
-                                accessor: 'firstName',
-                                title: 'Supplier',
-                                sortable: true,
-                            },
-                            { accessor: 'email', title: 'Operasional', sortable: true },
-                            { accessor: 'phone', title: 'Total', sortable: true },
-                            {
-                                accessor: 'action',
-                                title: 'Opsi',
-                                titleClassName: '!text-center',
-                                render: () => (
-                                    <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menupenjualan/restock/detailrestock">
-                                                <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
-                                        <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/restock/editrestock">
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
-                                    </div>
-                                ),
-                            },
-                        ]}
-                        totalRecords={initialRecords.length}
-                        recordsPerPage={pageSize}
-                        page={page}
-                        onPageChange={(p) => setPage(p)}
-                        recordsPerPageOptions={PAGE_SIZES}
-                        onRecordsPerPageChange={setPageSize}
-                        sortStatus={sortStatus}
-                        onSortStatusChange={setSortStatus}
-                        minHeight={200}
-                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
-                    />
+
+                <div className="grid xl:grid-cols-3 gap-6 grid-cols-1">
+                    <div className="datatables panel xl:col-span-2">
+                        <DataTable
+                            highlightOnHover
+                            className="whitespace-nowrap table-hover "
+                            records={recordsData}
+                            columns={[
+                                { accessor: 'id', title: 'No', sortable: true },
+                                { accessor: 'firstName', title: 'Keterangan', sortable: true },
+                                {
+                                    accessor: 'age',
+                                    title: 'Masuk',
+                                    sortable: true,
+                                    render: () => (
+                                        <div className="flex">
+                                            <label className="inline-flex">
+                                                <input type="checkbox" className="form-checkbox outline-info w-8 h-8" defaultChecked />
+                                            </label>
+                                        </div>
+                                    ),
+                                },
+                                {
+                                    accessor: 'phone',
+                                    title: 'Keluar',
+                                    sortable: true,
+                                    render: () => (
+                                        <div className="flex">
+                                            <label className="inline-flex">
+                                                <input type="checkbox" className="form-checkbox outline-info w-8 h-8" defaultChecked />
+                                            </label>
+                                        </div>
+                                    ),
+                                },
+                                {
+                                    accessor: 'dob',
+                                    title: 'Pengajuan',
+                                    sortable: true,
+                                    render: () => (
+                                        <div className="flex ">
+                                            <label className="inline-flex">
+                                                <input type="checkbox" className="form-checkbox outline-info w-8 h-8" defaultChecked />
+                                            </label>
+                                        </div>
+                                    ),
+                                },
+                                {
+                                    accessor: 'action',
+                                    title: 'Opsi',
+                                    titleClassName: '!text-center',
+                                    render: () => (
+                                        <div className="flex items-center w-max mx-auto gap-2">
+                                            <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                            </button>
+                                        </div>
+                                    ),
+                                },
+                            ]}
+                            totalRecords={initialRecords.length}
+                            recordsPerPage={pageSize}
+                            page={page}
+                            onPageChange={(p) => setPage(p)}
+                            recordsPerPageOptions={PAGE_SIZES}
+                            onRecordsPerPageChange={setPageSize}
+                            sortStatus={sortStatus}
+                            onSortStatusChange={setSortStatus}
+                            minHeight={200}
+                            paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
+                        />
+                    </div>
+                    <form className="space-y-5 panel xl:col-span-1">
+                        <h1 className="font-semibold text-xl dark:text-white-light mb-2 justify-center flex">Tambah Index</h1>
+                        <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
+                            <div className="">
+                                <label htmlFor="gridTotal" className="text-xl font-medium mr-8">
+                                    Keterangan:
+                                </label>
+                                <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="Nasi Goreng" className="form-input text-lg" />
+                            </div>
+                            <div className="space-y-2">
+                                <div className="text-xl font-medium">Makan :</div>
+                                <div>
+                                    <label className="inline-flex">
+                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" />
+                                        <span className="text-lg">Pemasukan</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label className="inline-flex">
+                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" />
+                                        <span className="text-lg ">Pengeluaran</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <label className="inline-flex">
+                                        <input type="checkbox" defaultChecked className="form-checkbox outline-info w-6 h-6" />
+                                        <span className="text-lg">Pengajuan</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <button type="submit" className="btn btn-primary !mt-6 w-full">
+                                <IconPlus className="mr-2 " /> Tambah
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     );
 };
 
-export default ListRestock;
+export default ControlPanel;

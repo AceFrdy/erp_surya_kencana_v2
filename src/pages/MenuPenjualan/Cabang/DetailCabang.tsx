@@ -419,7 +419,7 @@ const DetailCabang = () => {
                     </div>
                 </div>
             </div>
-
+            <h1 className='text-lg font-semibold mb-6'>Detail Cabang</h1>
             <div className="mb-5">
                 <div className="flex justify-center grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
                     <div className="panel h-full mr-4 col-span-2">
@@ -558,12 +558,6 @@ const DetailCabang = () => {
                                             accessor: 'id',
                                             title: 'No Dokumen',
                                             sortable: true,
-                                            // render: ({ id }) => (
-                                            //     <div className="flex items-center w-max">
-                                            //         <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
-                                            //         {/* <div>{firstName + ' ' + lastName}</div> */}
-                                            //     </div>
-                                            // ),
                                         },
                                         {
                                             accessor: 'firstName',
@@ -599,26 +593,26 @@ const DetailCabang = () => {
                                         //     title: 'Distribution Qty',
                                         //     sortable: true,
                                         // },
-                                        {
-                                            accessor: 'action',
-                                            title: 'Opsi',
-                                            titleClassName: '!text-center',
-                                            render: () => (
-                                                <div className="flex items-center w-max mx-auto gap-2">
-                                                    {/* <button type="button" style={{ color: 'blue' }}>
-                                            <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
-                                                    <button type="button" style={{ color: 'orange' }}>
-                                                        <Link to="/menupenjualan/distribution/editdistribution">
-                                                            <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                                        </Link>
-                                                    </button>
-                                                    {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
-                                                </div>
-                                            ),
-                                        },
+                                        // {
+                                        //     accessor: 'action',
+                                        //     title: 'Opsi',
+                                        //     titleClassName: '!text-center',
+                                        //     render: () => (
+                                        //         <div className="flex items-center w-max mx-auto gap-2">
+                                        //             {/* <button type="button" style={{ color: 'blue' }}>
+                                        //     <IconNotes className="ltr:mr-2 rtl:ml-2 " />
+                                        // </button> */}
+                                        //             <button type="button" style={{ color: 'orange' }}>
+                                        //                 <Link to="/menupenjualan/cabang/listcabang/editcabang/:id">
+                                        //                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                        //                 </Link>
+                                        //             </button>
+                                        //             {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                        //     <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                        // </button> */}
+                                        //         </div>
+                                        //     ),
+                                        // },
                                     ]}
                                     totalRecords={initialRecords.length}
                                     recordsPerPage={pageSize}
@@ -665,11 +659,9 @@ const DetailCabang = () => {
                                             titleClassName: '!text-center',
                                             render: () => (
                                                 <div className="flex items-center w-max mx-auto gap-2">
-                                                    {/* <button type="button" style={{ color: 'blue' }}>
-                                            <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
+                                                    
                                                     <button type="button" style={{ color: 'orange' }}>
-                                                        <Link to="/menupenjualan/distribution/editdistribution">
+                                                        <Link to="/menupenjualan/cabang/listcabang/editcabang/:id">
                                                             <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                                         </Link>
                                                     </button>

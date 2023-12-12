@@ -1,5 +1,5 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
@@ -8,6 +8,7 @@ import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import IconSend from '../../../components/Icon/IconSend';
+import { Dialog, Transition } from '@headlessui/react';
 
 const rowData = [
     {
@@ -638,40 +639,51 @@ const Distribusi = () => {
         return '';
     };
 
-    // const [operasionalCost, setOperasionalCost] = useState('');
-    // const [cost, setCost] = useState('');
-
-    // const handleOperasioanalCostChange = (e: { target: { value: any } }) => {
-    //     const inputValue = e.target.value;
-    //     let formattedValue = '';
-
-    //     // Remove non-numeric characters
-    //     const numericValue = inputValue.replace(/\D/g, '');
-
-    //     // Format the number with 'Rp.' prefix
-    //     if (numericValue !== '') {
-    //         formattedValue = `Rp. ${parseInt(numericValue, 10).toLocaleString('id-ID')}`;
-    //     }
-
-    //     setOperasionalCost(formattedValue);
-    // };
-
-    // const handleCostChange = (e: { target: { value: any } }) => {
-    //     const inputValue = e.target.value;
-    //     let formatValue = '';
-
-    //     // Remove non-numeric characters
-    //     const numValue = inputValue.replace(/\D/g, '');
-
-    //     // Format the number with 'Rp.' prefix
-    //     if (numValue !== '') {
-    //         formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-    //     }
-
-    //     setCost(formatValue);
-    // };
+    const [Edit, setEdit] = useState(false);
     return (
         <div>
+            <Transition appear show={Edit} as={Fragment}>
+                <Dialog as="div" open={Edit} onClose={() => setEdit(false)}>
+                    <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
+                        <div className="fixed inset-0" />
+                    </Transition.Child>
+                    <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
+                        <div className="flex items-center justify-center min-h-screen px-4">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 scale-95"
+                                enterTo="opacity-100 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 scale-100"
+                                leaveTo="opacity-0 scale-95"
+                            >
+                                <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg my-8 text-black dark:text-white-dark">
+                                    <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                                        <h5 className="font-bold text-lg">Edit Qty</h5>
+                                        {/* <button type="button" className="text-white-dark hover:text-dark" onClick={() => setEdit(false)}>
+                                            <svg>...</svg>
+                                        </button> */}
+                                    </div>
+                                    <div className="p-5">
+                                        <form>
+                                            <input type="text" placeholder="Some Text..." className="form-input" required />
+                                        </form>
+                                        <div className="flex justify-end items-center mt-8">
+                                            <button type="button" className="btn btn-outline-danger" onClick={() => setEdit(false)}>
+                                                Kembali
+                                            </button>
+                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setEdit(false)}>
+                                                Ubah
+                                            </button>
+                                        </div>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition>
             <ul className="flex space-x-2 rtl:space-x-reverse">
                 <li>
                     <Link to="/" className="text-primary hover:underline">
@@ -736,14 +748,7 @@ const Distribusi = () => {
                         Tambah
                     </button>
                 </form>
-                <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
-                        <button type="button" className=" px-2 btn btn-outline-info">
-                            <IconPlus className="flex mx-2" fill={true} /> Add
-                        </button>
-                    </Link> */}
-                </div>
-
+                <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5"></div>
                 <h5 className="font-semibold text-lg dark:text-white-light mb-4 mt-4 flex justify-center">Data Distribusi</h5>
                 <div className="datatables">
                     <DataTable
@@ -769,33 +774,6 @@ const Distribusi = () => {
                                 sortable: true,
                             },
                             { accessor: 'age', title: 'Qty', sortable: true },
-                            // {
-                            //     accessor: 'status',
-                            //     title: 'Status',
-                            //     sortable: true,
-                            //     render: (data) => (
-                            //         <span
-                            //             className={`badge whitespace-nowrap ${
-                            //                 data.status === 'completed'
-                            //                     ? 'bg-primary   '
-                            //                     : data.status === 'Pending'
-                            //                     ? 'bg-secondary'
-                            //                     : data.status === 'In Progress'
-                            //                     ? 'bg-success'
-                            //                     : data.status === 'Canceled'
-                            //                     ? 'bg-danger'
-                            //                     : 'bg-primary'
-                            //             }`}
-                            //         >
-                            //             {data.status}
-                            //         </span>
-                            //     ),
-                            // },
-                            // {
-                            //     accessor: 'age',
-                            //     title: 'Distribution Qty',
-                            //     sortable: true,
-                            // },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
@@ -805,10 +783,10 @@ const Distribusi = () => {
                                         {/* <button type="button" style={{ color: 'blue' }}>
                                             <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                         </button> */}
-                                        <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/distribution/editdistribution">
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
+                                        <button type="button" style={{ color: 'orange' }} onClick={() => setEdit(true)}>
+                                            {/* <Link to="/menupenjualan/distribution/editdistribution"> */}
+                                            <IconPencil className="ltr:mr-2 rtl:ml-2" />
+                                            {/* </Link> */}
                                         </button>
                                         <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
