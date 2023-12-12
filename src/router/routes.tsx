@@ -84,7 +84,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menupenjualan/product/unit/editunit',
+        path: '/menupenjualan/product/unit/editunit/:id',
         element: <EditUnit />,
         layout: 'default',
     },
@@ -157,7 +157,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menupenjualan/supplier/editsupplier',
+        path: '/menupenjualan/supplier/editsupplier/:id',
         element: <EditSupplier />,
         layout: 'default',
     },

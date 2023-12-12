@@ -706,10 +706,10 @@ const Unit = () => {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
-                                render: () => (
+                                render: (row) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/product/unit/editunit">
+                                            <Link to={`/menupenjualan/product/unit/editunit/${row.id}`}>
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
