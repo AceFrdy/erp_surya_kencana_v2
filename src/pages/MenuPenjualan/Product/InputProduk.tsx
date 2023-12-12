@@ -41,12 +41,27 @@ const InputProduk = () => {
     const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
         setImages(imageList as never[]);
     };
+    interface FormState {
+        product_category_id: '';
+        supplier_id: '';
+        product_name: '';
+        product_price: '';
+        product_modal: '';
+        product_pos: '';
+        ecommers: '';
+        responsibility: '';
+        product_image: '';
+        product_barcode: '';
+        product_ime: '';
+        product_weight: '';
+        errors: {};
+    }
 
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') || '';
 
-    const [formData, setFormData] = useState({
-        category_id: '',
+    const [formData, setFormData] = useState<FormState>({
+        product_category_id: '',
         supplier_id: '',
         product_name: '',
         product_price: '',
@@ -61,19 +76,31 @@ const InputProduk = () => {
         errors: {},
     });
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+
+        // Jika input adalah elemen input, atur value ke state sesuai nama bidang
+        if (e.target.tagName === 'INPUT') {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        } else if (e.target.tagName === 'SELECT') {
+            // Jika input adalah elemen select, atur value yang dipilih ke state sesuai nama bidang
+            const selectedValue = value;
+
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: selectedValue,
+            }));
+        }
     };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
         const data = {
-            product_category_id: formData.category_id,
+            product_category_id: formData.product_category_id,
             product_supplier_id: formData.supplier_id,
             product_name: formData.product_name,
             product_price: formData.product_price,
@@ -114,7 +141,7 @@ const InputProduk = () => {
                 toast.error('Error adding data');
             });
     };
-
+    const [productData, setProductData] = useState<any>({});
     const handleCancel = () => {
         // Instead of using a Link, directly use the navigate function
         navigate('/menupenjualan/product/produk');
@@ -142,49 +169,46 @@ const InputProduk = () => {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label htmlFor="gridEmail">Nama Produk</label>
-                                        <input 
-                                        id="gridEmail" 
-                                        type="text" 
-                                        placeholder="Nama Produk..." 
-                                        className="form-input" 
-                                        value={formData.product_name}
-                                        onChange={handleChange}
+                                        <input
+                                            id="gridEmail"
+                                            type="text"
+                                            placeholder="Nama Produk..."
+                                            name="product_name"
+                                            className="form-input"
+                                            value={formData.product_name}
+                                            onChange={handleChange}
                                         />
                                     </div>
                                     <div>
                                         <label htmlFor="gridPassword">Harga</label>
-                                        <input 
-                                        id="gridPassword" 
-                                        type="Password" 
-                                        placeholder="Masukan Harga..." 
-                                        className="form-input" 
-                                        value={formData.product_price}
-                                        onChange={handleChange}
+                                        <input
+                                            id="gridPassword"
+                                            type="text"
+                                            placeholder="Masukan Harga..."
+                                            className="form-input"
+                                            name="product_price"
+                                            value={formData.product_price}
+                                            onChange={handleChange}
                                         />
                                     </div>
                                 </div>
                                 <div>
                                     <div>
                                         <label htmlFor="gridState">Kategori Produk</label>
-                                        <select 
-                                        id="gridState" 
-                                        className="form-select text-white-dark"
-                                        // value={formData.product_category_id}
-                                        // onChange={handleChange}
-                                        >
-                                            <option>Choose...</option>
-                                            <option>1</option>
-                                            <option>2</option>
-                                            <option>3</option>
-                                            <option>4</option>
+                                        <select id="gridState" className="form-select text-white-dark" value={formData.product_category_id} onChange={handleChange}>
+                                            <option value="">Choose...</option>
+                                            {/* {data?.resource?.product_category &&
+                                                data.resource.product_category.map((category: any) => (
+                                                    <option key={category.id} value={category.id}>
+                                                        {category.product_category_name}
+                                                    </option>
+                                                ))} */}
                                         </select>
                                     </div>
                                 </div>
                                 <div>
                                     <label htmlFor="gridState">Suplier</label>
-                                    <select 
-                                    id="gridState" 
-                                    className="form-select text-white-dark">
+                                    <select id="gridState" className="form-select text-white-dark">
                                         <option>Choose...</option>
                                         <option>...</option>
                                     </select>
@@ -192,24 +216,25 @@ const InputProduk = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                     <div className="md:col-span-2">
                                         <label htmlFor="gridCity">Modal</label>
-                                        <input 
-                                        id="gridCity" 
-                                        type="text" 
-                                        placeholder="Masukan Modal..." 
-                                        className="form-input" 
-                                        value={formData.product_modal}
-                                        onChange={handleChange}
+                                        <input
+                                            id="gridCity"
+                                            type="text"
+                                            placeholder="Masukan Modal..."
+                                            className="form-input"
+                                            name="product_modal"
+                                            value={formData.product_modal}
+                                            onChange={handleChange}
                                         />
                                     </div>
                                     <div className="md:col-span-2">
                                         <label htmlFor="gridCity">Penanggung Jawab</label>
-                                        <input 
-                                        id="gridCity" 
-                                        type="text" 
-                                        placeholder="Penanggung Jawab..." 
-                                        className="form-input" 
-                                        // value={formData.product_responsibility}
-                                        // onChange={handleChange}
+                                        <input
+                                            id="gridCity"
+                                            type="text"
+                                            placeholder="Penanggung Jawab..."
+                                            className="form-input"
+                                            // value={formData.product_responsibility}
+                                            onChange={handleChange}
                                         />
                                     </div>
                                     <div className="md:col-span-2">
@@ -274,15 +299,15 @@ const InputProduk = () => {
                                 </ImageUploading>
                                 {images.length === 0 ? <img src="/assets/images/file-preview.svg" className="max-w-md w-full m-auto" alt="" /> : ''}
                                 <div className="flex">
-                                    <Link to="/menupenjualan/product/produk" >
-                                    <button type="submit" className="btn btn-primary !mt-6" onClick={() => showAlert(20)}>
-                                        Tambah
-                                    </button>
+                                    <Link to="/menupenjualan/product/produk">
+                                        <button type="submit" className="btn btn-primary !mt-6" onClick={() => showAlert(20)}>
+                                            Tambah
+                                        </button>
                                     </Link>
-                                    <Link to="/menupenjualan/product/produk" >
-                                    <button type="submit" className="btn btn-primary !mt-6 ml-6" onClick={handleCancel}>
-                                        Cancel
-                                    </button>
+                                    <Link to="/menupenjualan/product/produk">
+                                        <button type="submit" className="btn btn-primary !mt-6 ml-6" onClick={handleCancel}>
+                                            Cancel
+                                        </button>
                                     </Link>
                                 </div>
                             </div>
