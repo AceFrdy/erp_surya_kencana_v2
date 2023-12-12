@@ -743,7 +743,7 @@ const CustomerOffline = () => {
                         minHeight={200}
                         paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                     />
-                    <Transition appear show={hapusCustomer} as={Fragment}>
+                    {/* <Transition appear show={hapusCustomer} as={Fragment}>
                         <Dialog as="div" open={hapusCustomer} onClose={() => setHapusCustomer(false)}>
                             <Transition.Child
                                 as={Fragment}
@@ -793,7 +793,7 @@ const CustomerOffline = () => {
                                 </div>
                             </div>
                         </Dialog>
-                    </Transition>
+                    </Transition> */}
                 </div>
             </div>
         </div>
