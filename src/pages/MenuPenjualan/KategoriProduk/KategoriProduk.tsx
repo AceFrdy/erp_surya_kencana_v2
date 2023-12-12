@@ -1,12 +1,14 @@
-import React, { SetStateAction, useState, Fragment, useEffect } from 'react';
+import React, { SetStateAction, useState, Fragment, useEffect, FormEvent, ChangeEvent } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { Pagination } from '@mantine/core';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import IconPlus from '../../../components/Icon/IconPlus';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import IconPencil from '../../../components/Icon/IconPencil';
+import { FormikState } from 'formik';
+import { toast } from 'react-toastify';
 
 const tableData = [
     {
@@ -138,6 +140,7 @@ const showAlert = async (type: number) => {
     }
 };
 const Basic = () => {
+    const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState<number>(1); // Menggunakan tipe data number untuk state currentPage
     const itemsPerPage = 5;
     const totalPages = Math.ceil(tableData.length / itemsPerPage);
@@ -172,7 +175,60 @@ const Basic = () => {
                 console.error('Error fetching data:', error);
             });
     }, []);
-    
+
+    const [formData, setFormData] = useState({
+        product_category_name: '',
+        errors: {},
+    });
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+    const handleAdd = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const data = {
+            product_category_name: formData.product_category_name,
+        };
+
+        axios
+            .post('https://erp.digitalindustryagency.com/api/product-categories', data, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                console.log('Data kategori produk berhasil ditambahkan:', response.data);
+                setFormData({
+                    product_category_name: '',
+                    errors: {},
+                });
+                setAddKategori(false);
+                navigate('/menupenjualan/product/kategoriproduk');
+                toast.success('Data berhasil ditambahkan', {
+                    position: 'top-right',
+                    autoClose: 3000,
+                });
+            })
+            .catch((error) => {
+                if (error.response && error.response.data) {
+                    const apiErrors = error.response.data;
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        errors: apiErrors,
+                    }));
+                }
+                console.error('Error adding kategori produk data:', error);
+                toast.error('Error adding data');
+            });
+    };
+
 
     return (
         <div>
@@ -258,18 +314,25 @@ const Basic = () => {
                                         </div>
                                         <div className="p-5">
                                             <div>
-                                                <form className="space-y-5">
+                                                <form className="space-y-5" onSubmit={handleAdd}>
                                                     <div>
-                                                        <input type="textfield" placeholder="Masukan Kategori" className="form-input" />
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Masukan Kategori"
+                                                            className="form-input"
+                                                            name="product_category_name"
+                                                            value={formData.product_category_name}
+                                                            onChange={handleChange}
+                                                        />
                                                     </div>
                                                 </form>
                                             </div>
                                             <div className="flex justify-end items-center mt-8">
-                                                <button type="button" className="btn btn-outline-danger" onClick={() => setAddKategori(false)}>
-                                                    Discard
-                                                </button>
-                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setAddKategori(false)}>
+                                                <button type="submit" className="btn btn-primary ltr:ml-4 rtl:mr-4">
                                                     Save
+                                                </button>
+                                                <button type="submit" className="btn btn-outline-danger" onClick={() => setAddKategori(false)}>
+                                                    Discard
                                                 </button>
                                             </div>
                                         </div>
@@ -318,7 +381,7 @@ const Basic = () => {
                                 {categories.map((category, index) => {
                                     return (
                                         <tr key={category.id}>
-                                            <td>{index +1}</td>
+                                            <td>{index + 1}</td>
                                             <td>
                                                 <div className="whitespace-nowrap">{category.product_category_name}</div>
                                             </td>
