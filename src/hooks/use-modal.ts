@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type ModalType = 'delete';
+export type ModalType = 'delete' | 'delete-cabang' | 'delete-unit';
 
 interface ModalStore {
     type: ModalType | null;
