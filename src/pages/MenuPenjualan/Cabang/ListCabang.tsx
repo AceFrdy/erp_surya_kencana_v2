@@ -18,7 +18,7 @@ import { toast } from 'react-toastify';
 const rowData = [
     {
         id: 1,
-        firstName: 'Caroline',
+        branch_name: 'Caroline',
         lastName: 'Jensen',
         email: 'carolinejensen@zidant.com',
         dob: '2004-05-28',
@@ -548,6 +548,14 @@ const showAlert = async (type: number) => {
             });
     }
 };
+
+interface BranchDataProps {
+    id: number;
+    branch_name: string;
+    branch_contact: number;
+    branch_address: string;
+}
+
 const ListCabang = () => {
     const dispatch = useDispatch();
     const token = localStorage.getItem('accessToken') || '';
@@ -557,7 +565,7 @@ const ListCabang = () => {
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
+    const [initialRecords, setInitialRecords] = useState<BranchDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
 
     const [search, setSearch] = useState('');
@@ -578,13 +586,15 @@ const ListCabang = () => {
     }, [page, pageSize, initialRecords]);
 
     useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
+        if (!initialRecords) {
+            return;
+        }
+        setRecordsData(() => {
+            return initialRecords.filter((item) => {
                 return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
+                    item.branch_name.toLowerCase().includes(search.toLowerCase()) ||
+                    item.branch_address.toLowerCase().includes(search.toLowerCase()) ||
+                    item.branch_contact.toString().includes(search.toLowerCase())
                 );
             });
         });
@@ -654,7 +664,7 @@ const ListCabang = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
+                            // { accessor: 'id', title: 'No', sortable: true },
                             { accessor: 'branch_name', title: 'Nama Cabang', sortable: true },
                             {
                                 accessor: 'branch_address',
@@ -669,8 +679,8 @@ const ListCabang = () => {
                                 render: (row) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menupenjualan/cabang/detailcabang" >
-                                            <IconNotes className="ltr:mr-2 rtl:ml-2 " />
+                                            <Link to="/menupenjualan/cabang/detailcabang">
+                                                <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
                                         <button type="button" style={{ color: 'orange' }}>
