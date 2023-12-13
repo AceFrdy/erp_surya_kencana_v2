@@ -4,10 +4,12 @@ import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 const DeleteCustomerOfflineModal = () => {
     const { isOpen, type, onClose, data } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
+    const navigate = useNavigate();
 
     const isModalOpen = isOpen && type === 'delete-customer-offline';
 
@@ -21,7 +23,6 @@ const DeleteCustomerOfflineModal = () => {
             })
             .then(() => {
                 onClose();
-                toast.success('Customer Offline Berhasil Dihapus.');
             })
             .catch((err) => {
                 console.log('DELETE CUSTOMER', err);

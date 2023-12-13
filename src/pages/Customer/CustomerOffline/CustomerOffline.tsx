@@ -540,20 +540,23 @@ const CustomerOffline = () => {
     const { onOpen } = useModal();
 
     useEffect(() => {
-        axios
-            .get('https://erp.digitalindustryagency.com/api/customers-offline', {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                setInitialRecords(orderBy(response.data.data.resource, 'created_at', 'desc'));
-            })
-            .catch((err) => {
-                console.log(err.message);
-            });
-    }, []);
+        const id = setInterval(() => {
+            axios
+                .get('https://erp.digitalindustryagency.com/api/customers-offline', {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                .then((response) => {
+                    setInitialRecords(orderBy(response.data.data.resource, 'created_at', 'desc'));
+                })
+                .catch((err) => {
+                    console.log(err.message);
+                });
+        }, 2000);
+        return () => clearInterval(id)
+    }, [initialRecords]);
 
     useEffect(() => {
         setPage(1);

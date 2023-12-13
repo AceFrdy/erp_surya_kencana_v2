@@ -1,11 +1,11 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
-const DeleteModal = () => {
+const DeleteUnitModal = () => {
     const { isOpen, type, onClose, data } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
     const navigate = useNavigate();
@@ -23,6 +23,7 @@ const DeleteModal = () => {
             .then(() => {
                 onClose();
                 toast.success('Unit Stock Berhasil Dihapus.');
+                navigate(0);
             })
             .catch((err) => {
                 console.log('DELETE UNIT', err);
@@ -82,4 +83,4 @@ const DeleteModal = () => {
     );
 };
 
-export default DeleteModal;
+export default DeleteUnitModal;

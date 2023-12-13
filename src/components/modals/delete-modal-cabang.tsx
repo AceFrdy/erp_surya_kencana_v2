@@ -5,7 +5,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
-const DeleteModal = () => {
+const DeleteCabangModal = () => {
     const { isOpen, type, onClose, data } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
     const navigate = useNavigate();
@@ -14,7 +14,7 @@ const DeleteModal = () => {
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/users/${id}`, {
+            .delete(`https://erp.digitalindustryagency.com/api/branches/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -22,10 +22,11 @@ const DeleteModal = () => {
             })
             .then(() => {
                 onClose();
-                toast.success('Customer Offline Berhasil Dihapus.');
+                toast.success('Cabang Berhasil Dihapus.');
+                navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE CUSTOMER', err);
+                console.log('DELETE CABANG', err);
             });
     };
 
@@ -48,13 +49,13 @@ const DeleteModal = () => {
                         >
                             <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
                                 <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                    <div className="text-lg font-bold">Hapus Customer</div>
+                                    <div className="text-lg font-bold">Hapus Cabang</div>
                                 </div>
                                 <div className="p-5">
                                     <div>
                                         <form className="space-y-5">
                                             <div>
-                                                <h1>Apakah Anda yakin ingin menghapus Customer</h1>
+                                                <h1>Apakah Anda yakin ingin menghapus Cabang</h1>
                                             </div>
                                         </form>
                                     </div>
@@ -82,4 +83,4 @@ const DeleteModal = () => {
     );
 };
 
-export default DeleteModal;
+export default DeleteCabangModal;

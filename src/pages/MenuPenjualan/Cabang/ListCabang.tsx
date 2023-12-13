@@ -14,6 +14,7 @@ import IconNotes from '../../../components/Icon/IconNotes';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
+import { useModal } from '../../../hooks/use-modal';
 
 const rowData = [
     {
@@ -518,36 +519,6 @@ const rowData = [
     },
 ];
 
-const showAlert = async (type: number) => {
-    if (type === 11) {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
-                popup: 'sweet-alerts',
-            },
-            buttonsStyling: false,
-        });
-        swalWithBootstrapButtons
-            .fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true,
-                padding: '2em',
-            })
-            .then((result) => {
-                if (result.value) {
-                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
-                }
-            });
-    }
-};
 
 interface BranchDataProps {
     id: number;
@@ -574,6 +545,7 @@ const ListCabang = () => {
         direction: 'asc',
     });
     const [branch, setBranch] = useState([]);
+    const { onOpen } = useModal();
 
     useEffect(() => {
         setPage(1);
@@ -619,15 +591,14 @@ const ListCabang = () => {
             })
             .then((response) => {
                 const branch = response.data.data.resource.data;
-                setBranch(branch); // Set categories state with fetched data
                 setInitialRecords(branch);
-                setRecordsData(branch);
-                console.log('BRANCH', branch);
+                // setBranch(branch); 
+                // setRecordsData(branch);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, []);
+    }, [initialRecords]);
 
     return (
         <div>
@@ -676,7 +647,7 @@ const ListCabang = () => {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
-                                render: (row) => (
+                                render: (e) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'blue' }}>
                                             <Link to="/menupenjualan/cabang/detailcabang">
@@ -684,11 +655,11 @@ const ListCabang = () => {
                                             </Link>
                                         </button>
                                         <button type="button" style={{ color: 'orange' }}>
-                                            <Link to={`/menupenjualan/cabang/listcabang/editcabang/${row.id}`}>
+                                            <Link to={`/menupenjualan/cabang/listcabang/editcabang/${e.id}`}>
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                        <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-cabang', e.id)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
                                     </div>
