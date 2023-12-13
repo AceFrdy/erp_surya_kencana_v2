@@ -412,7 +412,7 @@ const Ecommerce = () => {
                     </div>
                 </div>
             </div>
-            <div className="grid lg:grid-cols-2 grid-cols-1 gap-6">
+            <div className="grid lg:grid-cols-2 grid-cols-1 gap-6 mt-6">
                 <div className="panel h-full w-full">
                     <div className="flex items-center justify-between mb-5">
                         <h5 className="font-semibold text-lg dark:text-white-light">Recent Orders</h5>
@@ -513,7 +513,6 @@ const Ecommerce = () => {
                         </table>
                     </div>
                 </div>
-
                 <div className="panel h-full w-full">
                     <div className="flex items-center justify-between mb-5">
                         <h5 className="font-semibold text-lg dark:text-white-light">Top Selling Product</h5>
