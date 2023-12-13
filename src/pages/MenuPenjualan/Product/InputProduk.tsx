@@ -6,8 +6,37 @@ import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
+import { formatPrice } from '../../../utils';
+import IconTrash from '../../../components/Icon/IconTrash';
+
+interface FormState {
+    product_category_id: string;
+    supplier_id: string;
+    product_name: string;
+    product_price: number;
+    product_modal: number;
+    product_pos: string;
+    ecommers: '';
+    product_responsibility: string;
+    product_image: File | null;
+    product_barcode: string;
+    product_ime: string;
+    product_weight: number;
+}
+
+interface CategoriesProductList {
+    id: number;
+    product_category_name: string;
+}
+
+interface SupliersList {
+    id: number;
+    suplier_name: string;
+}
 
 const InputProduk = () => {
+    const [categoriesProduct, setCategoriesProduct] = useState<CategoriesProductList[]>([]);
+    const [supliers, setSupliers] = useState<SupliersList[]>([]);
     const options = [
         { value: 'orange', label: 'Orange' },
         { value: 'white', label: 'White' },
@@ -19,62 +48,32 @@ const InputProduk = () => {
         dispatch(setPageTitle('File Upload Preview'));
     });
 
-    const showAlert = async (type: number) => {
-        if (type == 20) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'success',
-                title: 'Data Berhasil Ditambah',
-                padding: '10px 20px',
-            });
-        }
-    };
-
     const [images, setImages] = useState<any>([]);
     const maxNumber = 69;
 
-    const onChange = (imageList: ImageListType, addUpdateIndex: number[] | undefined) => {
-        setImages(imageList as never[]);
-    };
-    interface FormState {
-        product_category_id: string;
-        supplier_id: string;
-        product_name: string;
-        product_price: string;
-        product_modal: string;
-        product_pos: string;
-        ecommers: '';
-        product_responsibility: string;
-        product_image: File | null;
-        product_barcode: string;
-        product_ime: string;
-        product_weight: string;
-        errors: {};
-    }
-
     const navigate = useNavigate();
-    const token = localStorage.getItem('accessToken') || '';
+    const token = localStorage.getItem('accessToken') ?? '';
 
     const [formData, setFormData] = useState<FormState>({
         product_category_id: '',
         supplier_id: '',
         product_name: '',
-        product_price: '',
-        product_modal: '',
+        product_price: 0,
+        product_modal: 0,
         product_pos: '',
         ecommers: '',
         product_responsibility: '',
         product_image: null,
         product_barcode: '',
         product_ime: '',
-        product_weight: '',
-        errors: {},
+        product_weight: 0,
     });
+
+    const onChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setFormData({ ...formData, product_image: e.target.files[0] });
+        }
+    };
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -100,8 +99,8 @@ const InputProduk = () => {
         }));
     };
 
-    const handleSubmit = () => {
-        // e.preventDefault();
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
 
         const data = {
             product_category_id: formData.product_category_id,
@@ -144,6 +143,25 @@ const InputProduk = () => {
             });
     };
 
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/product-categories', { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
+            .then((response) => {
+                setCategoriesProduct(response.data.data.resource.data);
+            })
+            .catch((err: any) => {
+                console.log('CATEGORIES PRODUCT', err.message);
+            });
+        axios
+            .get('https://erp.digitalindustryagency.com/api/supliers', { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
+            .then((response) => {
+                setSupliers(response.data.data.resource.data);
+            })
+            .catch((err: any) => {
+                console.log('SUPLIER', err.message);
+            });
+    }, []);
+
     // const [productData, setProductData] = useState<any>({});
     const handleCancel = () => {
         // Instead of using a Link, directly use the navigate function
@@ -182,53 +200,57 @@ const InputProduk = () => {
                                             onChange={handleChange}
                                         />
                                     </div>
-                                    <div>
+                                    <div className="relative">
                                         <label htmlFor="gridPassword">Harga</label>
                                         <input
                                             id="gridPassword"
-                                            type="text"
+                                            type="number"
                                             placeholder="Masukan Harga..."
-                                            className="form-input"
+                                            className="form-input relative pl-8"
                                             name="product_price"
                                             value={formData.product_price}
                                             onChange={handleChange}
                                         />
+                                        <p className="absolute top-9 left-2">Rp.</p>
                                     </div>
                                 </div>
                                 <div>
                                     <div>
                                         <label htmlFor="gridState">Kategori Produk</label>
-                                        <select id="gridState" className="form-select text-white-dark" name='product_category_id' value={formData.product_category_id} onChange={handleChange}>
+                                        <select id="gridState" className="form-select text-black" name="product_category_id" value={formData.product_category_id} onChange={handleChange}>
                                             <option value="">Choose...</option>
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
+                                            {categoriesProduct.map((item) => (
+                                                <option key={item.id} value={item.id}>
+                                                    {item.product_category_name}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                 </div>
                                 <div>
                                     <label htmlFor="gridState">Suplier</label>
-                                    <select id="gridState" className="form-select text-white-dark" name="supplier_id" value={formData.supplier_id} onChange={handleChange}>
+                                    <select id="gridState" className="form-select text-black" name="supplier_id" value={formData.supplier_id} onChange={handleChange}>
                                         <option value="">Choose...</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
+                                        {supliers.map((item) => (
+                                            <option value={item.id} key={item.id}>
+                                                {item.suplier_name}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                    <div className="md:col-span-2">
+                                    <div className="md:col-span-2 relative">
                                         <label htmlFor="gridCity">Modal</label>
                                         <input
                                             id="gridCity"
-                                            type="text"
+                                            type="number"
                                             placeholder="Masukan Modal..."
-                                            className="form-input"
+                                            className="form-input pl-10"
                                             name="product_modal"
                                             value={formData.product_modal}
                                             onChange={handleChange}
                                         />
+                                        <p className="absolute top-9 left-3">Rp.</p>
                                     </div>
                                     <div className="md:col-span-2">
                                         <label htmlFor="gridCity">Penanggung Jawab</label>
@@ -258,17 +280,18 @@ const InputProduk = () => {
                                         <label htmlFor="gridZip">Imei</label>
                                         <input id="gridZip" type="text" placeholder="Masukan Ime..." name="product_ime" className="form-input" value={formData.product_ime} onChange={handleChange} />
                                     </div>
-                                    <div className="md:col-span-1">
+                                    <div className="md:col-span-1 relative">
                                         <label htmlFor="gridZip">Product Weight</label>
                                         <input
                                             id="gridZip"
-                                            type="text"
+                                            type="number"
                                             placeholder="Masukan Berat..."
                                             name="product_weight"
-                                            className="form-input"
+                                            className="form-input pr-10"
                                             value={formData.product_weight}
                                             onChange={handleChange}
                                         />
+                                        <p className="absolute top-9 right-3">Kg</p>
                                     </div>
                                 </div>
                                 <div>
@@ -300,11 +323,48 @@ const InputProduk = () => {
                                         <span className="text-white-dark">E-Commerce</span>
                                     </label>
                                 </div>
+                                <div className="relative">
+                                    {formData.product_image ? (
+                                        <div className="group w-60">
+                                            <label>Gambar Produk</label>
+                                            <div className="h-60 absolute top-[26px] w-60 rounded-md bg-red-100/80 hidden backdrop-blur-sm group-hover:flex justify-center items-center">
+                                                <button className="w-40 h-40 rounded-md flex justify-center items-center border-red-700 border-2 border-dashed">
+                                                    <IconTrash className="w-10 h-10 text-red-700" />
+                                                </button>
+                                            </div>
+                                            <div className="w-60 h-60 top-0 overflow-hidden rounded-md">
+                                                <img className="object-cover" src={URL.createObjectURL(formData.product_image)} />
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <label htmlFor="input-gambar">Gambar Produk</label>
+                                            <label htmlFor="input-gambar" className="h-60 absolute top-[26px] w-60 rounded-md border flex items-center justify-center hover:bg-blue-50">
+                                                <span className="w-40 h-40 flex justify-center items-center rounded-md border border-dashed border-black">Upload Gambar</span>
+                                            </label>
+                                            <div className="w-60 h-60" />
+                                            <input className="hidden" onChange={onChangeImage} id="input-gambar" type="file" accept=".png,.jpg,.jpeg,.webp" />
+                                        </>
+                                    )}
+                                </div>
+                                <div></div>
+                                <div className="flex">
+                                    <Link to="/menupenjualan/product/produk">
+                                        <button type="submit" className="btn btn-primary !mt-6" onClick={handleSubmit}>
+                                            Tambah
+                                        </button>
+                                    </Link>
+                                    <Link to="/menupenjualan/product/produk">
+                                        <button type="submit" className="btn btn-primary !mt-6 ml-6" onClick={handleCancel}>
+                                            Cancel
+                                        </button>
+                                    </Link>
+                                </div>
                             </form>
                         </div>
                         <div className="mb-5">
                             <div className="custom-file-container" data-upload-id="myFirstImage">
-                                <div className="label-container">
+                                {/* <div className="label-container">
                                     <label>Upload Foto </label>
                                     <button
                                         type="button"
@@ -335,19 +395,7 @@ const InputProduk = () => {
                                         </div>
                                     )}
                                 </ImageUploading>
-                                {images.length === 0 ? <img src="/assets/images/file-preview.svg" className="max-w-md w-full m-auto" alt="" /> : ''}
-                                <div className="flex">
-                                    <Link to="/menupenjualan/product/produk">
-                                        <button type="submit" className="btn btn-primary !mt-6" onClick={handleSubmit}>
-                                            Tambah
-                                        </button>
-                                    </Link>
-                                    <Link to="/menupenjualan/product/produk">
-                                        <button type="submit" className="btn btn-primary !mt-6 ml-6" onClick={handleCancel}>
-                                            Cancel
-                                        </button>
-                                    </Link>
-                                </div>
+                                {images.length === 0 ? <img src="/assets/images/file-preview.svg" className="max-w-md w-full m-auto" alt="" /> : ''} */}
                             </div>
                         </div>
                     </div>
