@@ -42,18 +42,18 @@ const InputProduk = () => {
         setImages(imageList as never[]);
     };
     interface FormState {
-        product_category_id: '';
-        supplier_id: '';
-        product_name: '';
-        product_price: '';
-        product_modal: '';
-        product_pos: '';
+        product_category_id: string;
+        supplier_id: string;
+        product_name: string;
+        product_price: string;
+        product_modal: string;
+        product_pos: string;
         ecommers: '';
-        responsibility: '';
-        product_image: '';
-        product_barcode: '';
-        product_ime: '';
-        product_weight: '';
+        product_responsibility: string;
+        product_image: File | null;
+        product_barcode: string;
+        product_ime: string;
+        product_weight: string;
         errors: {};
     }
 
@@ -68,8 +68,8 @@ const InputProduk = () => {
         product_modal: '',
         product_pos: '',
         ecommers: '',
-        responsibility: '',
-        product_image: '',
+        product_responsibility: '',
+        product_image: null,
         product_barcode: '',
         product_ime: '',
         product_weight: '',
@@ -77,23 +77,27 @@ const InputProduk = () => {
     });
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-
-        // Jika input adalah elemen input, atur value ke state sesuai nama bidang
-        if (e.target.tagName === 'INPUT') {
+        const { name, value, type } = e.target;
+        if (type === 'checkbox') {
+            const checkboxValue = (e.target as HTMLInputElement).checked ? 'yes' : '';
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: checkboxValue,
+            }));
+        } else {
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: value,
             }));
-        } else if (e.target.tagName === 'SELECT') {
-            // Jika input adalah elemen select, atur value yang dipilih ke state sesuai nama bidang
-            const selectedValue = value;
-
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: selectedValue,
-            }));
         }
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files && e.target.files[0]; // Mengambil file dari event onChange
+        setFormData((prevData) => ({
+            ...prevData,
+            product_image: file, // Menyimpan file ke state formData
+        }));
     };
 
     const handleSubmit = (e: FormEvent) => {
@@ -107,12 +111,13 @@ const InputProduk = () => {
             product_modal: formData.product_modal,
             product_pos: formData.product_pos,
             product_ecommers: formData.ecommers,
-            product_responsibility: formData.responsibility,
+            product_responsibility: formData.product_responsibility,
             product_image: formData.product_image,
             product_barcode: formData.product_barcode,
             product_ime: formData.product_ime,
             product_weight: formData.product_weight,
         };
+        console.log('Data to be sent:', data);
 
         axios
             .post('https://erp.digitalindustryagency.com/api/products', data, {
@@ -141,6 +146,7 @@ const InputProduk = () => {
                 toast.error('Error adding data');
             });
     };
+
     const [productData, setProductData] = useState<any>({});
     const handleCancel = () => {
         // Instead of using a Link, directly use the navigate function
@@ -195,22 +201,23 @@ const InputProduk = () => {
                                 <div>
                                     <div>
                                         <label htmlFor="gridState">Kategori Produk</label>
-                                        <select id="gridState" className="form-select text-white-dark" value={formData.product_category_id} onChange={handleChange}>
+                                        <select id="gridState" className="form-select text-white-dark" name='product_category_id' value={formData.product_category_id} onChange={handleChange}>
                                             <option value="">Choose...</option>
-                                            {/* {data?.resource?.product_category &&
-                                                data.resource.product_category.map((category: any) => (
-                                                    <option key={category.id} value={category.id}>
-                                                        {category.product_category_name}
-                                                    </option>
-                                                ))} */}
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div>
                                     <label htmlFor="gridState">Suplier</label>
-                                    <select id="gridState" className="form-select text-white-dark">
-                                        <option>Choose...</option>
-                                        <option>...</option>
+                                    <select id="gridState" className="form-select text-white-dark" name="supplier_id" value={formData.supplier_id} onChange={handleChange}>
+                                        <option value="">Choose...</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
                                     </select>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -233,26 +240,60 @@ const InputProduk = () => {
                                             type="text"
                                             placeholder="Penanggung Jawab..."
                                             className="form-input"
-                                            // value={formData.product_responsibility}
+                                            name="product_responsibility"
+                                            value={formData.product_responsibility}
                                             onChange={handleChange}
                                         />
                                     </div>
                                     <div className="md:col-span-2">
                                         <label htmlFor="gridZip">Barcode</label>
-                                        <input id="gridZip" type="text" placeholder="Masukan Barcode..." className="form-input" />
+                                        <input
+                                            id="gridZip"
+                                            type="text"
+                                            placeholder="Masukan Barcode..."
+                                            name="product_barcode"
+                                            className="form-input"
+                                            value={formData.product_barcode}
+                                            onChange={handleChange}
+                                        />
                                     </div>
                                     <div className="md:col-span-1">
                                         <label htmlFor="gridZip">Imei</label>
-                                        <input id="gridZip" type="text" placeholder="Masukan Imei..." className="form-input" />
+                                        <input id="gridZip" type="text" placeholder="Masukan Ime..." name="product_ime" className="form-input" value={formData.product_ime} onChange={handleChange} />
                                     </div>
                                     <div className="md:col-span-1">
                                         <label htmlFor="gridZip">Product Weight</label>
-                                        <input id="gridZip" type="text" placeholder="Masukan Berat..." className="form-input" />
+                                        <input
+                                            id="gridZip"
+                                            type="text"
+                                            placeholder="Masukan Berat..."
+                                            name="product_weight"
+                                            className="form-input"
+                                            value={formData.product_weight}
+                                            onChange={handleChange}
+                                        />
                                     </div>
                                 </div>
                                 <div>
                                     <label className="flex items-center mt-1 cursor-pointer">
-                                        <input type="checkbox" className="form-checkbox" />
+                                        <input
+                                            type="checkbox"
+                                            className="form-checkbox"
+                                            name="product_pos"
+                                            checked={formData.product_pos === 'yes'}
+                                            onChange={(e) => {
+                                                const newValue = e.target.checked ? 'yes' : '';
+                                                setFormData((prevData) => {
+                                                    const updatedData = {
+                                                        ...prevData,
+                                                        product_pos: newValue,
+                                                    };
+                                                    console.log('Updated product_pos:', updatedData.product_pos); // Log nilai terbaru ke console
+                                                    return updatedData;
+                                                });
+                                            }}
+                                        />
+
                                         <span className="text-white-dark">POS</span>
                                     </label>
                                 </div>
@@ -280,7 +321,7 @@ const InputProduk = () => {
                                     </button>
                                 </div>
                                 <label className="custom-file-container__custom-file"></label>
-                                <input type="file" className="custom-file-container__custom-file__custom-file-input" accept="image/*" />
+                                <input type="file" onChange={handleFileChange} name="product_image" className="custom-file-container__custom-file__custom-file-input" accept="image/*" />
                                 <input type="hidden" name="MAX_FILE_SIZE" value="10485760" />
                                 <ImageUploading value={images} onChange={onChange} maxNumber={maxNumber}>
                                     {({ imageList, onImageUpload, onImageRemoveAll, onImageUpdate, onImageRemove, isDragging, dragProps }) => (
@@ -300,7 +341,7 @@ const InputProduk = () => {
                                 {images.length === 0 ? <img src="/assets/images/file-preview.svg" className="max-w-md w-full m-auto" alt="" /> : ''}
                                 <div className="flex">
                                     <Link to="/menupenjualan/product/produk">
-                                        <button type="submit" className="btn btn-primary !mt-6" onClick={() => showAlert(20)}>
+                                        <button type="submit" className="btn btn-primary !mt-6" onClick={handleSubmit}>
                                             Tambah
                                         </button>
                                     </Link>
