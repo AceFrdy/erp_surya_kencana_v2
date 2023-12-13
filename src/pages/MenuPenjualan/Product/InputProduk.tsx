@@ -100,8 +100,8 @@ const InputProduk = () => {
         }));
     };
 
-    const handleSubmit = (e: FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = () => {
+        // e.preventDefault();
 
         const data = {
             product_category_id: formData.product_category_id,
@@ -127,7 +127,7 @@ const InputProduk = () => {
                 },
             })
             .then((response) => {
-                console.log('Data product berhasil ditambahkan:', response.data);
+                console.log('Customer data successfully added:', response.data);
                 navigate('/menupenjualan/product/produk');
                 toast.success('Data berhasil ditambahkan', {
                     position: 'top-right',
@@ -136,18 +136,15 @@ const InputProduk = () => {
             })
             .catch((error) => {
                 if (error.response && error.response.data) {
-                    const apiErrors = error.response.data;
-                    setFormData((prevData) => ({
-                        ...prevData,
-                        errors: apiErrors,
-                    }));
+                    console.error('Server Response Data:', error.response.data);
+                    // ... your existing error handling code
                 }
-                console.error('Error adding product data:', error);
+                console.error('Error adding customer data:', error);
                 toast.error('Error adding data');
             });
     };
 
-    const [productData, setProductData] = useState<any>({});
+    // const [productData, setProductData] = useState<any>({});
     const handleCancel = () => {
         // Instead of using a Link, directly use the navigate function
         navigate('/menupenjualan/product/produk');
