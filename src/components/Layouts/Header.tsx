@@ -119,7 +119,7 @@ const Header = () => {
                     <div className="horizontal-logo flex lg:hidden justify-between items-center ltr:mr-2 rtl:ml-2">
                         <Link to="/" className="main-logo flex items-center shrink-0">
                             <img className="w-8 ltr:-ml-1 rtl:-mr-1 inline" src="/assets/images/logo.svg" alt="logo" />
-                            <span className="text-2xl ltr:ml-1.5 rtl:mr-1.5  font-semibold  align-middle hidden md:inline dark:text-white-light transition-all duration-300">VRISTO</span>
+                            <span className="text-2xl ltr:ml-1.5 rtl:mr-1.5  font-semibold  align-middle hidden md:inline dark:text-white-light transition-all duration-300">ERP</span>
                         </Link>
                         <button
                             type="button"
@@ -138,7 +138,7 @@ const Header = () => {
 
                     <div className="ltr:mr-2 rtl:ml-2 hidden sm:block">
                         <ul className="flex items-center space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
-                            <li>
+                            {/* <li>
                                 <Link to="/apps/calendar" className="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path
@@ -151,8 +151,8 @@ const Header = () => {
                                         <path opacity="0.5" d="M2 9H22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                                     </svg>
                                 </Link>
-                            </li>
-                            <li>
+                            </li> */}
+                            {/* <li>
                                 <Link to="/apps/todolist" className="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path
@@ -175,8 +175,8 @@ const Header = () => {
                                         />
                                     </svg>
                                 </Link>
-                            </li>
-                            <li>
+                            </li> */}
+                            {/* <li>
                                 <Link to="/apps/chat" className="block p-2 rounded-full bg-white-light/40 dark:bg-dark/40 hover:text-primary hover:bg-white-light/90 dark:hover:bg-dark/60">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <circle r="3" transform="matrix(-1 0 0 1 19 5)" stroke="currentColor" strokeWidth="1.5" />
@@ -189,11 +189,11 @@ const Header = () => {
                                         />
                                     </svg>
                                 </Link>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
-                    <div className="sm:flex-1 ltr:sm:ml-0 ltr:ml-auto sm:rtl:mr-0 rtl:mr-auto flex items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
-                        <div className="sm:ltr:mr-auto sm:rtl:ml-auto">
+                    <div className="sm:flex-1 justify-end ltr:sm:mr-0 ltr:mr-auto sm:rtl:ml-0 rtl:ml-auto flex items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
+                        {/* <div className="sm:ltr:mr-auto sm:rtl:ml-auto">
                             <form
                                 className={`${search && '!block'} sm:relative absolute inset-x-0 sm:top-0 top-1/2 sm:translate-y-0 -translate-y-1/2 sm:mx-0 mx-4 z-10 sm:block hidden`}
                                 onSubmit={() => setSearch(false)}
@@ -228,7 +228,7 @@ const Header = () => {
                                     <path d="M18.5 18.5L22 22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                                 </svg>
                             </button>
-                        </div>
+                        </div> */}
                         <div>
                             {themeConfig.theme === 'light' ? (
                                 <button
@@ -295,7 +295,7 @@ const Header = () => {
                                 </button>
                             )}
                         </div>
-                        <div className="dropdown shrink-0">
+                        {/* <div className="dropdown shrink-0">
                             <Dropdown
                                 offset={[0, 8]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
@@ -323,8 +323,8 @@ const Header = () => {
                                     })}
                                 </ul>
                             </Dropdown>
-                        </div>
-                        <div className="dropdown shrink-0">
+                        </div> */}
+                        {/* <div className="dropdown shrink-0">
                             <Dropdown
                                 offset={[0, 8]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
@@ -428,8 +428,8 @@ const Header = () => {
                                     )}
                                 </ul>
                             </Dropdown>
-                        </div>
-                        <div className="dropdown shrink-0">
+                        </div> */}
+                        {/* <div className="dropdown shrink-0">
                             <Dropdown
                                 offset={[0, 8]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
@@ -527,7 +527,7 @@ const Header = () => {
                                     )}
                                 </ul>
                             </Dropdown>
-                        </div>
+                        </div> */}
                         <div className="dropdown shrink-0 flex">
                             <Dropdown
                                 offset={[0, 8]}
