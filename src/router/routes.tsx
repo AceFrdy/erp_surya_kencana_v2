@@ -239,7 +239,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menupenjualan/distribution/detaildistribution',
+        path: '/menupenjualan/distribution/detaildistribution/:id',
         element: <DetailDistribusi />,
         layout: 'default',
     },
