@@ -539,30 +539,11 @@ const Unit = () => {
         direction: 'asc',
     });
 
-    const [hapusUnit, setHapusUnit] = useState(false);
     const token = localStorage.getItem('accessToken') || '';
     const [initialRecords, setInitialRecords] = useState<UnitsDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
     const navigate = useNavigate();
     const { onOpen } = useModal();
-    const [unit, setUnit] = useState([]);
-
-    const handleDelete = (id: number) => {
-        axios
-            .delete(`https://erp.digitalindustryagency.com/api/unit-stock/${id}`, {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then(() => {
-                toast.success('Unit Berhasil Dihapus.');
-                navigate(0);
-            })
-            .catch((err) => {
-                console.log('DELETE UNIT', err);
-            });
-    };
 
     useEffect(() => {
         axios
@@ -574,10 +555,8 @@ const Unit = () => {
             })
             .then((response) => {
                 const unit = response.data.data.resource.data;
-                setUnit(unit); // Set categories state with fetched data
                 setInitialRecords(unit);
-                setRecordsData(unit);
-                // console.log('UNIT', unit);
+                console.log('UNIT', unit);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
