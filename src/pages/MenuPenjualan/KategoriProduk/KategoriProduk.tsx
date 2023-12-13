@@ -157,9 +157,11 @@ const Basic = () => {
     const [data, setData] = useState([]);
     const [categories, setCategories] = useState<{ id: number; product_category_name: string }[]>([]);
     const [nextIndex, setNextIndex] = useState(1);
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
-        axios
+        const id = setInterval(() => {
+            axios
             .get('https://erp.digitalindustryagency.com/api/product-categories', {
                 headers: {
                     Accept: 'application/json',
@@ -169,12 +171,14 @@ const Basic = () => {
             .then((response) => {
                 const categories = response.data.data.resource.data;
                 setCategories(categories); // Set categories state with fetched data
-                // console.log('CATEGORIES', categories);
+                console.log('CATEGORIES',  response.data.data);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, []);
+        }, 2000);
+        return () => clearInterval(id); 
+    }, [categories]);
 
     const [formData, setFormData] = useState({
         product_category_name: '',
@@ -189,7 +193,7 @@ const Basic = () => {
         }));
     };
 
-    const handleAdd = (e: FormEvent<HTMLFormElement>) => {
+    const handleAdd = (e: FormEvent) => {
         e.preventDefault();
 
         const data = {
@@ -229,6 +233,32 @@ const Basic = () => {
             });
     };
 
+    // const handleEditKategori = () => {
+    //     axios
+    //         .put(`https://erp.digitalindustryagency.com/api/product-categories/${id}`, formData, {
+    //             headers: {
+    //                 Accept: 'application/json',
+    //                 'Content-Type': 'application/json',
+    //                 Authorization: `Bearer ${token}`,
+    //             },
+    //         })
+    //         .then((response) => {
+    //             console.log('kategori data successfully updated:', response.data);
+    //             navigate('/menupenjualan/product/kategoriproduk');
+    //             toast.success('Data berhasil diedit', {
+    //                 position: 'top-right',
+    //                 autoClose: 3000,
+    //             });
+    //         })
+    //         .catch((error) => {
+    //             if (error.response && error.response.data) {
+    //                 setErrors(error.response.data);
+    //                 console.log('Validation Errors:', error.response.data);
+    //             }
+    //             console.error('Error updating kategori data:', error);
+    //             toast.error('Error updating data');
+    //         });
+    // };
 
     return (
         <div>
@@ -328,7 +358,7 @@ const Basic = () => {
                                                 </form>
                                             </div>
                                             <div className="flex justify-end items-center mt-8">
-                                                <button type="submit" className="btn btn-primary ltr:ml-4 rtl:mr-4">
+                                                <button type="submit" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleAdd}>
                                                     Save
                                                 </button>
                                                 <button type="submit" className="btn btn-outline-danger" onClick={() => setAddKategori(false)}>
