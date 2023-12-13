@@ -1,6 +1,6 @@
-import { create } from 'zustand';
+import { StoreApi, UseBoundStore, create } from 'zustand';
 
-export type ModalType = 'delete' | 'delete-cabang' | 'delete-unit';
+export type ModalType = 'delete-customer-offline' | 'delete-cabang' | 'delete-unit';
 
 interface ModalStore {
     type: ModalType | null;
@@ -10,7 +10,7 @@ interface ModalStore {
     onClose: () => void;
 }
 
-export const useModal = create<ModalStore>((set) => ({
+export const useModal: UseBoundStore<StoreApi<ModalStore>> = create<ModalStore>((set) => ({
     type: null,
     isOpen: false,
     data: 0,

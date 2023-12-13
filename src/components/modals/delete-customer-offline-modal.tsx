@@ -1,16 +1,15 @@
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
 
-const DeleteModal = () => {
+const DeleteCustomerOfflineModal = () => {
     const { isOpen, type, onClose, data } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
-    const navigate = useNavigate();
 
-    const isModalOpen = isOpen && type === 'delete';
+    const isModalOpen = isOpen && type === 'delete-customer-offline';
 
     const handleDelete = (id: number) => {
         axios
@@ -82,4 +81,4 @@ const DeleteModal = () => {
     );
 };
 
-export default DeleteModal;
+export default DeleteCustomerOfflineModal;

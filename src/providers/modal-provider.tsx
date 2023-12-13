@@ -1,9 +1,9 @@
-import DeleteModal from '../components/modals/delete-modal';
+import DeleteCustomerOfflineModal from '../components/modals/delete-customer-offline-modal';
 
 const ModalProvider = () => {
     return (
         <>
-            <DeleteModal />
+            <DeleteCustomerOfflineModal />
         </>
     );
 };
