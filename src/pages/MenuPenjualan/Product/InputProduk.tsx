@@ -8,15 +8,16 @@ import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 import { formatPrice } from '../../../utils';
 import IconTrash from '../../../components/Icon/IconTrash';
+import IconUpload from '../../../components/Icon/icon-upload';
 
 interface FormState {
-    product_category_id: string;
-    supplier_id: string;
+    product_category_id: number;
+    supplier_id: number;
     product_name: string;
     product_price: number;
     product_modal: number;
     product_pos: string;
-    ecommers: '';
+    product_ecommers: string;
     product_responsibility: string;
     product_image: File | null;
     product_barcode: string;
@@ -37,31 +38,23 @@ interface SupliersList {
 const InputProduk = () => {
     const [categoriesProduct, setCategoriesProduct] = useState<CategoriesProductList[]>([]);
     const [supliers, setSupliers] = useState<SupliersList[]>([]);
-    const options = [
-        { value: 'orange', label: 'Orange' },
-        { value: 'white', label: 'White' },
-        { value: 'purple', label: 'Purple' },
-    ];
 
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('File Upload Preview'));
     });
 
-    const [images, setImages] = useState<any>([]);
-    const maxNumber = 69;
-
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') ?? '';
 
     const [formData, setFormData] = useState<FormState>({
-        product_category_id: '',
-        supplier_id: '',
+        product_category_id: 0,
+        supplier_id: 0,
         product_name: '',
         product_price: 0,
         product_modal: 0,
         product_pos: '',
-        ecommers: '',
+        product_ecommers: '',
         product_responsibility: '',
         product_image: null,
         product_barcode: '',
@@ -91,25 +84,17 @@ const InputProduk = () => {
         }
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files && e.target.files[0]; // Mengambil file dari event onChange
-        setFormData((prevData) => ({
-            ...prevData,
-            product_image: file, // Menyimpan file ke state formData
-        }));
-    };
-
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
         const data = {
             product_category_id: formData.product_category_id,
-            product_supplier_id: formData.supplier_id,
+            supplier_id: formData.supplier_id,
             product_name: formData.product_name,
             product_price: formData.product_price,
             product_modal: formData.product_modal,
             product_pos: formData.product_pos,
-            product_ecommers: formData.ecommers,
+            product_ecommers: formData.product_ecommers,
             product_responsibility: formData.product_responsibility,
             product_image: formData.product_image,
             product_barcode: formData.product_barcode,
@@ -296,30 +281,14 @@ const InputProduk = () => {
                                 </div>
                                 <div>
                                     <label className="flex items-center mt-1 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            className="form-checkbox"
-                                            name="product_pos"
-                                            checked={formData.product_pos === 'yes'}
-                                            onChange={(e) => {
-                                                const newValue = e.target.checked ? 'yes' : '';
-                                                setFormData((prevData) => {
-                                                    const updatedData = {
-                                                        ...prevData,
-                                                        product_pos: newValue,
-                                                    };
-                                                    console.log('Updated product_pos:', updatedData.product_pos); // Log nilai terbaru ke console
-                                                    return updatedData;
-                                                });
-                                            }}
-                                        />
+                                        <input type="checkbox" className="form-checkbox" name="product_pos" checked={formData.product_pos === 'yes'} onChange={handleChange} />
 
                                         <span className="text-white-dark">POS</span>
                                     </label>
                                 </div>
                                 <div>
                                     <label className="flex items-center mt-1 cursor-pointer">
-                                        <input type="checkbox" className="form-checkbox" />
+                                        <input type="checkbox" className="form-checkbox" name="product_ecommers" checked={formData.product_ecommers === 'yes'} onChange={handleChange} />
                                         <span className="text-white-dark">E-Commerce</span>
                                     </label>
                                 </div>
@@ -328,9 +297,16 @@ const InputProduk = () => {
                                         <div className="group w-60">
                                             <label>Gambar Produk</label>
                                             <div className="h-60 absolute top-[26px] w-60 rounded-md bg-red-100/80 hidden backdrop-blur-sm group-hover:flex justify-center items-center">
-                                                <button className="w-40 h-40 rounded-md flex justify-center items-center border-red-700 border-2 border-dashed">
-                                                    <IconTrash className="w-10 h-10 text-red-700" />
-                                                </button>
+                                                <div className="w-40 h-40  rounded-md flex justify-center items-center border-red-700 border border-dashed">
+                                                    <button
+                                                        className="w-12 h-12 rounded-full bg-red-700 flex justify-center items-center cursor-default hover:bg-red-700/80"
+                                                        onClick={() => {
+                                                            setFormData({ ...formData, product_image: null });
+                                                        }}
+                                                    >
+                                                        <IconTrash className="w-6 h-6 text-red-100" />
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div className="w-60 h-60 top-0 overflow-hidden rounded-md">
                                                 <img className="object-cover" src={URL.createObjectURL(formData.product_image)} />
@@ -340,25 +316,25 @@ const InputProduk = () => {
                                         <>
                                             <label htmlFor="input-gambar">Gambar Produk</label>
                                             <label htmlFor="input-gambar" className="h-60 absolute top-[26px] w-60 rounded-md border flex items-center justify-center hover:bg-blue-50">
-                                                <span className="w-40 h-40 flex justify-center items-center rounded-md border border-dashed border-black">Upload Gambar</span>
+                                                <span className="w-40 h-40 flex justify-center items-center rounded-md border border-dashed border-black">
+                                                    <div className="w-12 h-12 rounded-full bg-black hover:bg-black/80 flex justify-center items-center">
+                                                        <IconUpload className="text-white w-6 h-6" />
+                                                    </div>
+                                                </span>
                                             </label>
                                             <div className="w-60 h-60" />
-                                            <input className="hidden" onChange={onChangeImage} id="input-gambar" type="file" accept=".png,.jpg,.jpeg,.webp" />
+                                            <input className="hidden" onChange={onChangeImage} id="input-gambar" type="file" accept="image/*" />
                                         </>
                                     )}
                                 </div>
                                 <div></div>
                                 <div className="flex">
-                                    <Link to="/menupenjualan/product/produk">
-                                        <button type="submit" className="btn btn-primary !mt-6" onClick={handleSubmit}>
-                                            Tambah
-                                        </button>
-                                    </Link>
-                                    <Link to="/menupenjualan/product/produk">
-                                        <button type="submit" className="btn btn-primary !mt-6 ml-6" onClick={handleCancel}>
-                                            Cancel
-                                        </button>
-                                    </Link>
+                                    <button type="submit" className="btn btn-primary !mt-6">
+                                        Tambah
+                                    </button>
+                                    <button className="btn btn-primary !mt-6 ml-6" onClick={handleCancel}>
+                                        Cancel
+                                    </button>
                                 </div>
                             </form>
                         </div>
