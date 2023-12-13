@@ -547,6 +547,14 @@ const showAlert = async (type: number) => {
             });
     }
 };
+
+interface SuplierDataProps {
+    id: number;
+    suplier_name: string;
+    suplier_contact: number;
+    suplier_address: string;
+}
+
 const Suplier = () => {
     const dispatch = useDispatch();
     const token = localStorage.getItem('accessToken') || '';
@@ -556,7 +564,7 @@ const Suplier = () => {
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
+    const [initialRecords, setInitialRecords] = useState<SuplierDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
 
     const [search, setSearch] = useState('');
@@ -577,14 +585,17 @@ const Suplier = () => {
         setRecordsData([...initialRecords.slice(from, to)]);
     }, [page, pageSize, initialRecords]);
 
+    console.log(search);
     useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
+        if (!initialRecords) {
+            return;
+        }
+        setRecordsData(() => {
+            return initialRecords.filter((item) => {
                 return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
+                    item.suplier_name.toLowerCase().includes(search.toLowerCase()) ||
+                    item.suplier_address.toLowerCase().includes(search.toLowerCase()) ||
+                    item.suplier_contact.toString().includes(search.toLowerCase())
                 );
             });
         });
@@ -665,10 +676,10 @@ const Suplier = () => {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
-                                render: () => (
+                                render: (row) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/supplier/editsupplier">
+                                            <Link to={`/menupenjualan/supplier/editsupplier/${row.id}`}>
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>

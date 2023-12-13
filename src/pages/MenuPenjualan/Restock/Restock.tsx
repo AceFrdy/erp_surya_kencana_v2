@@ -754,42 +754,17 @@ const Restock = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'age', title: 'Distribusion Code', sortable: true },
+                            // { accessor: 'id', title: 'No', sortable: true },
+                            { accessor: 'age', title: 'Nama Produk', sortable: true },
                             {
                                 accessor: 'dob',
-                                title: 'Tanggal',
+                                title: 'Qty',
                                 sortable: true,
                                 render: ({ dob }) => <div>{formatDate(dob)}</div>,
                             },
-                            { accessor: 'phone', title: 'Total', sortable: true },
-                            {
-                                accessor: 'status',
-                                title: 'Status',
-                                sortable: true,
-                                render: (data) => (
-                                    <span
-                                        className={`badge whitespace-nowrap ${
-                                            data.status === 'completed'
-                                                ? 'bg-primary   '
-                                                : data.status === 'Pending'
-                                                ? 'bg-secondary'
-                                                : data.status === 'In Progress'
-                                                ? 'bg-success'
-                                                : data.status === 'Canceled'
-                                                ? 'bg-danger'
-                                                : 'bg-primary'
-                                        }`}
-                                    >
-                                        {data.status}
-                                    </span>
-                                ),
-                            },
-                            {
-                                accessor: 'age',
-                                title: 'Distribution Qty',
-                                sortable: true,
-                            },
+                            { accessor: 'phone', title: 'Harga', sortable: true },
+                            { accessor: 'email', title: 'Supplier', sortable: true },
+                            { accessor: 'age', title: 'Operational Cost', sortable: true },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',

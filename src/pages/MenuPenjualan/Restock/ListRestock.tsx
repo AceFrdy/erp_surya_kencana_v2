@@ -21,6 +21,7 @@ const rowData = [
         lastName: 'Jensen',
         email: 'carolinejensen@zidant.com',
         dob: '2004-05-28',
+        status: 'Completed',
         address: {
             street: '529 Scholes Street',
             city: 'Temperanceville',
@@ -41,6 +42,7 @@ const rowData = [
         lastName: 'Grant',
         email: 'celestegrant@polarax.com',
         dob: '1989-11-19',
+        status: 'Pending',
         address: {
             street: '639 Kimball Street',
             city: 'Bascom',
@@ -61,6 +63,7 @@ const rowData = [
         lastName: 'Forbes',
         email: 'tillmanforbes@manglo.com',
         dob: '2016-09-05',
+        status: 'In Progress',
         address: {
             street: '240 Vandalia Avenue',
             city: 'Thynedale',
@@ -81,6 +84,7 @@ const rowData = [
         lastName: 'Whitley',
         email: 'daisywhitley@applideck.com',
         dob: '1987-03-23',
+        status: 'Canceled',
         address: {
             street: '350 Pleasant Place',
             city: 'Idledale',
@@ -101,6 +105,7 @@ const rowData = [
         lastName: 'Bowman',
         email: 'weberbowman@volax.com',
         dob: '1983-02-24',
+        status: 'Completed',
         address: {
             street: '154 Conway Street',
             city: 'Broadlands',
@@ -121,6 +126,7 @@ const rowData = [
         lastName: 'Townsend',
         email: 'buckleytownsend@orbaxter.com',
         dob: '2011-05-29',
+        status: 'Completed',
         address: {
             street: '131 Guernsey Street',
             city: 'Vallonia',
@@ -141,6 +147,7 @@ const rowData = [
         lastName: 'Bradshaw',
         email: 'latoyabradshaw@opportech.com',
         dob: '2010-11-23',
+        status: 'Canceled',
         address: {
             street: '668 Lenox Road',
             city: 'Lowgap',
@@ -161,6 +168,7 @@ const rowData = [
         lastName: 'Lindsay',
         email: 'katelindsay@gorganic.com',
         dob: '1987-07-02',
+        status: 'Pending',
         address: {
             street: '773 Harrison Avenue',
             city: 'Carlton',
@@ -181,6 +189,7 @@ const rowData = [
         lastName: 'Sandoval',
         email: 'marvasandoval@avit.com',
         dob: '2010-11-02',
+        status: 'Completed',
         address: {
             street: '200 Malta Street',
             city: 'Tuskahoma',
@@ -201,6 +210,7 @@ const rowData = [
         lastName: 'Russell',
         email: 'deckerrussell@quilch.com',
         dob: '1994-04-21',
+        status: 'In Progress',
         address: {
             street: '708 Bath Avenue',
             city: 'Coultervillle',
@@ -658,6 +668,33 @@ const ListRestock = () => {
                             },
                             { accessor: 'email', title: 'Operasional', sortable: true },
                             { accessor: 'phone', title: 'Total', sortable: true },
+                            {
+                                accessor: 'status',
+                                title: 'Status',
+                                sortable: true,
+                                render: (data) => (
+                                    <span
+                                        className={`badge whitespace-nowrap ${
+                                            data.status === 'completed'
+                                                ? 'bg-primary   '
+                                                : data.status === 'Pending'
+                                                ? 'bg-secondary'
+                                                : data.status === 'In Progress'
+                                                ? 'bg-success'
+                                                : data.status === 'Canceled'
+                                                ? 'bg-danger'
+                                                : 'bg-primary'
+                                        }`}
+                                    >
+                                        {data.status}
+                                    </span>
+                                ),
+                            },
+                            {
+                                accessor: 'age',
+                                title: 'Distribution Qty',
+                                sortable: true,
+                            },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',

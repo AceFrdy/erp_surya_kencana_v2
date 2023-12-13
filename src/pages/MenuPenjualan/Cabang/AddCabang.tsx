@@ -25,7 +25,7 @@ const AddCabang = () => {
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const data = { 
+        const data = {
             branch_name: formData.branch_name,
             branch_address: formData.branch_address,
             branch_contact: formData.branch_contact,
@@ -83,34 +83,13 @@ const AddCabang = () => {
                         <form className="space-y-5" onSubmit={handleSubmit}>
                             <h1 className="text-lg font-bold mb-12">Tambah Cabang</h1>
                             <div>
-                                <input
-                                    type="text"
-                                    placeholder="Nama Cabang..."
-                                    className="form-input"
-                                    name="branch_name"
-                                    value={formData.branch_name}
-                                    onChange={handleChange}
-                                />
+                                <input type="text" placeholder="Nama Cabang..." className="form-input" name="branch_name" value={formData.branch_name} onChange={handleChange} />
                             </div>
                             <div>
-                                <input
-                                    type="text"
-                                    placeholder="Alamat Cabang..."
-                                    className="form-input"
-                                    name="branch_address"
-                                    value={formData.branch_address}
-                                    onChange={handleChange}
-                                />
+                                <input type="text" placeholder="Alamat Cabang..." className="form-input" name="branch_address" value={formData.branch_address} onChange={handleChange} />
                             </div>
                             <div>
-                                <input
-                                    type="text"
-                                    placeholder="No Handphone..."
-                                    className="form-input"
-                                    name="branch_contact"
-                                    value={formData.branch_contact}
-                                    onChange={handleChange}
-                                />
+                                <input type="text" placeholder="No Handphone..." className="form-input" name="branch_contact" value={formData.branch_contact} onChange={handleChange} />
                             </div>
                             <div className="!mt-2">
                                 <span className="text-white-dark text-[11px] inline-block">*Required Fields</span>
