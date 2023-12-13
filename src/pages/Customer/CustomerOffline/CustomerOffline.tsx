@@ -518,10 +518,6 @@ interface CustomersDataProps {
     name: string;
     contact: number;
     address: string;
-    privilage: {
-        id: number;
-        privilage_name: string;
-    };
 }
 
 const CustomerOffline = () => {
@@ -557,7 +553,7 @@ const CustomerOffline = () => {
             .catch((err) => {
                 console.log(err.message);
             });
-    }, [initialRecords]);
+    }, []);
 
     useEffect(() => {
         setPage(1);
@@ -569,7 +565,6 @@ const CustomerOffline = () => {
         setRecordsData([...initialRecords.slice(from, to)]);
     }, [page, pageSize, initialRecords]);
 
-    console.log(search);
     useEffect(() => {
         if (!initialRecords) {
             return;

@@ -557,6 +557,16 @@ const showAlert = async (type: number) => {
             });
     }
 };
+
+interface DataInitial {
+    distribution_report_code: string;
+    branch: {
+        branch_name: string;
+        id: number;
+    };
+    items_total: number;
+    status: string;
+}
 const LaporanDistribusi = () => {
     const dispatch = useDispatch();
     useEffect(() => {
@@ -565,16 +575,15 @@ const LaporanDistribusi = () => {
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
 
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const [hapusCabang, setHapusCabang] = useState(false);
-    const [branch, setBranch] = useState([]);
+    const token = localStorage.getItem('accessToken') ?? '';
+    const [initialRecords, setInitialRecords] = useState<DataInitial[]>([]);
+    const [recordsData, setRecordsData] = useState(initialRecords);
 
     useEffect(() => {
         setPage(1);
@@ -586,28 +595,38 @@ const LaporanDistribusi = () => {
         setRecordsData([...initialRecords.slice(from, to)]);
     }, [page, pageSize, initialRecords]);
 
+    // get distribution report
     useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/distribution-reports', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setInitialRecords(response.data.data.resource.data);
+            })
+            .catch((err: any) => {
+                console.log('GET DISTRIBRUTION REPORT', err.message);
+            });
+    }, []);
+
+    useEffect(() => {
+        if (!initialRecords) {
+            return;
+        }
         setInitialRecords(() => {
-            return rowData.filter((item) => {
+            return initialRecords.filter((item) => {
                 return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
+                    item.distribution_report_code.toLowerCase().includes(search.toLowerCase()) ||
+                    item.branch.branch_name.toLowerCase().includes(search.toLowerCase()) ||
+                    item.status.toLowerCase().includes(search.toLowerCase())
                 );
             });
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search]);
-    const formatDate = (date: string | number | Date) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
-        }
-        return '';
-    };
+    }, [search, recordsData]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -617,25 +636,25 @@ const LaporanDistribusi = () => {
     }, [sortStatus]);
 
     // get branch
-    useEffect(() => {
-        axios
-            .get('https://erp.digitalindustryagency.com/api/branches', {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer 236|MbxuMzgJNUwvwWRlbOBp8gWFF7EH3leqnc4iOfxf6ace0b04`,
-                },
-            })
-            .then((response) => {
-                const branch = response.data.data.resource.data;
-                setBranch(branch); // Set categories state with fetched data
-                setInitialRecords(branch);
-                setRecordsData(branch);
-                console.log('BRANCH', branch);
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error);
-            });
-    }, []);
+    // useEffect(() => {
+    //     axios
+    //         .get('https://erp.digitalindustryagency.com/api/branches', {
+    //             headers: {
+    //                 Accept: 'application/json',
+    //                 Authorization: `Bearer 236|MbxuMzgJNUwvwWRlbOBp8gWFF7EH3leqnc4iOfxf6ace0b04`,
+    //             },
+    //         })
+    //         .then((response) => {
+    //             const branch = response.data.data.resource.data;
+    //             setBranch(branch); // Set categories state with fetched data
+    //             setInitialRecords(branch);
+    //             setRecordsData(branch);
+    //             console.log('BRANCH', branch);
+    //         })
+    //         .catch((error) => {
+    //             console.error('Error fetching data:', error);
+    //         });
+    // }, []);
 
     return (
         <div>
@@ -672,20 +691,14 @@ const LaporanDistribusi = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'branch_name', title: 'No Dokumen', sortable: true },
+                            { accessor: 'index', title: 'No', render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'distribution_report_code', title: 'No Dokumen', sortable: true },
                             {
-                                accessor: 'branch_address',
+                                accessor: 'branch.branch_name',
                                 title: 'Tujuan Cabang',
                                 sortable: true,
                             },
-                            {
-                                accessor: 'dob',
-                                title: 'Harga',
-                                sortable: true,
-                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
-                            },
-                            { accessor: 'branch_contact', title: 'Jumlah Barang', sortable: true },
+                            { accessor: 'items_total', title: 'Jumlah Barang', sortable: true },
                             {
                                 accessor: 'status',
                                 title: 'Status',
