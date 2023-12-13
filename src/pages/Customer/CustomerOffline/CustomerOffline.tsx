@@ -539,6 +539,7 @@ const CustomerOffline = () => {
     const [recordsData, setRecordsData] = useState(initialRecords);
     const { onOpen } = useModal();
 
+    console.log(search);
     useEffect(() => {
         axios
             .get('https://erp.digitalindustryagency.com/api/customers-offline', {
