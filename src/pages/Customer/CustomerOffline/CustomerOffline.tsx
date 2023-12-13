@@ -1,14 +1,12 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState } from 'react';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link, useNavigate } from 'react-router-dom';
-import { Dialog, Transition } from '@headlessui/react';
+import { Link } from 'react-router-dom';
 import IconPlus from '../../../components/Icon/IconPlus';
 import axios from 'axios';
-import { toast } from 'react-toastify';
 import { orderBy } from 'lodash';
 import { useModal } from '../../../hooks/use-modal';
 
@@ -540,40 +538,10 @@ const CustomerOffline = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    // const [hapusCustomer, setHapusCustomer] = useState(false);
     const token = localStorage.getItem('accessToken') ?? '';
     const [initialRecords, setInitialRecords] = useState<CustomersDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
-    const navigate = useNavigate();
     const { onOpen } = useModal();
-
-    const handleModal = (id: number) => {
-        toast('Apakah Anda yakin ingin menghapus Customer?', {
-            position: 'top-center',
-            autoClose: false,
-            hideProgressBar: false,
-            draggable: true,
-            progress: undefined,
-            theme: 'light',
-        });
-    };
-
-    const handleDelete = (id: number) => {
-        axios
-            .delete(`https://erp.digitalindustryagency.com/api/users/${id}`, {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then(() => {
-                toast.success('Customer Offline Berhasil Dihapus.');
-                navigate(0);
-            })
-            .catch((err) => {
-                console.log('DELETE CUSTOMER', err);
-            });
-    };
 
     useEffect(() => {
         axios
@@ -612,7 +580,7 @@ const CustomerOffline = () => {
             });
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search]);
+    }, [search, recordsData]);
 
     useEffect(() => {
         const data = orderBy(initialRecords, sortStatus.columnAccessor, 'desc');
@@ -636,8 +604,6 @@ const CustomerOffline = () => {
                     <span> Customer Offline</span>
                 </li>
             </ul>
-            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
-            </div> */}
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
                     <Link to="/customer/offline/tambah-customer-offline">
@@ -656,6 +622,7 @@ const CustomerOffline = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
+                            { accessor: 'index', title: 'No', render: (e) => recordsData.indexOf(e) + 1 },
                             { accessor: 'name', title: 'Nama Customer', sortable: true },
                             {
                                 accessor: 'address',
@@ -674,60 +641,9 @@ const CustomerOffline = () => {
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete', e.id)}>
+                                        <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-customer-offline', e.id)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
-                                        {/* <Transition appear show={hapusCustomer} as={Fragment}>
-                                            <Dialog as="div" open={hapusCustomer} onClose={() => setHapusCustomer(false)}>
-                                                <Transition.Child
-                                                    as={Fragment}
-                                                    enter="ease-out duration-300"
-                                                    enterFrom="opacity-0"
-                                                    enterTo="opacity-100"
-                                                    leave="ease-in duration-200"
-                                                    leaveFrom="opacity-100"
-                                                    leaveTo="opacity-0"
-                                                >
-                                                    <div className="fixed inset-0" />
-                                                </Transition.Child>
-                                                <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
-                                                    <div className="flex items-start justify-center min-h-screen px-4">
-                                                        <Transition.Child
-                                                            as={Fragment}
-                                                            enter="ease-out duration-300"
-                                                            enterFrom="opacity-0 scale-95"
-                                                            enterTo="opacity-100 scale-100"
-                                                            leave="ease-in duration-200"
-                                                            leaveFrom="opacity-100 scale-100"
-                                                            leaveTo="opacity-0 scale-95"
-                                                        >
-                                                            <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
-                                                                <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                                                    <div className="text-lg font-bold">Hapus Customer</div>
-                                                                </div>
-                                                                <div className="p-5">
-                                                                    <div>
-                                                                        <form className="space-y-5">
-                                                                            <div>
-                                                                                <h1>Apakah Anda yakin ingin menghapus Customer</h1>
-                                                                            </div>
-                                                                        </form>
-                                                                    </div>
-                                                                    <div className="flex justify-end items-center mt-8">
-                                                                        <button type="button" className="btn btn-outline-danger" onClick={() => setHapusCustomer(false)}>
-                                                                            Kembali
-                                                                        </button>
-                                                                        <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => alert('hapus')}>
-                                                                            Hapus
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            </Dialog.Panel>
-                                                        </Transition.Child>
-                                                    </div>
-                                                </div>
-                                            </Dialog>
-                                        </Transition> */}
                                     </div>
                                 ),
                             },
