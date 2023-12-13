@@ -598,7 +598,7 @@ const ListCabang = () => {
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, [initialRecords]);
+    }, []);
 
     return (
         <div>
