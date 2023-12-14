@@ -78,6 +78,15 @@ const showAlert = async (type: number) => {
     }
 };
 
+interface AkunDataProps {
+    id: number;
+    acc_code: string;
+    acc_type: string;
+    acc_group_name: string;
+    acc_info: string;
+    // branch_address: string;
+}
+
 const Akun = () => {
 
     const dispatch = useDispatch();
@@ -90,7 +99,7 @@ const Akun = () => {
     });
 
     // State untuk menyimpan data dari API
-    const [initialRecords, setInitialRecords] = useState([]);
+    const [initialRecords, setInitialRecords] = useState<AkunDataProps[]>([]);
     const [recordsData, setRecordsData] = useState([]);
 
     const [page, setPage] = useState(1);
@@ -265,7 +274,7 @@ const Akun = () => {
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
-                                titleClassName: '!text-center',
+                                 titleClassName: '!text-center',
                                 render: (row) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'blue' }}>
