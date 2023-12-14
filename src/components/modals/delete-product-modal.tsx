@@ -4,7 +4,6 @@ import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
 
 const DeleteProductModal = () => {
     const { isOpen, type, onClose, data } = useModal();
@@ -14,7 +13,7 @@ const DeleteProductModal = () => {
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/users/${id}`, {
+            .delete(`https://erp.digitalindustryagency.com/api/products/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -22,9 +21,10 @@ const DeleteProductModal = () => {
             })
             .then(() => {
                 onClose();
+                toast.success('Product Berhasil Dihapus.');
             })
             .catch((err) => {
-                console.log('DELETE CUSTOMER', err);
+                console.log('DELETE PRODUCT', err);
             });
     };
 
@@ -47,13 +47,13 @@ const DeleteProductModal = () => {
                         >
                             <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
                                 <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                    <div className="text-lg font-bold">Hapus Customer</div>
+                                    <div className="text-lg font-bold">Hapus Product</div>
                                 </div>
                                 <div className="p-5">
                                     <div>
                                         <form className="space-y-5">
                                             <div>
-                                                <h1>Apakah Anda yakin ingin menghapus Customer</h1>
+                                                <h1>Apakah Anda yakin ingin menghapus Product</h1>
                                             </div>
                                         </form>
                                     </div>
