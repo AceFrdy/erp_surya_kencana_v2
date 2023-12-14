@@ -677,7 +677,7 @@ const ControlPanel = () => {
             </ul>
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
-            <div className="panel mt-6">
+            <div className="panel mt-6 dark:text-white-light mb-5">
                 <h1 className="text-lg font-bold font- flex justify-start py-4">Data Penjualan</h1>
                 <div className="flex justify-center grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
                     <div className="panel bg-gradient-to-r col-span-4 from-blue-500 to-blue-900">

@@ -1,4 +1,9 @@
 import { lazy } from 'react';
+import Karyawan from '../pages/MenuHumanResource/Karyawan/Karyawan';
+import AddKaryawan from '../pages/MenuHumanResource/Karyawan/AddKaryawan';
+import EditKaryawan from '../pages/MenuHumanResource/Karyawan/EditKaryawan';
+import Jabatan from '../pages/MenuHumanResource/Jabatan/Jabatan';
+import DetailJabatan from '../pages/MenuHumanResource/Jabatan/DetailJabatan';
 const Index = lazy(() => import('../pages/Index'));
 const Ecommerce = lazy(() => import('../pages/Ecommerce'));
 const Kategoriproduk = lazy(() => import('../pages/MenuPenjualan/KategoriProduk/KategoriProduk'));
@@ -393,6 +398,34 @@ const routes = [
         element: <DetailLaporan />,
         layout: 'default',
     },
+    // Karyawan
+    {
+        path: '/menuhumanresource/karyawan',
+        element: <Karyawan />,
+        layout: 'default',
+    },
+    {
+        path: '/menuhumanresource/karyawan/addkaryawan',
+        element: <AddKaryawan />,
+        layout: 'default',
+    },
+    {
+        path: '/menuhumanresource/karyawan/editkaryawan',
+        element: <EditKaryawan />,
+        layout: 'default',
+    },
+    //Jabatan
+    {
+        path: '/menuhumanresource/jabatan',
+        element: <Jabatan />,
+        layout: 'default',
+    },
+    {
+        path: '/menuhumanresource/jabatan/detailjabatan',
+        element: <DetailJabatan />,
+        layout: 'default',
+    },
+
 ];
 
 export { routes };
