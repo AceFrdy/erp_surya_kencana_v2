@@ -4,6 +4,13 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify'; 
 
+interface AkunDataProps {
+ 
+    acc_type: string;
+    acc_group_name: string;
+    acc_info: string;
+    // branch_address: string;
+}
 
 const AddAkun = () => {
     const navigate = useNavigate(); // hook untuk navigasi
@@ -11,15 +18,13 @@ const AddAkun = () => {
     const [accGroupName, setAccGroupName] = useState('');
     const [accInfo, setAccInfo] = useState('');
     const token = localStorage.getItem('accessToken') || '';
+    const [formData, setFormData] = useState<AkunDataProps>({ 
+        acc_type: '',
+        acc_group_name: '',
+        acc_info: '',
+        });
 
-    interface AkunDataProps {
-        id: number;
-        acc_code: string;
-        acc_type: string;
-        acc_group_name: string;
-        acc_info: string;
-        // branch_address: string;
-    }
+ 
         // Handle Submit Form
         const handleSubmit = async (event:FormEvent) => {
             event.preventDefault();
@@ -27,9 +32,9 @@ const AddAkun = () => {
                 await axios.post(
                     'https://erp.digitalindustryagency.com/api/accounts',
                     {
-                        acc_type: accType,
-                        acc_group_name: accGroupName,
-                        acc_info: accInfo,
+                        acc_type: formData.acc_type,
+                        acc_group_name: formData.acc_group_name,
+                        acc_info: formData.acc_info,
                     },
                     {
                         headers: {
@@ -68,21 +73,11 @@ const AddAkun = () => {
 
     // Update the state for each input field
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const target = e.target as HTMLInputElement | HTMLSelectElement;
-        const value = target.value;
-        switch (target.id) {
-            case 'gridState':
-                setAccType(value);
-                break;
-            case 'actionWeb':
-                setAccInfo(value);
-                break;
-            case 'actionGroup':
-                setAccGroupName(value);
-                break;
-            default:
-                break;
-        }
+        const {name, value} = e.target ;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
     };
     
     return (
@@ -108,7 +103,8 @@ const AddAkun = () => {
                         <select
                             id="gridState"
                             className="form-select text-white-dark"
-                            value={accType}
+                            name='acc_type'
+                            value={formData.acc_type}
                             onChange={handleInputChange} // Modified to use the general handler
                         >
                             <option>Choose...</option>
@@ -125,8 +121,9 @@ const AddAkun = () => {
                             id="actionGroup"
                             type="text"
                             placeholder="Group..."
+                            name='acc_group_name'
                             className="form-input ltr:rounded-l-none rtl:rounded-r-none"
-                            value={accGroupName}
+                            value={formData.acc_group_name}
                             onChange={handleInputChange} // Modified to use the general handler
                         />
                     </div>
@@ -137,7 +134,8 @@ const AddAkun = () => {
                             type="text"
                             placeholder="Keterangan..."
                             className="form-input"
-                            value={accInfo}
+                            name='acc_info'
+                            value={formData.acc_info}
                             onChange={handleInputChange} // Modified to use the general handler
                         />
                     </div>
