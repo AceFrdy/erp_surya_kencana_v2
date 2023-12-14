@@ -582,7 +582,7 @@ const showAlert = async (type: number) => {
 const Distribusi = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Restock'));
+        dispatch(setPageTitle('Distribusi'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];

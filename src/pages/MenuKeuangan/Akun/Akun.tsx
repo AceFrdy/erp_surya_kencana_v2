@@ -86,7 +86,7 @@ const Akun = () => {
 
 
     useEffect(() => {
-        dispatch(setPageTitle('Restock'));
+        dispatch(setPageTitle('Akun'));
     });
 
     // State untuk menyimpan data dari API

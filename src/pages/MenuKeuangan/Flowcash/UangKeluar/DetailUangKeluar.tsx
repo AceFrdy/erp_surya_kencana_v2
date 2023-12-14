@@ -20,7 +20,7 @@ const DetailUangKeluar = () => {
 
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('File Upload Preview'));
+        dispatch(setPageTitle('Detail Uang Keluar'));
     });
     const [codeArr, setCodeArr] = useState<string[]>([]);
 
@@ -210,7 +210,7 @@ const DetailUangKeluar = () => {
                         <div className="mb-5">
                             <div className="custom-file-container" data-upload-id="myFirstImage">
                                 <div className="label-container">
-                                    <label>Upload Foto </label>
+                                    <label>Upload Foto</label>
                                     <button
                                         type="button"
                                         className="custom-file-container__image-clear"

@@ -541,7 +541,7 @@ const showAlert = async (type: number) => {
 const EditPiutang = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Restock'));
+        dispatch(setPageTitle('Edit Piutang'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];

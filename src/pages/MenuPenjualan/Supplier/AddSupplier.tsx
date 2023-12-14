@@ -1,9 +1,15 @@
-import React, { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { setPageTitle } from '../../../store/themeConfigSlice';
 
 const AddSupplier = () => {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Tambah Supplier'));
+    });
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') || '';
 

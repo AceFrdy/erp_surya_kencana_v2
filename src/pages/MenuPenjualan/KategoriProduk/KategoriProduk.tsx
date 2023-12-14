@@ -9,6 +9,8 @@ import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import IconPencil from '../../../components/Icon/IconPencil';
 import { FormikState } from 'formik';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { setPageTitle } from '../../../store/themeConfigSlice';
 
 const tableData = [
     {
@@ -139,7 +141,11 @@ const showAlert = async (type: number) => {
             });
     }
 };
-const Basic = () => {
+const KategoriProduk = () => {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Kategori Produk'));
+    });
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState<number>(1); // Menggunakan tipe data number untuk state currentPage
     const itemsPerPage = 5;
@@ -499,4 +505,4 @@ const Basic = () => {
     );
 };
 
-export default Basic;
+export default KategoriProduk;

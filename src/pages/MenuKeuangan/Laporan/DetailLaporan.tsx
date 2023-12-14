@@ -11,7 +11,7 @@ import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
 const DetailLaporan = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Restock'));
+        dispatch(setPageTitle('Detail Laporan'));
     });
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;

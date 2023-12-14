@@ -1,6 +1,13 @@
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import { useEffect } from 'react';
 const AddDetailAkun = () => {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Tambah Detail Akun'));
+    });
     const showAlert = async (type: number) => {
         if (type == 20) {
             const toast = Swal.mixin({

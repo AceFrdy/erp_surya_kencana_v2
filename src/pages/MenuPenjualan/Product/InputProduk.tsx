@@ -39,7 +39,7 @@ const InputProduk = () => {
 
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('File Upload Preview'));
+        dispatch(setPageTitle('Tambah Produk'));
     });
 
     const navigate = useNavigate();

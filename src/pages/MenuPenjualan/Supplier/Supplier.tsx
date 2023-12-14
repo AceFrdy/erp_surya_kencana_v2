@@ -559,7 +559,7 @@ const Suplier = () => {
     const dispatch = useDispatch();
     const token = localStorage.getItem('accessToken') || '';
     useEffect(() => {
-        dispatch(setPageTitle('Multi Column Table'));
+        dispatch(setPageTitle('Supplier'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
