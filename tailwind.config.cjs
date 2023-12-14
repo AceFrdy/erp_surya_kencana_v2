@@ -61,7 +61,6 @@ module.exports = {
                     light: '#e0e6ed',
                     dark: '#888ea8',
                 },
-                
             },
             fontFamily: {
                 nunito: ['Nunito', 'sans-serif'],

@@ -1,7 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { setPageTitle } from '../../../store/themeConfigSlice';
 const AddSaldo = () => {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Tambah Saldo'));
+    });
     const showAlert = async (type: number) => {
         if (type == 20) {
             const toast = Swal.mixin({

@@ -580,7 +580,7 @@ const showAlert = async (type: number) => {
 const UangMasuk = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Restock'));
+        dispatch(setPageTitle('Uang Masuk'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];

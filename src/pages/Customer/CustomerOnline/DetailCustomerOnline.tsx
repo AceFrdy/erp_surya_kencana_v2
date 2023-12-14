@@ -3,8 +3,14 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useDispatch } from 'react-redux';
+import { setPageTitle } from '../../../store/themeConfigSlice';
 
 const DetailCustomerOnline = () => {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Detail Customer Online'));
+    });
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') || '';
 

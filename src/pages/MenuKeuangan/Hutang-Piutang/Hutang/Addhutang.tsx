@@ -1,12 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../../../store';
+import { setPageTitle } from '../../../../store/themeConfigSlice';
 const AddHutang = () => {
     const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Uang Masuk'));
+    });
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [date1, setDate1] = useState<any>('2022-07-05');
     const showAlert = async (type: number) => {

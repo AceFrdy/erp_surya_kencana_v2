@@ -20,7 +20,7 @@ const AddUangKeluar = () => {
 
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('File Upload Preview'));
+        dispatch(setPageTitle('Tambah Uang Keluar'));
     });
 
 

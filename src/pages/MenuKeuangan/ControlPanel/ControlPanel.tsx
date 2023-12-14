@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import IconSend from '../../../components/Icon/IconSend';
 import IconPlus from '../../../components/Icon/IconPlus';
-import IconCircleCheck from '../../../components/Icon/IconCircleCheck';
+// import IconCircleCheck from '../../../components/Icon/IconCircleCheck';
 import IconTrendingUp from '../../../components/Icon/IconTrendingUp';
 import Dropdown from '../../../components/Dropdown';
 import IconHorizontalDots from '../../../components/Icon/IconHorizontalDots';
@@ -586,7 +586,7 @@ const showAlert = async (type: number) => {
 const ControlPanel = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Restock'));
+        dispatch(setPageTitle('Control Panel'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -600,17 +600,7 @@ const ControlPanel = () => {
         direction: 'asc',
     });
 
-    // const randomColor = () => {
-    //     const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
-    //     const random = Math.floor(Math.random() * color.length);
-    //     return color[random];
-    // };
-
-    // const randomStatus = () => {
-    //     const status = ['PAID', 'APPROVED', 'FAILED', 'CANCEL', 'SUCCESS', 'PENDING', 'COMPLETE'];
-    //     const random = Math.floor(Math.random() * status.length);
-    //     return status[random];
-    // };
+    
 
     useEffect(() => {
         setPage(1);
@@ -688,12 +678,12 @@ const ControlPanel = () => {
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6">
-                <h1 className="text-lg font-bold flex justify-start py-4">Data Penjualan</h1>
+                <h1 className="text-lg font-bold font- flex justify-start py-4">Data Penjualan</h1>
                 <div className="flex justify-center grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-                    <div className="panel bg-gradient-to-r col-span-4 from-cyan-500 to-blue-400">
-                        <div className='f'>
-                        {/* <IconCashBanknotes className='w-20 h-20' /> */}
-                        </div>
+                    <div className="panel bg-gradient-to-r col-span-4 from-blue-500 to-blue-900">
+                        {/* <div className='flex'>
+                        <IconCashBanknotes className='w-20 h-20' />
+                        </div> */}
                         <div className="flex">
                             <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">Saldo Awal</div>
                             <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold mx-2 ">-</div>
@@ -709,19 +699,18 @@ const ControlPanel = () => {
                             Last Week Rp.644.700,-
                         </div>
                     </div>
-                    <div className="panel overflow-hidden col-span-4">
+                    <div className="panel overflow-hidden col-span-3">
                         <div className="flex items-center justify-between">
                             <div>
                                 <div className="text-lg font-bold">Total Keseluruhan</div>
                                 <div className="text-success"> Berdasarkan Tahun 2022 </div>
                             </div>
-                            
                         </div>
                         <div className="relative mt-10">
-                            <div className="absolute -bottom-12 ltr:-right-12 rtl:-left-12 w-24 h-24">
+                            {/* <div className="absolute -bottom-12 ltr:-right-12 rtl:-left-12 w-24 h-24">
                                 <IconCircleCheck className="text-success opacity-20 w-full h-full" />
-                            </div>
-                            <div className="grid grid-cols-3 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 justify-between flex gap-6">
+                            </div> */}
+                            <div className="grid grid-cols-3 xs:grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 justify-between flex gap-6">
                                 <div className="panel bg-gray-400">
                                     <div className="text-dark">Saldo Akhir</div>
                                     <div className="mt-2 font-semibold text-2xl border-b border-b-gray-800">Rp.15.000.000,-</div>
@@ -829,7 +818,7 @@ const ControlPanel = () => {
                                 <label htmlFor="gridTotal" className="text-xl font-medium mr-8">
                                     Keterangan:
                                 </label>
-                                <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="Nasi Goreng" className="form-input text-lg" />
+                                <input id="gridTotal" type="text" placeholder="Keterangan..." defaultValue="Nasi Goreng" className="form-input text-lg" />
                             </div>
                             <div className="space-y-2">
                                 <div className="text-xl font-medium">Makan :</div>
