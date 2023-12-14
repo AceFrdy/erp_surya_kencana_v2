@@ -78,6 +78,15 @@ const showAlert = async (type: number) => {
     }
 };
 
+interface AkunDataProps {
+    id: number;
+    acc_code: string;
+    acc_type: string;
+    acc_group_name: string;
+    acc_info: string;
+    // branch_address: string;
+}
+
 const Akun = () => {
 
     const dispatch = useDispatch();
