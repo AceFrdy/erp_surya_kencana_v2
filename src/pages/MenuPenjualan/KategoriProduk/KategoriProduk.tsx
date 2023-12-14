@@ -156,6 +156,7 @@ const KategoriProduk = () => {
     const [addKategori, setAddKategori] = useState(false);
     const [editKategori, setEditKategori] = useState(false);
     const token = localStorage.getItem('accessToken') || '';
+    const [editedCategoryId, setEditedCategoryId] = useState<number | null>(null);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page); // Memperbarui state currentPage saat halaman berubah
@@ -163,24 +164,28 @@ const KategoriProduk = () => {
     const [data, setData] = useState([]);
     const [categories, setCategories] = useState<{ id: number; product_category_name: string }[]>([]);
     const [nextIndex, setNextIndex] = useState(1);
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
-        axios
-            .get('https://erp.digitalindustryagency.com/api/product-categories', {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                const categories = response.data.data.resource.data;
-                setCategories(categories); // Set categories state with fetched data
-                // console.log('CATEGORIES', categories);
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error);
-            });
-    }, []);
+        const id = setInterval(() => {
+            axios
+                .get('https://erp.digitalindustryagency.com/api/product-categories', {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                .then((response) => {
+                    const categories = response.data.data.resource.data;
+                    setCategories(categories); // Set categories state with fetched data
+                    // console.log('CATEGORIES', response.data.data);
+                })
+                .catch((error) => {
+                    console.error('Error fetching data:', error);
+                });
+        }, 2000);
+        return () => clearInterval(id);
+    }, [categories]);
 
     const [formData, setFormData] = useState({
         product_category_name: '',
@@ -195,7 +200,7 @@ const KategoriProduk = () => {
         }));
     };
 
-    const handleAdd = (e: FormEvent<HTMLFormElement>) => {
+    const handleAdd = (e: FormEvent) => {
         e.preventDefault();
 
         const data = {
@@ -235,6 +240,83 @@ const KategoriProduk = () => {
             });
     };
 
+    const handleEditButtonClick = (categoryId: number) => {
+        const editedCategory = categories.find((category) => category.id === categoryId);
+        if (editedCategory) {
+            setFormData({
+                product_category_name: editedCategory.product_category_name,
+                errors: {},
+            });
+            setEditedCategoryId(categoryId);
+            setEditKategori(true);
+        }
+    };
+
+    const handleEditKategori = () => {
+        if (!editedCategoryId) {
+            return; // Ensure we have a valid category ID
+        }
+
+        const editedData = {
+            id: editedCategoryId,
+            product_category_name: formData.product_category_name,
+        };
+
+        console.log('Edited Data:', editedData);
+        axios
+            .put(`https://erp.digitalindustryagency.com/api/product-categories/${editedCategoryId}`, editedData, {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                console.log('API Response:', response.data); // Log the response for debugging
+                console.log('kategori data successfully updated:', response.data);
+                navigate('/menupenjualan/product/kategoriproduk');
+                toast.success('Data berhasil diedit', {
+                    position: 'top-right',
+                    autoClose: 3000,
+                });
+                setEditKategori(false);
+                setEditedCategoryId(null); // Reset edited category ID
+            })
+            .catch((error) => {
+                if (error.response && error.response.data) {
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        errors: error.response.data,
+                    }));
+                    console.log('Validation Errors:', error.response.data);
+                }
+                console.error('Error updating kategori data:', error);
+                toast.error('Error updating data');
+            });
+    };
+
+    const handleDeleteKategori = (categoryId: number) => {
+        axios
+            .delete(`https://erp.digitalindustryagency.com/api/product-categories/${categoryId}`, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                console.log('API Response:', response.data);
+                console.log('kategori data successfully deleted:', response.data);
+                toast.success('Data berhasil dihapus', {
+                    position: 'top-right',
+                    autoClose: 3000,
+                });
+                // You may want to update the state or fetch the updated category list after deletion
+            })
+            .catch((error) => {
+                console.error('Error deleting kategori data:', error);
+                toast.error('Error deleting data');
+            });
+    };
 
     return (
         <div>
@@ -271,7 +353,14 @@ const KategoriProduk = () => {
                                             <div>
                                                 <form className="space-y-5">
                                                     <div>
-                                                        <input type="textfield" placeholder="Masukan Kategori" className="form-input" />
+                                                        <input
+                                                            type="textfield"
+                                                            placeholder="Masukan Kategori"
+                                                            className="form-input"
+                                                            name="product_category_name"
+                                                            value={formData.product_category_name}
+                                                            onChange={handleChange}
+                                                        />
                                                     </div>
                                                 </form>
                                             </div>
@@ -279,7 +368,7 @@ const KategoriProduk = () => {
                                                 <button type="button" className="btn btn-outline-danger" onClick={() => setEditKategori(false)}>
                                                     Discard
                                                 </button>
-                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setEditKategori(false)}>
+                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleEditKategori}>
                                                     Save
                                                 </button>
                                             </div>
@@ -334,7 +423,7 @@ const KategoriProduk = () => {
                                                 </form>
                                             </div>
                                             <div className="flex justify-end items-center mt-8">
-                                                <button type="submit" className="btn btn-primary ltr:ml-4 rtl:mr-4">
+                                                <button type="submit" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleAdd}>
                                                     Save
                                                 </button>
                                                 <button type="submit" className="btn btn-outline-danger" onClick={() => setAddKategori(false)}>
@@ -394,10 +483,10 @@ const KategoriProduk = () => {
                                             <td></td>
                                             <td></td>
                                             <td className="p-3 border-b border-[#ebedf2] dark:border-[#191e3a] text-center">
-                                                <button type="button" style={{ color: 'orange' }} onClick={() => setEditKategori(true)}>
+                                                <button type="button" style={{ color: 'orange' }} onClick={() => handleEditButtonClick(category.id)}>
                                                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                                 </button>
-                                                <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                                <button type="button" style={{ color: 'red' }} onClick={() => handleDeleteKategori(category.id)}>
                                                     <IconTrashLines />
                                                 </button>
                                             </td>

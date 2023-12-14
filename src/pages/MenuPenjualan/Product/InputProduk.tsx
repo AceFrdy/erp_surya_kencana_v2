@@ -1,14 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import ImageUploading, { ImageListType } from 'react-images-uploading';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import Swal from 'sweetalert2';
-import { formatPrice } from '../../../utils';
 import IconTrash from '../../../components/Icon/IconTrash';
 import IconUpload from '../../../components/Icon/icon-upload';
+import fs from 'fs';
 
 interface FormState {
     product_category_id: number;
@@ -46,6 +44,7 @@ const InputProduk = () => {
 
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') ?? '';
+    const [file, setFile] = useState<File | null>(null);
 
     const [formData, setFormData] = useState<FormState>({
         product_category_id: 0,
@@ -62,8 +61,10 @@ const InputProduk = () => {
         product_weight: 0,
     });
 
-    const onChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
+    const onChangeImage = (e: any) => {
         if (e.target.files) {
+            console.log(e.target.value, e.target.files);
+            setFile(e.target.files[0]);
             setFormData({ ...formData, product_image: e.target.files[0] });
         }
     };
@@ -84,48 +85,50 @@ const InputProduk = () => {
         }
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-        const data = {
-            product_category_id: formData.product_category_id,
-            supplier_id: formData.supplier_id,
-            product_name: formData.product_name,
-            product_price: formData.product_price,
-            product_modal: formData.product_modal,
-            product_pos: formData.product_pos,
-            product_ecommers: formData.product_ecommers,
-            product_responsibility: formData.product_responsibility,
-            product_image: formData.product_image,
-            product_barcode: formData.product_barcode,
-            product_ime: formData.product_ime,
-            product_weight: formData.product_weight,
-        };
-        console.log('Data to be sent:', data);
+        if (file) {
+            const data = {
+                product_category_id: formData.product_category_id,
+                suplier_id: formData.supplier_id,
+                product_name: formData.product_name,
+                product_price: formData.product_price,
+                product_modal: formData.product_modal,
+                product_pos: formData.product_pos,
+                product_ecommers: formData.product_ecommers,
+                product_responsibility: formData.product_responsibility,
+                product_image: file,
+                product_barcode: formData.product_barcode,
+                product_ime: formData.product_ime,
+                product_weight: formData.product_weight,
+            };
+            console.log('Data to be sent:', data);
 
-        axios
-            .post('https://erp.digitalindustryagency.com/api/products', data, {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                console.log('Customer data successfully added:', response.data);
-                navigate('/menupenjualan/product/produk');
-                toast.success('Data berhasil ditambahkan', {
-                    position: 'top-right',
-                    autoClose: 3000,
+            await axios
+                .post('https://erp.digitalindustryagency.com/api/products', data, {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                .then((response) => {
+                    console.log('Customer data successfully added:', response.data);
+                    navigate('/menupenjualan/product/produk');
+                    toast.success('Data berhasil ditambahkan', {
+                        position: 'top-right',
+                        autoClose: 3000,
+                    });
+                })
+                .catch((error) => {
+                    if (error.response && error.response.data) {
+                        console.error('Server Response Data:', error.response.data);
+                        // ... your existing error handling code
+                    }
+                    console.error('Error adding customer data:', error);
+                    toast.error('Error adding data');
                 });
-            })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    console.error('Server Response Data:', error.response.data);
-                    // ... your existing error handling code
-                }
-                console.error('Error adding customer data:', error);
-                toast.error('Error adding data');
-            });
+        }
     };
 
     useEffect(() => {
@@ -337,42 +340,6 @@ const InputProduk = () => {
                                     </button>
                                 </div>
                             </form>
-                        </div>
-                        <div className="mb-5">
-                            <div className="custom-file-container" data-upload-id="myFirstImage">
-                                {/* <div className="label-container">
-                                    <label>Upload Foto </label>
-                                    <button
-                                        type="button"
-                                        className="custom-file-container__image-clear"
-                                        title="Clear Image"
-                                        onClick={() => {
-                                            setImages([]);
-                                        }}
-                                    >
-                                        ×
-                                    </button>
-                                </div>
-                                <label className="custom-file-container__custom-file"></label>
-                                <input type="file" onChange={handleFileChange} name="product_image" className="custom-file-container__custom-file__custom-file-input" accept="image/*" />
-                                <input type="hidden" name="MAX_FILE_SIZE" value="10485760" />
-                                <ImageUploading value={images} onChange={onChange} maxNumber={maxNumber}>
-                                    {({ imageList, onImageUpload, onImageRemoveAll, onImageUpdate, onImageRemove, isDragging, dragProps }) => (
-                                        <div className="upload__image-wrapper">
-                                            <button className="custom-file-container__custom-file__custom-file-control" onClick={onImageUpload}>
-                                                Choose File...
-                                            </button>
-                                            &nbsp;
-                                            {imageList.map((image, index) => (
-                                                <div key={index} className="custom-file-container__image-preview relative">
-                                                    <img src={image.dataURL} alt="img" className="m-auto" />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </ImageUploading>
-                                {images.length === 0 ? <img src="/assets/images/file-preview.svg" className="max-w-md w-full m-auto" alt="" /> : ''} */}
-                            </div>
                         </div>
                     </div>
                 </div>

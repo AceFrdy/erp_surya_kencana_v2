@@ -28,7 +28,7 @@ const AddCabang = () => {
         }));
     };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
         const data = {
@@ -36,6 +36,8 @@ const AddCabang = () => {
             branch_address: formData.branch_address,
             branch_contact: formData.branch_contact,
         };
+
+        console.log('DATA SENT:', data);
 
         axios
             .post('https://erp.digitalindustryagency.com/api/branches', data, {

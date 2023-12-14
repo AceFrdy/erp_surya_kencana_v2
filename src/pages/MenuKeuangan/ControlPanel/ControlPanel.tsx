@@ -737,7 +737,6 @@ const ControlPanel = () => {
                         </button>
                     </Link> */}
                     <div className="ltr:mr-auto rtl:ml-auto">
-                        {/* <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} /> */}
                     </div>
                 </div>
 
