@@ -21,63 +21,6 @@ import { useModal } from '../../../hooks/use-modal';
 
 
 
-const showAlert = async (type: number) => {
-    if (type === 11) {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
-                popup: 'sweet-alerts',
-            },
-            buttonsStyling: false,
-        });
-        swalWithBootstrapButtons
-            .fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true,
-                padding: '2em',
-            })
-            .then((result) => {
-                if (result.value) {
-                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
-                }
-            });
-    }
-    if (type === 15) {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-        });
-        toast.fire({
-            icon: 'success',
-            title: 'Berhasil Dikirim',
-            padding: '10px 20px',
-        });
-    }
-    if (type == 20) {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-        });
-        toast.fire({
-            icon: 'success',
-            title: 'Data Berhasil Ditambah',
-            padding: '10px 20px',
-        });
-    }
-};
-
 interface AkunDataProps {
     id: number;
     acc_code: string;
@@ -100,8 +43,8 @@ const Akun = () => {
 
     // State untuk menyimpan data dari API
     const [initialRecords, setInitialRecords] = useState<AkunDataProps[]>([]);
-    const [recordsData, setRecordsData] = useState([]);
-
+    const [recordsData, setRecordsData] = useState(initialRecords);
+    console.log("initial, records: ", initialRecords, recordsData);
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
@@ -114,57 +57,30 @@ const Akun = () => {
     });
 
     // Fungsi untuk memuat data dari API
-    const fetchData = async () => {
-        try {
-            const response = await axios.get('https://erp.digitalindustryagency.com/api/accounts', {
+
+    useEffect(() => {
+        const id = setInterval(() => {
+            axios.get('https://erp.digitalindustryagency.com/api/accounts', {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
-            });
-            const data = response.data.data.resource.data;
-            setInitialRecords(data);
-            // setRecordsData(data);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
+            }).then(response => {
+                const data = response.data.data.resource.data;
+                // console.log("data :", response.data.data.resource);
+                setInitialRecords(data);
 
-    useEffect(() => {
-        const id = setInterval(() => {
-            fetchData();
+            })
+            .catch((error:any) => {
+                console.error('Error fetching data:', error);
+
+            }) 
+        
 
         }, 2000)
         return () => clearInterval(id);
     }, [initialRecords]);
-    const handleDelete = async (id) => {
-        const confirmed = await Swal.fire({
-            title: 'Hapus Akun',
-            text: "Apakah Anda Yakin Ingin Menghapus Akun?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Hapus',
-            cancelButtonText: 'Kembali',
-            reverseButtons: true,
-        });
 
-        if (confirmed.value) {
-            try {
-                const response = await axios.delete(`https://erp.digitalindustryagency.com/api/accounts/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                Swal.fire('Deleted!', 'The account has been deleted.', 'success');
-
-                setRecordsData(prevRecords => prevRecords.filter(record => record.id !== id));
-            } catch (error) {
-                console.error('Error deleting the account:', error);
-                Swal.fire('Cancelled', 'There was an error deleting the account.', 'error');
-            }
-        }
-    };
 
 
     useEffect(() => {
@@ -183,12 +99,8 @@ const Akun = () => {
         }
         setRecordsData(() => {
             return initialRecords.filter((item) => {
-                return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.acc_code.toLowerCase().includes(search.toLowerCase()) ||
-                    item.acc_type.toLowerCase().includes(search.toLowerCase())
+                return item.acc_code.toLowerCase().includes(search.toLowerCase()) || item.acc_type.toLowerCase().includes(search.toLowerCase())
 
-                );
             });
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -274,11 +186,11 @@ const Akun = () => {
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
-                                 titleClassName: '!text-center',
+                                titleClassName: '!text-center',
                                 render: (row) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menukeuangan/akun/detailakun">
+                                            <Link to={`/menukeuangan/akun/detailakun/${row.id}`}>
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>

@@ -277,7 +277,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menukeuangan/akun/detailakun',
+        path: '/menukeuangan/akun/detailakun/:id',
         element: <DetailAkun />,
         layout: 'default',
     },
