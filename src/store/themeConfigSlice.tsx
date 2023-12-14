@@ -134,7 +134,7 @@ const themeConfigSlice = createSlice({
         },
 
         setPageTitle(state, { payload }) {
-            document.title = `${payload} | VRISTO - ERP Management`;
+            document.title = `${payload} | ERP - Enterprise Resource Planning`;
         },
     },
 });

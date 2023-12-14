@@ -2,9 +2,11 @@ import * as Yup from 'yup';
 import { Field, Form, Formik } from 'formik';
 import Swal from 'sweetalert2';
 import { Link, useNavigate } from 'react-router-dom';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import { useDispatch } from 'react-redux';
 // const submitForm = () => {
 //     const toast = Swal.mixin({
 //         toast: true,
@@ -25,6 +27,10 @@ import { toast } from 'react-toastify';
 // });
 
 const AddUnit = () => {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Tambah Unit'));
+    });
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') || '';
 

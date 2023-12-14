@@ -290,7 +290,7 @@ const showAlert = async (type: number) => {
 const DetailCabang = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Restock'));
+        dispatch(setPageTitle('Detail Cabang'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];

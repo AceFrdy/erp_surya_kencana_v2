@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 const EditProduk = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('File Upload Preview'));
+        dispatch(setPageTitle('Edit Produk'));
     });
     const [codeArr, setCodeArr] = useState<string[]>([]);
 

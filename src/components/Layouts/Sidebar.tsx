@@ -215,7 +215,7 @@ const Sidebar = () => {
                                     <li className="menu nav-item">
                                         <button type="button" className={`${currentMenu === 'customer' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('customer')}>
                                             <div className="flex items-center">
-                                                <IconUsersGroup />
+                                                <IconUsersGroup className="group-hover:!text-primary shrink-0" />
                                                 <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Customer')}</span>
                                             </div>
 
@@ -352,7 +352,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'akun' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('akun')}>
                                     <div className="flex items-center">
-                                        <IconUser />
+                                        <IconUser className="group-hover:!text-primary shrink-0" />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Akun')}</span>
                                     </div>
 
@@ -379,8 +379,8 @@ const Sidebar = () => {
 
                             <li className="menu nav-item">
                                 <NavLink to="/menukeuangan/controlpanel" className="group">
-                                    <div className="flex items-center">
-                                        <IconLock fill={true}/>
+                                    <div className="flex items-center ">
+                                        <IconLock className="group-hover:!text-primary shrink-0" />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Contol Panel')}</span>
                                     </div>
                                 </NavLink>
@@ -389,7 +389,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <NavLink to="/menukeuangan/saldo" className="group">
                                     <div className="flex items-center">
-                                        <IconDollarSignCircle fill={true}/>
+                                        <IconDollarSignCircle fill={true} className="group-hover:!text-primary shrink-0" />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Saldo')}</span>
                                     </div>
                                 </NavLink>
@@ -398,7 +398,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'flowcash' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('flowcash')}>
                                     <div className="flex items-center">
-                                    <IconDollarSignCircle />
+                                    <IconDollarSignCircle className="group-hover:!text-primary shrink-0" />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Flow Cash')}</span>
                                     </div>
 
@@ -423,7 +423,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'hutang-piutang' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('hutang-piutang')}>
                                     <div className="flex items-center">
-                                    <IconCashBanknotes fill={true} />
+                                    <IconCashBanknotes fill={true} className="group-hover:!text-primary shrink-0" />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Hutang / Piutang')}</span>
                                     </div>
 
@@ -482,7 +482,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <NavLink to="/karyawan" className="group">
                                     <div className="flex items-center">
-                                        <IconUsers />
+                                        <IconUsers className="group-hover:!text-primary shrink-0" />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Karyawan')}</span>
                                     </div>
                                 </NavLink>
@@ -490,7 +490,7 @@ const Sidebar = () => {
                             <li className="menu nav-item">
                                 <NavLink to="/jabatan" className="group">
                                     <div className="flex items-center">
-                                        <IconMenuUsers />
+                                        <IconMenuUsers className="group-hover:!text-primary shrink-0" />
                                         <span className="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">{t('Jabatan')}</span>
                                     </div>
                                 </NavLink>

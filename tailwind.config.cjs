@@ -16,7 +16,7 @@ module.exports = {
         },
         extend: {
             colors: {
-                primary: {
+                success: {
                     DEFAULT: '#4361ee',
                     light: '#eaf1ff',
                     'dark-light': 'rgba(67,97,238,.15)',
@@ -26,7 +26,7 @@ module.exports = {
                     light: '#ebe4f7',
                     'dark-light': 'rgb(128 93 202 / 15%)',
                 },
-                success: {
+                primary: {
                     DEFAULT: '#00ab55',
                     light: '#ddf5f0',
                     'dark-light': 'rgba(0,171,85,.15)',
@@ -61,6 +61,7 @@ module.exports = {
                     light: '#e0e6ed',
                     dark: '#888ea8',
                 },
+                
             },
             fontFamily: {
                 nunito: ['Nunito', 'sans-serif'],
