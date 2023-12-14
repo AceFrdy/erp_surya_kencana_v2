@@ -17,6 +17,7 @@ import { IRootState } from '../../../store';
 import IconCircleCheck from '../../../components/Icon/IconCircleCheck';
 import IconCaretDown from '../../../components/Icon/IconCaretDown';
 import IconCode from '../../../components/Icon/IconCode';
+import axios from 'axios';
 
 const rowData = [
     {
@@ -289,14 +290,16 @@ const showAlert = async (type: number) => {
 };
 const DetailCabang = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') || '';
     useEffect(() => {
-        dispatch(setPageTitle('Restock'));
+        dispatch(setPageTitle('Detail Cabang'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
     const [recordsData, setRecordsData] = useState(initialRecords);
+    const [branch, setBranch] = useState([]);
 
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
@@ -367,6 +370,26 @@ const DetailCabang = () => {
             setCodeArr([...codeArr, name]);
         }
     };
+
+    const handleGetBranch = () => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/branches', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const branch = response.data.data.resource.data;
+                setInitialRecords(branch);
+                setBranch(branch);
+                setRecordsData(branch);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    };
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -419,7 +442,7 @@ const DetailCabang = () => {
                     </div>
                 </div>
             </div>
-            <h1 className='text-lg font-semibold mb-6'>Detail Cabang</h1>
+            <h1 className="text-lg font-semibold mb-6">Detail Cabang</h1>
             <div className="mb-5">
                 <div className="flex justify-center grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
                     <div className="panel h-full mr-4 col-span-2">
@@ -659,7 +682,6 @@ const DetailCabang = () => {
                                             titleClassName: '!text-center',
                                             render: () => (
                                                 <div className="flex items-center w-max mx-auto gap-2">
-                                                    
                                                     <button type="button" style={{ color: 'orange' }}>
                                                         <Link to="/menupenjualan/cabang/listcabang/editcabang/:id">
                                                             <IconPencil className="ltr:mr-2 rtl:ml-2 " />

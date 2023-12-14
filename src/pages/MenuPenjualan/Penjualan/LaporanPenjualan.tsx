@@ -554,7 +554,7 @@ const showAlert = async (type: number) => {
 const LaporanPenjualan = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Multi Column Table'));
+        dispatch(setPageTitle('Laporan Penjualan'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];

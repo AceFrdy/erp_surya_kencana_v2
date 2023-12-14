@@ -86,7 +86,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menupenjualan/product/produk/editproduk',
+        path: '/menupenjualan/product/produk/editproduk/:id',
         element: <EditProduk />,
         layout: 'default',
     },

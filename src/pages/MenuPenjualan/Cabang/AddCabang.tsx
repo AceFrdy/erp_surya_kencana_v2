@@ -1,9 +1,15 @@
-import React, { ChangeEvent, FormEvent, useState } from 'react';
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import { useDispatch } from 'react-redux';
 
 const AddCabang = () => {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Tambah Cabang'));
+    });
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') || '';
 
@@ -22,7 +28,7 @@ const AddCabang = () => {
         }));
     };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
         const data = {
@@ -30,6 +36,8 @@ const AddCabang = () => {
             branch_address: formData.branch_address,
             branch_contact: formData.branch_contact,
         };
+
+        console.log('DATA SENT:', data);
 
         axios
             .post('https://erp.digitalindustryagency.com/api/branches', data, {

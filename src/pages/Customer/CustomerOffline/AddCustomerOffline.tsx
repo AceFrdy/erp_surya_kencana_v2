@@ -3,6 +3,8 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useDispatch } from 'react-redux';
+import { setPageTitle } from '../../../store/themeConfigSlice';
 
 interface FormState {
     name: string;
@@ -11,6 +13,10 @@ interface FormState {
 }
 
 const AddCustomerOffline = () => {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Tambah Customer Offline'));
+    });
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') ?? '';
 

@@ -559,7 +559,7 @@ const Suplier = () => {
     const dispatch = useDispatch();
     const token = localStorage.getItem('accessToken') || '';
     useEffect(() => {
-        dispatch(setPageTitle('Multi Column Table'));
+        dispatch(setPageTitle('Supplier'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
@@ -664,7 +664,7 @@ const Suplier = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
+                            { accessor: 'id', title: 'No', render: (e) => recordsData.indexOf(e) + 1 },
                             { accessor: 'suplier_name', title: 'Nama Supplier', sortable: true },
                             { accessor: 'suplier_contact', title: 'No HP', sortable: true },
                             {
@@ -672,23 +672,23 @@ const Suplier = () => {
                                 title: 'Address',
                                 sortable: true,
                             },
-                            {
-                                accessor: 'action',
-                                title: 'Opsi',
-                                titleClassName: '!text-center',
-                                render: (row) => (
-                                    <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button" style={{ color: 'orange' }}>
-                                            <Link to={`/menupenjualan/supplier/editsupplier/${row.id}`}>
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
-                                        <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button>
-                                    </div>
-                                ),
-                            },
+                            // {
+                            //     accessor: 'action',
+                            //     title: 'Opsi',
+                            //     titleClassName: '!text-center',
+                            //     render: (row) => (
+                            //         <div className="flex items-center w-max mx-auto gap-2">
+                            //             <button type="button" style={{ color: 'orange' }}>
+                            //                 <Link to={`/menupenjualan/supplier/editsupplier/${row.id}`}>
+                            //                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                            //                 </Link>
+                            //             </button>
+                            //             <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                            //                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                            //             </button>
+                            //         </div>
+                            //     ),
+                            // },
                         ]}
                         totalRecords={initialRecords.length}
                         recordsPerPage={pageSize}

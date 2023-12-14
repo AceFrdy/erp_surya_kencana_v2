@@ -1,9 +1,15 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { setPageTitle } from '../../../store/themeConfigSlice';
 
 const EditSupplier = () => {
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Edit Supplier'));
+    });
     const navigate = useNavigate();
     const { id } = useParams();
     const token = localStorage.getItem('accessToken') || '';
