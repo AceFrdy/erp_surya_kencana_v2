@@ -582,7 +582,8 @@ const ListCabang = () => {
 
     // get branch
     useEffect(() => {
-        axios
+        const id = setInterval(() => {
+            axios
             .get('https://erp.digitalindustryagency.com/api/branches', {
                 headers: {
                     Accept: 'application/json',
@@ -592,13 +593,15 @@ const ListCabang = () => {
             .then((response) => {
                 const branch = response.data.data.resource.data;
                 setInitialRecords(branch);
-                // setBranch(branch); 
-                // setRecordsData(branch);
+                setBranch(branch); 
+                setRecordsData(branch);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, []);
+        }, 2000);
+        return () => clearInterval(id)
+    }, [initialRecords]);
 
     return (
         <div>
@@ -635,7 +638,7 @@ const ListCabang = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            // { accessor: 'id', title: 'No', sortable: true },
+                            { accessor: 'id', title: 'No', render: (e) => recordsData.indexOf(e) + 1 },
                             { accessor: 'branch_name', title: 'Nama Cabang', sortable: true },
                             {
                                 accessor: 'branch_address',
