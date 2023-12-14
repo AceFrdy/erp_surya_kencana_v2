@@ -86,7 +86,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menupenjualan/product/produk/editproduk',
+        path: '/menupenjualan/product/produk/editproduk/:id',
         element: <EditProduk />,
         layout: 'default',
     },
@@ -239,7 +239,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menupenjualan/distribution/detaildistribution',
+        path: '/menupenjualan/distribution/detaildistribution/:id',
         element: <DetailDistribusi />,
         layout: 'default',
     },
@@ -271,7 +271,8 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menukeuangan/akun/editakun',
+        path: '/menukeuangan/akun/editakun/:id',
+        // path: '/menupenjualan/cabang/listcabang/editcabang/:id',
         element: <EditAkun />,
         layout: 'default',
     },

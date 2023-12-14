@@ -689,29 +689,9 @@ const Restock = () => {
             </div> */}
             <div className="panel mt-6">
                 <h1 className="text-lg font-bold">Data Restock</h1>
-                <div className="flex mb-4 justify-end">
-                    <button type="button" className="btn btn-outline-danger mr-4" onClick={() => showAlert(11)}>
-                        <IconTrashLines className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                        Batal
-                    </button>
-                    <button type="button" className="btn btn-outline-primary" onClick={() => showAlert(15)}>
-                        <IconSend className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                        Kirim
-                    </button>
-                </div>
-                <h1 className="text-lg font-bold mb-4">Kode:SK0012023</h1>
+                
+                <h1 className="text-lg font-bold my-4">Kode: SK0012023</h1>
                 <form className="space-y-5">
-                    <div>
-                        <label htmlFor="gridState">Supplier</label>
-                        <select id="gridState" className="form-select text-white-dark">
-                            <option>Choose...</option>
-                            <option>...</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label htmlFor="Opcost">Operasional Cost</label>
-                        <input id="Opcost" type="text" value={operasionalCost} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
-                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label htmlFor="Produk">Produk</label>
@@ -797,6 +777,33 @@ const Restock = () => {
                         minHeight={200}
                         paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                     />
+                </div>
+                <div>
+                <form className='my-14'>
+                    <div>
+                    <div className="flex mb-4 justify-end">
+                    <button type="button" className="btn btn-outline-danger mr-4" onClick={() => showAlert(11)}>
+                        <IconTrashLines className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                        Batal
+                    </button>
+                    <button type="button" className="btn btn-outline-primary" onClick={() => showAlert(15)}>
+                        <IconSend className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                        Kirim
+                    </button>
+                </div>
+                <div className='mt-4 mb-4'>
+                        <label htmlFor="gridState ">Supplier</label>
+                        <select id="gridState" className="form-select text-white-dark">
+                            <option>Choose...</option>
+                            <option>...</option>
+                        </select>
+                    </div>
+                    </div>
+                    <div className='mt-4'>
+                        <label htmlFor="Opcost">Operasional Cost</label>
+                        <input id="Opcost" type="text" value={operasionalCost} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
+                    </div>
+                </form>
                 </div>
             </div>
         </div>

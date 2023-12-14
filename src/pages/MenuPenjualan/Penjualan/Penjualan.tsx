@@ -679,7 +679,7 @@ const Penjualan = () => {
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6">
-                <h1 className="text-lg font-bold flex justify-center">Data Penjualan</h1>
+                <h1 className="text-lg font-bold flex justify-center mb-4">Data Penjualan</h1>
                 
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
                     

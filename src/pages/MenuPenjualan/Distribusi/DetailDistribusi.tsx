@@ -5,10 +5,12 @@ import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import IconSend from '../../../components/Icon/IconSend';
 import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
+import axios from 'axios';
+import { formatPrice } from '../../../utils';
 
 const rowData = [
     {
@@ -523,62 +525,14 @@ const rowData = [
     },
 ];
 
-const showAlert = async (type: number) => {
-    if (type === 11) {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
-                popup: 'sweet-alerts',
-            },
-            buttonsStyling: false,
-        });
-        swalWithBootstrapButtons
-            .fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true,
-                padding: '2em',
-            })
-            .then((result) => {
-                if (result.value) {
-                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
-                }
-            });
-    }
-    if (type === 15) {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-        });
-        toast.fire({
-            icon: 'success',
-            title: 'Berhasil Dikirim',
-            padding: '10px 20px',
-        });
-    }
-    if (type == 20) {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-        });
-        toast.fire({
-            icon: 'success',
-            title: 'Data Berhasil Ditambah',
-            padding: '10px 20px',
-        });
-    }
-};
+interface DetailDistribution {
+    distribution_code: string;
+    product_name: string;
+    distribution_qty: number;
+    product_price: number;
+    total_price: number;
+}
+
 const DetailDistribusi = () => {
     const dispatch = useDispatch();
     useEffect(() => {
@@ -587,16 +541,17 @@ const DetailDistribusi = () => {
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const token = localStorage.getItem('accessToken') ?? '';
 
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
     });
-
-    //
+    const { id } = useParams();
+    const [initialRecords, setInitialRecords] = useState<DetailDistribution[]>([]);
+    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [branchName, setBranchName] = useState<string>('');
 
     useEffect(() => {
         setPage(1);
@@ -608,20 +563,35 @@ const DetailDistribusi = () => {
         setRecordsData([...initialRecords.slice(from, to)]);
     }, [page, pageSize, initialRecords]);
 
+    // get distribution report by id
     useEffect(() => {
+        axios
+            .get(`https://erp.digitalindustryagency.com/api/distribution-reports/${id}`, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setInitialRecords(response.data.data.resource.distributions);
+                setBranchName(response.data.data.resource.branch.branch_name);
+            })
+            .catch((err: any) => {
+                console.log('GET DISTRIBRUTION REPORT', err.message);
+            });
+    }, []);
+
+    useEffect(() => {
+        if (!initialRecords) {
+            return;
+        }
         setInitialRecords(() => {
-            return rowData.filter((item) => {
-                return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
-                );
+            return initialRecords.filter((item) => {
+                return item.distribution_code.toLowerCase().includes(search.toLowerCase()) || item.product_name.toLowerCase().includes(search.toLowerCase());
             });
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search]);
+    }, [search, recordsData]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -629,48 +599,7 @@ const DetailDistribusi = () => {
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
-    const formatDate = (date: string | number | Date) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
-        }
-        return '';
-    };
 
-    // const [operasionalCost, setOperasionalCost] = useState('');
-    // const [cost, setCost] = useState('');
-
-    // const handleOperasioanalCostChange = (e: { target: { value: any } }) => {
-    //     const inputValue = e.target.value;
-    //     let formattedValue = '';
-
-    //     // Remove non-numeric characters
-    //     const numericValue = inputValue.replace(/\D/g, '');
-
-    //     // Format the number with 'Rp.' prefix
-    //     if (numericValue !== '') {
-    //         formattedValue = `Rp. ${parseInt(numericValue, 10).toLocaleString('id-ID')}`;
-    //     }
-
-    //     setOperasionalCost(formattedValue);
-    // };
-
-    // const handleCostChange = (e: { target: { value: any } }) => {
-    //     const inputValue = e.target.value;
-    //     let formatValue = '';
-
-    //     // Remove non-numeric characters
-    //     const numValue = inputValue.replace(/\D/g, '');
-
-    //     // Format the number with 'Rp.' prefix
-    //     if (numValue !== '') {
-    //         formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-    //     }
-
-    //     setCost(formatValue);
-    // };
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -702,50 +631,10 @@ const DetailDistribusi = () => {
                 </div>
                 <form className="space-y-5">
                     <div>
-                        <label htmlFor="gridState">Lokasi Tujuan</label>
-                        <select id="gridState" disabled className="form-select text-white-dark">
-                            <option>Gedung Utama</option>
-                            <option>...</option>
-                        </select>
+                        <p>Lokasi Tujuan</p>
+                        <input value={branchName} className="form-input text-black border-zinc-300" disabled />
                     </div>
-                    {/* <div>
-                        <label htmlFor="Opcost">Operasional Cost</label>
-                        <input id="Opcost" type="text" value={operasionalCost} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
-                    </div> */}
-                    {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div>
-                            <label htmlFor="Search">Search Produk</label>
-                            <input id="Search" type="text" className="form-input" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
-                        </div>
-                        <div>
-                            <label htmlFor="Qty">Qty</label>
-                            <input id="Qty" type="Text" placeholder="" className="form-input" />
-                        </div>
-                        <div>
-                            <label htmlFor="gridState">Satuan</label>
-                            <select id="gridState" className="form-select text-white-dark">
-                                <option>Choose...</option>
-                                <option>...</option>
-                            </select>
-                        </div>
-                    </div> */}
-                    {/* <div>
-                        <label className="flex items-center mt-1 cursor-pointer">
-                            <input type="checkbox" className="form-checkbox" />
-                            <span className="text-white-dark">Check me out</span>
-                        </label>
-                    </div> */}
-                    {/* <button type="submit" className="btn btn-outline-primary !mt-6 w-full mb-6" onClick={() => showAlert(20)}>
-                        Tambah
-                    </button> */}
                 </form>
-                <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
-                        <button type="button" className=" px-2 btn btn-outline-info">
-                            <IconPlus className="flex mx-2" fill={true} /> Add
-                        </button>
-                    </Link> */}
-                </div>
 
                 <h5 className="font-semibold text-lg dark:text-white-light mb-4 mt-4 flex justify-center">Data Distribusi</h5>
                 <div className="datatables">
@@ -756,50 +645,23 @@ const DetailDistribusi = () => {
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true },
                             {
-                                accessor: 'id',
+                                accessor: 'distribution_code',
                                 title: 'Barcode',
                                 sortable: true,
-                                render: ({ id }) => (
-                                    <div className="flex items-center w-max">
-                                        <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
-                                        {/* <div>{firstName + ' ' + lastName}</div> */}
-                                    </div>
-                                ),
                             },
                             {
-                                accessor: 'firstName',
+                                accessor: 'product_name',
                                 title: 'Nama',
                                 sortable: true,
                             },
-                            { accessor: 'age', title: 'Qty', sortable: true },
-                            // {
-                            //     accessor: 'status',
-                            //     title: 'Status',
-                            //     sortable: true,
-                            //     render: (data) => (
-                            //         <span
-                            //             className={`badge whitespace-nowrap ${
-                            //                 data.status === 'completed'
-                            //                     ? 'bg-primary   '
-                            //                     : data.status === 'Pending'
-                            //                     ? 'bg-secondary'
-                            //                     : data.status === 'In Progress'
-                            //                     ? 'bg-success'
-                            //                     : data.status === 'Canceled'
-                            //                     ? 'bg-danger'
-                            //                     : 'bg-primary'
-                            //             }`}
-                            //         >
-                            //             {data.status}
-                            //         </span>
-                            //     ),
-                            // },
-                            // {
-                            //     accessor: 'age',
-                            //     title: 'Distribution Qty',
-                            //     sortable: true,
-                            // },
-                            // 
+                            {
+                                accessor: 'product_price',
+                                title: 'Harga',
+                                sortable: true,
+                                render: (e) => formatPrice(e.product_price),
+                            },
+                            { accessor: 'distribution_qty', title: 'Qty', sortable: true },
+                            { accessor: 'total_price', title: 'Harga Total', sortable: true, render: (e) => formatPrice(e.total_price) },
                         ]}
                         totalRecords={initialRecords.length}
                         recordsPerPage={pageSize}
