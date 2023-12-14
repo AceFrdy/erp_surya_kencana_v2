@@ -25,7 +25,7 @@ interface ProductList {
 
 const Produk = () => {
     const dispatch = useDispatch();
-    const token = localStorage.getItem('accessToken') || '';
+    const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
         dispatch(setPageTitle('Produk'));
     });
