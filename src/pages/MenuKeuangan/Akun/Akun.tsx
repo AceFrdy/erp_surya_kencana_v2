@@ -99,7 +99,7 @@ const Akun = () => {
     });
 
     // State untuk menyimpan data dari API
-    const [initialRecords, setInitialRecords] = useState([]);
+    const [initialRecords, setInitialRecords] = useState<AkunDataProps[]>([]);
     const [recordsData, setRecordsData] = useState([]);
 
     const [page, setPage] = useState(1);
@@ -274,7 +274,7 @@ const Akun = () => {
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
-                                titleClassName: '!text-center',
+                                 titleClassName: '!text-center',
                                 render: (row) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'blue' }}>
