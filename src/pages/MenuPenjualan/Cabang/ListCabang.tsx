@@ -595,6 +595,7 @@ const ListCabang = () => {
                 setInitialRecords(branch);
                 setBranch(branch); 
                 setRecordsData(branch);
+                console.log(branch);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);

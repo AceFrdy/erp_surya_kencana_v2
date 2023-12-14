@@ -442,7 +442,7 @@ const DetailCabang = () => {
                     </div>
                 </div>
             </div>
-            <h1 className="text-lg font-semibold mb-6">Detail Cabang</h1>
+            <h1 className="text-lg dark:text-white-light mb-5 font-semibold mb-6">Detail Cabang</h1>
             <div className="mb-5">
                 <div className="flex justify-center grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
                     <div className="panel h-full mr-4 col-span-2">
@@ -487,11 +487,11 @@ const DetailCabang = () => {
                             <span className="ltr:ml-5 rtl:mr-5 dark:text-white-light">57%</span>
                         </div>
                     </div>
-                    <div className="panel overflow-hidden col-span-2">
+                    <div className="panel overflow-hidden col-span-2 dark:text-white-light mb-5">
                         <div className="flex items-center justify-between">
                             <div>
                                 <div className="text-lg font-bold">Top Sales Product</div>
-                                <div className="text-success"> Berdasarkan Tahun 2022 </div>
+                                <div className="text-info"> Berdasarkan Tahun 2022 </div>
                             </div>
                             <div className="dropdown">
                                 <Dropdown
@@ -570,141 +570,120 @@ const DetailCabang = () => {
                     </Tab.List>
                     <Tab.Panels>
                         <Tab.Panel>
-                            <div className="active pt-5 panel">
-                                <DataTable
-                                    highlightOnHover
-                                    className="whitespace-nowrap table-hover"
-                                    records={recordsData}
-                                    columns={[
-                                        { accessor: 'id', title: 'No', sortable: true },
-                                        {
-                                            accessor: 'id',
-                                            title: 'No Dokumen',
-                                            sortable: true,
-                                        },
-                                        {
-                                            accessor: 'firstName',
-                                            title: 'Pelanggan',
-                                            sortable: true,
-                                        },
-                                        { accessor: 'age', title: 'Qty', sortable: true },
-                                        { accessor: 'age', title: 'Total', sortable: true },
-                                        {
-                                            accessor: 'status',
-                                            title: 'Status',
-                                            sortable: true,
-                                            render: (data) => (
-                                                <span
-                                                    className={`badge whitespace-nowrap ${
-                                                        data.status === 'completed'
-                                                            ? 'bg-primary   '
-                                                            : data.status === 'Pending'
-                                                            ? 'bg-secondary'
-                                                            : data.status === 'In Progress'
-                                                            ? 'bg-success'
-                                                            : data.status === 'Canceled'
-                                                            ? 'bg-danger'
-                                                            : 'bg-primary'
-                                                    }`}
-                                                >
-                                                    {data.status}
-                                                </span>
-                                            ),
-                                        },
-                                        // {
-                                        //     accessor: 'age',
-                                        //     title: 'Distribution Qty',
-                                        //     sortable: true,
-                                        // },
-                                        // {
-                                        //     accessor: 'action',
-                                        //     title: 'Opsi',
-                                        //     titleClassName: '!text-center',
-                                        //     render: () => (
-                                        //         <div className="flex items-center w-max mx-auto gap-2">
-                                        //             {/* <button type="button" style={{ color: 'blue' }}>
-                                        //     <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                        // </button> */}
-                                        //             <button type="button" style={{ color: 'orange' }}>
-                                        //                 <Link to="/menupenjualan/cabang/listcabang/editcabang/:id">
-                                        //                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                        //                 </Link>
-                                        //             </button>
-                                        //             {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                        //     <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        // </button> */}
-                                        //         </div>
-                                        //     ),
-                                        // },
-                                    ]}
-                                    totalRecords={initialRecords.length}
-                                    recordsPerPage={pageSize}
-                                    page={page}
-                                    onPageChange={(p) => setPage(p)}
-                                    recordsPerPageOptions={PAGE_SIZES}
-                                    onRecordsPerPageChange={setPageSize}
-                                    sortStatus={sortStatus}
-                                    onSortStatusChange={setSortStatus}
-                                    minHeight={200}
-                                    paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
-                                />
+                            <div className="grid xl:grid-cols-1 gap-6 grid-cols-1 ">
+                                <div className="active pt-5 datatables panel xl:col-span-2">
+                                    <DataTable
+                                        highlightOnHover
+                                        className="whitespace-nowrap table-hover"
+                                        records={recordsData}
+                                        columns={[
+                                            { accessor: 'id', title: 'No', sortable: true },
+                                            {
+                                                accessor: 'id',
+                                                title: 'No Dokumen',
+                                                sortable: true,
+                                            },
+                                            {
+                                                accessor: 'firstName',
+                                                title: 'Pelanggan',
+                                                sortable: true,
+                                            },
+                                            { accessor: 'age', title: 'Qty', sortable: true },
+                                            { accessor: 'age', title: 'Total', sortable: true },
+                                            {
+                                                accessor: 'status',
+                                                title: 'Status',
+                                                sortable: true,
+                                                render: (data) => (
+                                                    <span
+                                                        className={`badge whitespace-nowrap ${
+                                                            data.status === 'completed'
+                                                                ? 'bg-primary   '
+                                                                : data.status === 'Pending'
+                                                                ? 'bg-secondary'
+                                                                : data.status === 'In Progress'
+                                                                ? 'bg-success'
+                                                                : data.status === 'Canceled'
+                                                                ? 'bg-danger'
+                                                                : 'bg-primary'
+                                                        }`}
+                                                    >
+                                                        {data.status}
+                                                    </span>
+                                                ),
+                                            },
+                                        ]}
+                                        totalRecords={initialRecords.length}
+                                        recordsPerPage={pageSize}
+                                        page={page}
+                                        onPageChange={(p) => setPage(p)}
+                                        recordsPerPageOptions={PAGE_SIZES}
+                                        onRecordsPerPageChange={setPageSize}
+                                        sortStatus={sortStatus}
+                                        onSortStatusChange={setSortStatus}
+                                        minHeight={200}
+                                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
+                                    />
+                                </div>
                             </div>
                         </Tab.Panel>
                         <Tab.Panel>
-                            <div className="panel">
-                                <DataTable
-                                    highlightOnHover
-                                    className="whitespace-nowrap table-hover"
-                                    records={recordsData}
-                                    columns={[
-                                        { accessor: 'id', title: 'No', sortable: true },
-                                        {
-                                            accessor: 'id',
-                                            title: 'Barcode',
-                                            sortable: true,
-                                            render: ({ id }) => (
-                                                <div className="flex items-center w-max">
-                                                    <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
-                                                    {/* <div>{firstName + ' ' + lastName}</div> */}
-                                                </div>
-                                            ),
-                                        },
-                                        {
-                                            accessor: 'firstName',
-                                            title: 'Nama Barang',
-                                            sortable: true,
-                                        },
-                                        { accessor: 'lastName', title: 'Kategori', sortable: true },
-                                        { accessor: 'age', title: 'Qty', sortable: true },
-                                        {
-                                            accessor: 'action',
-                                            title: 'Opsi',
-                                            titleClassName: '!text-center',
-                                            render: () => (
-                                                <div className="flex items-center w-max mx-auto gap-2">
-                                                    <button type="button" style={{ color: 'orange' }}>
-                                                        <Link to="/menupenjualan/cabang/listcabang/editcabang/:id">
-                                                            <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                                        </Link>
-                                                    </button>
-                                                    <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                                        <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                                    </button>
-                                                </div>
-                                            ),
-                                        },
-                                    ]}
-                                    totalRecords={initialRecords.length}
-                                    recordsPerPage={pageSize}
-                                    page={page}
-                                    onPageChange={(p) => setPage(p)}
-                                    recordsPerPageOptions={PAGE_SIZES}
-                                    onRecordsPerPageChange={setPageSize}
-                                    sortStatus={sortStatus}
-                                    onSortStatusChange={setSortStatus}
-                                    minHeight={200}
-                                    paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
-                                />
+                            <div className="grid xl:grid-cols-1 gap-6 grid-cols-1">
+                                <div className="datatables panel xl:col-span-2">
+                                    <DataTable
+                                        highlightOnHover
+                                        className="whitespace-nowrap table-hover"
+                                        records={recordsData}
+                                        columns={[
+                                            { accessor: 'id', title: 'No', sortable: true },
+                                            {
+                                                accessor: 'id',
+                                                title: 'Barcode',
+                                                sortable: true,
+                                                render: ({ id }) => (
+                                                    <div className="flex items-center w-max">
+                                                        <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
+                                                        {/* <div>{firstName + ' ' + lastName}</div> */}
+                                                    </div>
+                                                ),
+                                            },
+                                            {
+                                                accessor: 'firstName',
+                                                title: 'Nama Barang',
+                                                sortable: true,
+                                            },
+                                            { accessor: 'lastName', title: 'Kategori', sortable: true },
+                                            { accessor: 'age', title: 'Qty', sortable: true },
+                                            {
+                                                accessor: 'action',
+                                                title: 'Opsi',
+                                                titleClassName: '!text-center',
+                                                render: () => (
+                                                    <div className="flex items-center w-max mx-auto gap-2">
+                                                        <button type="button" style={{ color: 'orange' }}>
+                                                            <Link to="/menupenjualan/cabang/listcabang/editcabang/:id">
+                                                                <IconPencil className="ltr:mr-2 rtl:ml-2" />
+                                                            </Link>
+                                                        </button>
+                                                        <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2" />
+                                                        </button>
+                                                    </div>
+                                                ),
+                                            },
+                                        ]}
+                                        totalRecords={initialRecords.length}
+                                        recordsPerPage={pageSize}
+                                        page={page}
+                                        onPageChange={(p) => setPage(p)}
+                                        recordsPerPageOptions={PAGE_SIZES}
+                                        onRecordsPerPageChange={setPageSize}
+                                        sortStatus={sortStatus}
+                                        onSortStatusChange={setSortStatus}
+                                        minHeight={200}
+                                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
+                                    />
+                                </div>
                             </div>
                         </Tab.Panel>
                         <Tab.Panel>
