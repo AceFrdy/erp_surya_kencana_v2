@@ -271,7 +271,8 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menukeuangan/akun/editakun',
+        path: '/menukeuangan/akun/editakun/:id',
+        // path: '/menupenjualan/cabang/listcabang/editcabang/:id',
         element: <EditAkun />,
         layout: 'default',
     },
