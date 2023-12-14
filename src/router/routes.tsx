@@ -425,7 +425,6 @@ const routes = [
         element: <DetailJabatan />,
         layout: 'default',
     },
-
 ];
 
 export { routes };
