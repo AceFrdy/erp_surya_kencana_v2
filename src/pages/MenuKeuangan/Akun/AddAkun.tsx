@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, FormEvent, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -12,9 +12,16 @@ const AddAkun = () => {
     const [accInfo, setAccInfo] = useState('');
     const token = localStorage.getItem('accessToken') || '';
 
-
+    interface AkunDataProps {
+        id: number;
+        acc_code: string;
+        acc_type: string;
+        acc_group_name: string;
+        acc_info: string;
+        // branch_address: string;
+    }
         // Handle Submit Form
-        const handleSubmit = async (event) => {
+        const handleSubmit = async (event:FormEvent) => {
             event.preventDefault();
             try {
                 await axios.post(
@@ -60,9 +67,10 @@ const AddAkun = () => {
     
 
     // Update the state for each input field
-    const handleInputChange = (e) => {
-        const { id, value } = e.target;
-        switch (id) {
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const target = e.target as HTMLInputElement | HTMLSelectElement;
+        const value = target.value;
+        switch (target.id) {
             case 'gridState':
                 setAccType(value);
                 break;
@@ -76,6 +84,7 @@ const AddAkun = () => {
                 break;
         }
     };
+    
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse mb-10">

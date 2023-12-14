@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -37,15 +37,17 @@ const EditAkun = () => {
             });
     }, [id, token]);
 
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setAkunData((prevData) => ({
+    const handleInputChange = (event:ChangeEvent<HTMLInputElement>) => {
+      event.preventDefault();
+       const { name, value } = event.target;
+        setAkunData(prevData => ({
             ...prevData,
             [name]: value,
         }));
     };
 
-    const handleSubmit = async (event) => {
+
+    const handleSubmit = async (event:FormEvent) => {
         event.preventDefault();
         console.log('Submitting the following data:', akunData); // Log data yang akan dikirim
 
@@ -60,7 +62,7 @@ const EditAkun = () => {
             console.log('Response from server:', response.data); // Log response dari server
             toast.success('Data berhasil diubah');
             navigate('/menukeuangan/akun/akun');
-        } catch (error) {
+        } catch (error:any) {
             console.error('Error updating account:', error); // Log error yang terjadi
             toast.error('Gagal mengubah data');
             if (error.response) {

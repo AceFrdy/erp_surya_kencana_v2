@@ -272,8 +272,8 @@ const DetailJabatan = () => {
                         <div className="whitespace-nowrap dark:text-white text-2xl">Trickster</div>
                     </div>
                     <div className="flex items-center w-full justify-start mb-2 gap-4">
-                        <div className=" dark:text-white text-2xl">Jumlah :</div>
-                        <CountUp start={0} end={105} duration={10} className="dark:text-white text-xl sm:text-3xl text-center" />
+                        <div className=" dark:text-white text-2xl">Jumlah Karyawan :</div>
+                        <CountUp start={0} end={500} duration={1.5} className="dark:text-white text-xl sm:text-3xl text-center" />
                     </div>
                 </div>
             </div>
