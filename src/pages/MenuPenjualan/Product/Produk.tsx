@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 import IconPlus from '../../../components/Icon/IconPlus';
 import axios from 'axios';
 import { formatPrice } from '../../../utils';
+import { useModal } from '../../../hooks/use-modal';
 
 interface ProductList {
     id: number;
@@ -39,6 +40,7 @@ const Produk = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
+    const { onOpen } = useModal();
 
     useEffect(() => {
         setPage(1);
@@ -71,21 +73,24 @@ const Produk = () => {
 
     // get produk
     useEffect(() => {
-        axios
-            .get('https://erp.digitalindustryagency.com/api/products', {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                const product = response.data.data.resource.data;
-                setInitialRecords(product);
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error);
-            });
-    }, []);
+        const id = setInterval(() => {
+            axios
+                .get('https://erp.digitalindustryagency.com/api/products', {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                .then((response) => {
+                    const product = response.data.data.resource.data;
+                    setInitialRecords(product);
+                })
+                .catch((error) => {
+                    console.error('Error fetching data:', error);
+                });
+        }, 2000);
+        return () => clearInterval(id);
+    }, [initialRecords]);
 
     return (
         <div>
@@ -122,7 +127,7 @@ const Produk = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             {
                                 accessor: 'product_image',
                                 title: 'Foto',
@@ -166,7 +171,7 @@ const Produk = () => {
                                             </Link>
                                         </button>
 
-                                        <button type="button" style={{ color: 'red' }} onClick={() => {}}>
+                                        <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-product', e.id)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2" />
                                         </button>
                                     </div>

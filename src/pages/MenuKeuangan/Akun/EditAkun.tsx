@@ -15,12 +15,13 @@ const EditAkun = () => {
     });
 
     useEffect(() => {
-        axios.get(`https://erp.digitalindustryagency.com/api/accounts/${id}`, {
-            headers: {
-                Accept: 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-        })
+        axios
+            .get(`https://erp.digitalindustryagency.com/api/accounts/${id}`, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
             .then((response) => {
                 const accountData = response.data.data.resource;
                 setAkunData({
@@ -38,24 +39,22 @@ const EditAkun = () => {
 
     const handleInputChange = (event) => {
         const { name, value } = event.target;
-        setAkunData(prevData => ({
+        setAkunData((prevData) => ({
             ...prevData,
-            [name]: value
+            [name]: value,
         }));
     };
-
-
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         console.log('Submitting the following data:', akunData); // Log data yang akan dikirim
-    
+
         try {
             const response = await axios.put(`https://erp.digitalindustryagency.com/api/accounts/${id}`, akunData, {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                 },
             });
             console.log('Response from server:', response.data); // Log response dari server
@@ -69,7 +68,6 @@ const EditAkun = () => {
             }
         }
     };
-    
 
     return (
         <div>
@@ -91,12 +89,7 @@ const EditAkun = () => {
                 <form className="space-y-5" onSubmit={handleSubmit}>
                     <div>
                         <label htmlFor="gridState">Jenis Akun</label>
-                        <select id="gridState"
-                            name="acc_type"
-                            value={akunData.acc_type}
-                            onChange={handleInputChange}
-                            className="form-select text-white-dark">
-
+                        <select id="gridState" name="acc_type" value={akunData.acc_type} onChange={handleInputChange} className="form-select text-white-dark">
                             <option>Modal</option>
                             <option>Choose...</option>
                             <option>Asset/Harta</option>
@@ -108,18 +101,20 @@ const EditAkun = () => {
                     <div>
                         <label htmlFor="actionWeb">Group:</label>
                         <div className="flex flex-1">
-             
-                            <input id="actionWeb" name="acc_group_name"
+                            <input
+                                id="actionWeb"
+                                name="acc_group_name"
                                 value={akunData.acc_group_name}
                                 onChange={handleInputChange}
-                                type="text" placeholder="Group..." className="form-input ltr:rounded-l-none rtl:rounded-r-none" />
+                                type="text"
+                                placeholder="Group..."
+                                className="form-input ltr:rounded-l-none rtl:rounded-r-none"
+                            />
                         </div>
                     </div>
                     <div>
                         <label htmlFor="actionWeb">Keterangan</label>
-                        <input id="actionWeb" name="acc_info"
-                            value={akunData.acc_info}
-                            onChange={handleInputChange} type="text" placeholder="Keterangan..." className="form-input" />
+                        <input id="actionWeb" name="acc_info" value={akunData.acc_info} onChange={handleInputChange} type="text" placeholder="Keterangan..." className="form-input" />
                     </div>
                     <div className="flex">
                         <button type="submit" className="btn btn-primary !mt-6 mr-8">
