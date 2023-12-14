@@ -1,22 +1,3 @@
-<<<<<<< HEAD
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-const EditAkun = () => {
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(setPageTitle('Edit Akun'));
-    });
-    const showAlert = async (type: number) => {
-        if (type == 20) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top',
-                showConfirmButton: false,
-                timer: 3000,
-=======
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -52,7 +33,6 @@ const EditAkun = () => {
             .catch((error) => {
                 console.error('Error fetching account data:', error);
                 toast.error('Error fetching data');
->>>>>>> 94b627ebe4bc2e61ea4b1d0484a30c08c755437d
             });
     }, [id, token]);
 
