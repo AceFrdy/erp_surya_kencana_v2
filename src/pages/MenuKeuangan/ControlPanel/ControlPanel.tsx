@@ -699,7 +699,7 @@ const ControlPanel = () => {
                             Last Week Rp.644.700,-
                         </div>
                     </div>
-                    <div className="panel overflow-hidden col-span-3">
+                    <div className="panel overflow-hidden col-span-4">
                         <div className="flex items-center justify-between">
                             <div>
                                 <div className="text-lg font-bold">Total Keseluruhan</div>
@@ -710,7 +710,7 @@ const ControlPanel = () => {
                             {/* <div className="absolute -bottom-12 ltr:-right-12 rtl:-left-12 w-24 h-24">
                                 <IconCircleCheck className="text-success opacity-20 w-full h-full" />
                             </div> */}
-                            <div className="grid grid-cols-3 xs:grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 justify-between flex gap-6">
+                            <div className="grid grid-cols-1 ss:grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 justify-between flex gap-6">
                                 <div className="panel bg-gray-400">
                                     <div className="text-dark">Saldo Akhir</div>
                                     <div className="mt-2 font-semibold text-2xl border-b border-b-gray-800">Rp.15.000.000,-</div>
