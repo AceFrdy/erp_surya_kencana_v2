@@ -11,6 +11,7 @@ import IconSend from '../../../components/Icon/IconSend';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import Pagination from '../../../components/Pagination';
+import IconDatabase from '../../../components/Icon/icon-database';
 
 interface DistributionListProps {
     id: number;
@@ -74,6 +75,11 @@ const Distribusi = () => {
     const [cabangList, setCabangList] = useState<CabangListProps[]>([]);
     const [productList, setProductList] = useState<ProductListProps[]>([]);
     const [unitList, setUnitList] = useState<UnitListProps[]>([]);
+
+    // not Found Data
+    const [notFoundData, setNotFoundData] = useState<string>('');
+
+    // pagination
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
@@ -132,7 +138,12 @@ const Distribusi = () => {
                 },
             })
             .then((response) => {
-                setInitialRecords(response.data.data.resource.data);
+                if ((response.data.data.resource.data = 'Data not available')) {
+                    setNotFoundData(response.data.data.resource.data);
+                } else {
+                    setInitialRecords(response.data.data.resource.data);
+                }
+
                 // page
                 setMetaLink(response.data.data.resource.meta);
                 setMetaLinksLink(response.data.data.resource.meta.links);
@@ -272,28 +283,28 @@ const Distribusi = () => {
                             <option>...</option>
                         </select>
                     </div>
-                    {/* <div>
-                        <label htmlFor="Opcost">Operasional Cost</label>
-                        <input id="Opcost" type="text" value={operasionalCost} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
-                    </div> */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="relative">
                             <label htmlFor="barcode">Barcode Produk</label>
-                            <input id="barcode" ref={ProductRef} type="text" className="form-input" placeholder="Pilih Produk Barcode" onChange={handleProductChange} autoComplete="off" />
+                            <input id="barcode" ref={ProductRef} type="text" className="form-input" placeholder="Produk Barcode" onChange={handleProductChange} autoComplete="off" />
                             {showProduct && (
-                                <div className="w-full flex flex-col absolute top-[70px] p-1 bg-white z-20 border border-zinc-100 rounded-md h-20 overflow-y-scroll">
-                                    {filteredProduct.map((item) => (
-                                        <button
-                                            className="h-10 w-full hover:bg-green-100 text-start flex px-5 rounded-md"
-                                            key={item.id}
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                handleProductClick(item.product_barcode);
-                                            }}
-                                        >
-                                            {item.product_barcode}
-                                        </button>
-                                    ))}
+                                <div className="w-full flex absolute top-[70px] p-1 bg-white z-20 border border-zinc-100 rounded-md">
+                                    <div className="h-40 overflow-y-scroll w-full">
+                                        <div className="h-auto flex flex-col w-full pb-[120px]">
+                                            {filteredProduct.map((item) => (
+                                                <button
+                                                    className="h-10 w-full hover:bg-green-100 text-start flex px-5 items-center rounded-md"
+                                                    key={item.id}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        handleProductClick(item.product_barcode);
+                                                    }}
+                                                >
+                                                    {item.product_barcode}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -303,21 +314,25 @@ const Distribusi = () => {
                         </div>
                         <div className="relative">
                             <label htmlFor="satuan">Satuan</label>
-                            <input id="satuan" ref={UnitRef} type="text" className="form-input" placeholder="Pilih Satuan Qty" onChange={handleUnitChange} autoComplete="off" />
+                            <input id="satuan" ref={UnitRef} type="text" className="form-input" placeholder="Satuan Qty" onChange={handleUnitChange} autoComplete="off" />
                             {showUnit && (
-                                <div className="w-full flex flex-col absolute top-[70px] p-1 bg-white z-20 border border-zinc-100 rounded-md h-40 overflow-y-scroll">
-                                    {filteredUnit.map((item) => (
-                                        <button
-                                            className="h-10 w-full hover:bg-green-100 text-start px-5 rounded-md"
-                                            key={item.id}
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                handleUnitClick(item.unit_stock_name);
-                                            }}
-                                        >
-                                            {item.unit_stock_name}
-                                        </button>
-                                    ))}
+                                <div className="w-full flex absolute top-[70px] p-1 bg-white z-20 border border-zinc-100 rounded-md">
+                                    <div className="h-40 overflow-y-scroll w-full">
+                                        <div className="h-auto flex flex-col w-full pb-[120px]">
+                                            {filteredUnit.map((item) => (
+                                                <button
+                                                    className="h-10 w-full hover:bg-green-100 text-start px-5 rounded-md"
+                                                    key={item.id}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        handleUnitClick(item.unit_stock_name);
+                                                    }}
+                                                >
+                                                    {item.unit_stock_name}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -329,48 +344,57 @@ const Distribusi = () => {
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5"></div>
                 <h5 className="font-semibold text-lg dark:text-white-light mb-4 mt-4 flex justify-center">Data Distribusi</h5>
                 <div className="datatables">
-                    <DataTable
-                        highlightOnHover
-                        className="whitespace-nowrap table-hover"
-                        records={initialRecords}
-                        columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
-                            {
-                                accessor: 'product.product_barcode',
-                                title: 'Barcode',
-                                sortable: true,
-                            },
-                            {
-                                accessor: 'product.product_name',
-                                title: 'Nama',
-                                sortable: true,
-                            },
-                            { accessor: 'distribution_qty', title: 'Qty', sortable: true },
-                            {
-                                accessor: 'action',
-                                title: 'Opsi',
-                                titleClassName: '!text-center',
-                                render: () => (
-                                    <div className="flex items-center w-max mx-auto gap-2">
-                                        {/* <button type="button" style={{ color: 'blue' }}>
+                    {notFoundData !== 'Data not available' ? (
+                        <DataTable
+                            highlightOnHover
+                            className="whitespace-nowrap table-hover"
+                            records={initialRecords}
+                            columns={[
+                                { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
+                                {
+                                    accessor: 'product.product_barcode',
+                                    title: 'Barcode',
+                                    sortable: true,
+                                },
+                                {
+                                    accessor: 'product.product_name',
+                                    title: 'Nama',
+                                    sortable: true,
+                                },
+                                { accessor: 'distribution_qty', title: 'Qty', sortable: true },
+                                {
+                                    accessor: 'action',
+                                    title: 'Opsi',
+                                    titleClassName: '!text-center',
+                                    render: () => (
+                                        <div className="flex items-center w-max mx-auto gap-2">
+                                            {/* <button type="button" style={{ color: 'blue' }}>
                                                     <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                                 </button> */}
-                                        <button type="button" style={{ color: 'orange' }} onClick={() => setEdit(true)}>
-                                            {/* <Link to="/menupenjualan/distribution/editdistribution"> */}
-                                            <IconPencil className="ltr:mr-2 rtl:ml-2" />
-                                            {/* </Link> */}
-                                        </button>
-                                        <button type="button" style={{ color: 'red' }} onClick={() => {}}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button>
-                                    </div>
-                                ),
-                            },
-                        ]}
-                        sortStatus={sortStatus}
-                        onSortStatusChange={setSortStatus}
-                        minHeight={200}
-                    />
+                                            <button type="button" style={{ color: 'orange' }} onClick={() => setEdit(true)}>
+                                                {/* <Link to="/menupenjualan/distribution/editdistribution"> */}
+                                                <IconPencil className="ltr:mr-2 rtl:ml-2" />
+                                                {/* </Link> */}
+                                            </button>
+                                            <button type="button" style={{ color: 'red' }} onClick={() => {}}>
+                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                            </button>
+                                        </div>
+                                    ),
+                                },
+                            ]}
+                            sortStatus={sortStatus}
+                            onSortStatusChange={setSortStatus}
+                            minHeight={200}
+                        />
+                    ) : (
+                        <div className="w-full h-[200px] flex justify-center flex-col border border-zinc-200 rounded-md items-center font-semibold gap-y-2">
+                            <div className="w-16 h-16 rounded-full bg-zinc-300 flex justify-center items-center">
+                                <IconDatabase className="w-8 h-8 text-white" />
+                            </div>
+                            Data Not Found
+                        </div>
+                    )}
                     {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                 </div>
             </div>
