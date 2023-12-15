@@ -4,11 +4,12 @@ import IconCreditCard from '../components/Icon/IconCreditCard';
 import IconHorizontalDots from '../components/Icon/IconHorizontalDots';
 import IconPlus from '../components/Icon/IconPlus';
 import IconTrendingUp from '../components/Icon/IconTrendingUp';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../store';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import IconMultipleForwardRight from '../components/Icon/IconMultipleForwardRight';
+import { setPageTitle } from '../store/themeConfigSlice';
 
 const Ecommerce = () => {
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
@@ -250,6 +251,10 @@ const Ecommerce = () => {
             },
         },
     };
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('E-Commerce'));
+    });
     const [loading] = useState(false);
     return (
         <div>

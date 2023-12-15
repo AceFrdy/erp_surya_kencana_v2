@@ -1,4 +1,4 @@
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Dropdown from '../components/Dropdown';
 import IconEye from '../components/Icon/IconEye';
 import IconHorizontalDots from '../components/Icon/IconHorizontalDots';
@@ -16,6 +16,8 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import ReactApexChart from 'react-apexcharts';
 import { Link } from 'react-router-dom';
 import IconMultipleForwardRight from '../components/Icon/IconMultipleForwardRight';
+import { useEffect } from 'react';
+import { setPageTitle } from '../store/themeConfigSlice';
 
 const Index = () => {
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
@@ -116,6 +118,10 @@ const Index = () => {
             },
         },
     };
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(setPageTitle('Dashboard'));
+    });
     return (
         <div>
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6 text-white">
