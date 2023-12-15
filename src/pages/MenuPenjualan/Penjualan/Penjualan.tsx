@@ -1,5 +1,5 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 // import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 // import { Dialog, Transition } from '@headlessui/react';
 // import IconPlus from '../../../components/Icon/IconPlus';
 // import IconNotes from '../../../components/Icon/IconNotes';
@@ -15,6 +15,7 @@ import Swal from 'sweetalert2';
 import IconSend from '../../../components/Icon/IconSend';
 import axios from 'axios';
 import Pagination from '../../../components/Pagination';
+import { toast } from 'react-toastify';
 // import * as Yup from 'yup';
 // import { Field, Form, Formik } from 'formik';
 
@@ -536,7 +537,12 @@ interface SaleOrderListProps {
 interface MetaLinkProps {
     current_page: number;
     last_page: number;
+    from: number;
+    to: number;
+    per_page: number;
+    total: number;
 }
+
 interface MetaLinksLinkProps {
     active: boolean;
     label: string;
@@ -555,20 +561,27 @@ interface FormState {
     id: number;
     name: string;
     branch_name: string;
-    product_price: number;
-    product_modal: number;
-    product_pos: string;
-    product_ecommers: string;
-    product_responsibility: string;
-    product_image: File | null;
     product_barcode: string;
-    product_ime: string;
-    product_weight: number;
+    sale_order_qty: number;
+    unit_stock_name: string;
+    unit_stock_id: number;
+    sale_order_discount: number;
+    branch_id: number;
 }
 
 interface CustomersList {
     id: number;
     name: string;
+}
+
+interface BarcodeDataProps {
+    id: number;
+    product_barcode: string;
+}
+
+interface UnitDataProps {
+    id: number;
+    unit_stock_name: string;
 }
 
 interface BranchDataProps {
@@ -634,6 +647,7 @@ const showAlert = async (type: number) => {
 };
 const Penjualan = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') || '';
     useEffect(() => {
         dispatch(setPageTitle('Penjualan'));
@@ -645,6 +659,8 @@ const Penjualan = () => {
     const [recordsData, setRecordsData] = useState(initialRecords);
     const [penjualan, setPenjualan] = useState([]);
     const [customer, setCustomer] = useState<CustomersList[]>([]);
+    const [barcodeProduk, setBarcodeProduk] = useState<BarcodeDataProps[]>([]);
+    const [unit, setUnit] = useState<UnitDataProps[]>([]);
     const [branch, setBranch] = useState<BranchDataProps[]>([]);
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
@@ -661,15 +677,12 @@ const Penjualan = () => {
         id: 0,
         name: '',
         branch_name: '',
-        product_price: 0,
-        product_modal: 0,
-        product_pos: '',
-        product_ecommers: '',
-        product_responsibility: '',
-        product_image: null,
         product_barcode: '',
-        product_ime: '',
-        product_weight: 0,
+        sale_order_qty: 0,
+        unit_stock_id: 0,
+        unit_stock_name: '',
+        sale_order_discount: 0,
+        branch_id: 0,
     });
 
     // const randomColor = () => {
@@ -744,18 +757,36 @@ const Penjualan = () => {
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/customers-offline', {
+            .get('https://erp.digitalindustryagency.com/api/products', {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {
-                const customer = response.data.data.resource;
-                setInitialRecords(customer);
-                setCustomer(customer);
-                setRecordsData(customer);
-                console.log("CUSTOMER", customer);
+                const barcodeProduk = response.data.data.resource.data;
+                setInitialRecords(barcodeProduk);
+                setBarcodeProduk(barcodeProduk);
+                setRecordsData(barcodeProduk);
+                // console.log('BARCODE', barcodeProduk);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+
+        axios
+            .get('https://erp.digitalindustryagency.com/api/unit-stock', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const unit = response.data.data.resource.data;
+                setInitialRecords(unit);
+                setUnit(unit);
+                setRecordsData(unit);
+                // console.log('UNIT', unit);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -773,7 +804,7 @@ const Penjualan = () => {
                 setInitialRecords(branch);
                 setBranch(branch);
                 setRecordsData(branch);
-                console.log("BRANCH", branch);
+                // console.log('BRANCH', branch);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -798,8 +829,6 @@ const Penjualan = () => {
 
     const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/sale-orders');
 
-    // console.log('alert', metaLink, metaLinksLink, linksLink);
-
     useEffect(() => {
         axios
             .get(url, {
@@ -809,11 +838,9 @@ const Penjualan = () => {
                 },
             })
             .then((response) => {
-                // console.log('data', response.data.data.resource.data_order);
                 const penjualan = response.data.data.resource.data_order.data;
                 setInitialRecords(penjualan);
-                setPenjualan(penjualan);
-                console.log("PENJUALAN", penjualan);
+                // console.log('PENJUALAN', penjualan);
                 // page
                 // setMetaLink(response.data.data.resource.meta);
                 // setMetaLinksLink(response.data.data.resource.meta.links);
@@ -824,28 +851,46 @@ const Penjualan = () => {
             });
     }, [url]);
 
-    // useEffect(() => {
-    //     axios
-    //         .get('https://erp.digitalindustryagency.com/api/sale-orders', {
-    //             headers: {
-    //                 Accept: 'application/json',
-    //                 Authorization: `Bearer ${token}`,
-    //             },
-    //         })
-    //         .then((response) => {
-    //             console.log('API Response:', response.data.data.resource.data_order);
-    //             const penjualan = response.data.data.resource.data_order;
-    //             console.log('Penjualan before setting state:', penjualan);
-    //             setPenjualan(penjualan);
-    //             console.log('Penjualan after setting state:', penjualan);
-    //             setInitialRecords(penjualan);
-    //             setRecordsData(penjualan);
-    //             console.log(penjualan);
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error fetching data:', error);
-    //         });
-    // }, []);
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
+
+        const data = {
+            product_barcode: formData.product_barcode,
+            sale_order_qty: formData.sale_order_qty,
+            unit_stock_id: formData.unit_stock_id,
+            sale_order_discount: formData.sale_order_discount,
+            branch_id: formData.branch_id,
+        };
+
+        console.log('DATA SENT:', data);
+
+        axios
+            .post('https://erp.digitalindustryagency.com/api/sale-orders', data, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                console.log('Data penjualan berhasil ditambahkan:', response.data);
+                navigate('/menupenjualan/penjualan/penjualan');
+                toast.success('Data berhasil ditambahkan', {
+                    position: 'top-right',
+                    autoClose: 3000,
+                });
+            })
+            .catch((error) => {
+                if (error.response && error.response.data) {
+                    const apiErrors = error.response.data;
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        errors: apiErrors,
+                    }));
+                }
+                console.error('Error adding penjualan data:', error);
+                toast.error('Error adding data');
+            });
+    };
 
     return (
         <div>
@@ -880,17 +925,11 @@ const Penjualan = () => {
                             className="whitespace-nowrap table-hover"
                             records={initialRecords}
                             columns={[
-                                // { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                                { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                                 {
                                     accessor: 'sale_order_invoice',
-                                    title: 'Barcode',
+                                    title: 'Invoice',
                                     sortable: true,
-                                    // render: ({ id }) => (
-                                    //     <div className="flex items-center w-max">
-                                    //         <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
-                                    //         {/* <div>{firstName + ' ' + lastName}</div> */}
-                                    //     </div>
-                                    // ),
                                 },
                                 { accessor: 'product.product_name', title: 'Nama', sortable: true },
                                 { accessor: 'sale_order_qty', title: 'Qty', sortable: true },
@@ -898,7 +937,6 @@ const Penjualan = () => {
                                     accessor: 'sale_order_total',
                                     title: 'Harga',
                                     sortable: true,
-                                    // render: ({ dob }) => <div>{formatDate(dob)}</div>,
                                 },
                                 {
                                     accessor: 'sale_order_sub_total',
@@ -923,13 +961,13 @@ const Penjualan = () => {
                                     Showing <span>1</span> to <span>10</span> of <span>10</span> entries
                                 </p>
                             </div>
-                            {metaLink && linksLink && <Pagination currentPage={metaLink.current_page} linksMeta={metaLinksLink} lastPage={metaLink.last_page} links={linksLink} setUrl={setUrl} />}
+                            {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                         </div>
                     </div>
-                    <form className="space-y-5 panel xl:col-span-1">
+                    <form className="space-y-5 panel xl:col-span-1" onSubmit={handleSubmit}>
                         <h1 className="font-semibold text-xl dark:text-white-light mb-2 justify-center flex">Penjualan</h1>
                         <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
-                            <div>
+                            {/* <div>
                                 <label htmlFor="gridCustomer">Customer</label>
                                 <select id="gridCustomer" className="form-select text-white-dark" name="id" value={formData.id} onChange={handleChange}>
                                     <option>Choose...</option>
@@ -939,10 +977,40 @@ const Penjualan = () => {
                                         </option>
                                     ))}
                                 </select>
+                            </div> */}
+                            <div>
+                                <label htmlFor="gridCustomer">Product Barcode</label>
+                                <select id="gridCustomer" className="form-select text-white-dark" name="product_barcode" value={formData.product_barcode} onChange={handleChange}>
+                                    <option>Choose...</option>
+                                    {barcodeProduk.map((item) => (
+                                        <option key={item.id} value={item.product_barcode}>
+                                            {item.product_barcode}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label htmlFor="gridTotal">Jumlah Penjualan</label>
+                                <input id="gridTotal" type="text" placeholder="Jumlah penjualan" className="form-input" name="sale_order_qty" value={formData.sale_order_qty} onChange={handleChange} />
+                            </div>
+                            <div>
+                                <label htmlFor="gridUnit">Unit</label>
+                                <select id="gridUnit" className="form-select text-white-dark" name="unit_stock_id" value={formData.unit_stock_id} onChange={handleChange}>
+                                    <option>Choose...</option>
+                                    {unit.map((item) => (
+                                        <option value={item.id} key={item.id}>
+                                            {item.unit_stock_name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label htmlFor="gridDiskon">Diskon Penjualan</label>
+                                <input id="gridDiskon" type="text" placeholder="Diskon penjualan" className="form-input" name="sale_order_discount" value={formData.sale_order_discount} onChange={handleChange}/>
                             </div>
                             <div>
                                 <label htmlFor="gridCabang">Cabang</label>
-                                <select id="gridCabang" className="form-select text-white-dark" name="id" >
+                                <select id="gridCabang" className="form-select text-white-dark" name="branch_id" value={formData.branch_id} onChange={handleChange}>
                                     <option>Choose...</option>
                                     {branch.map((item) => (
                                         <option value={item.id} key={item.id}>
@@ -953,21 +1021,9 @@ const Penjualan = () => {
                             </div>
                         </div>
                         <div>
-                            <label htmlFor="gridTotal">Total :</label>
-                            <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="1234 Main St" className="form-input" />
-                        </div>
-                        <div>
-                            <label htmlFor="Cost">Cash</label>
-                            <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input" />
-                        </div>
-                        <div>
                             <button type="submit" className="btn btn-primary !mt-6 w-full">
                                 Submit
                             </button>
-                        </div>
-                        <div>
-                            <label htmlFor="gridTotal">Kembalian :</label>
-                            <input id="gridTotal" type="text" placeholder="Enter Address" defaultValue="1234 Main St" className="form-input" />
                         </div>
                         {/* <div>
                             <label className="flex items-center mt-1 cursor-pointer">
