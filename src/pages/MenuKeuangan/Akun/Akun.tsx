@@ -112,32 +112,7 @@ const Akun = () => {
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
-    const formatDate = (date: string | number | Date) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
-        }
-        return '';
-    };
 
-    const [cost, setCost] = useState('');
-
-    const handleCostChange = (e: { target: { value: any } }) => {
-        const inputValue = e.target.value;
-        let formatValue = '';
-
-        // Remove non-numeric characters
-        const numValue = inputValue.replace(/\D/g, '');
-
-        // Format the number with 'Rp.' prefix
-        if (numValue !== '') {
-            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-        }
-
-        setCost(formatValue);
-    };
 
 
     return (
@@ -182,6 +157,7 @@ const Akun = () => {
                         columns={[
                             { accessor: 'acc_code', title: 'Kode Akun', sortable: true },
                             { accessor: 'acc_type', title: 'Jenis Akun', sortable: true },
+                            { accessor: 'acc_group_name', title: 'Group Akun', sortable: true },
 
                             {
                                 accessor: 'action',
@@ -190,15 +166,14 @@ const Akun = () => {
                                 render: (row) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'blue' }}>
-                                            <Link to={`/menukeuangan/akun/detailakun/${row.id}`}>
+                                            <Link to={`/menukeuangan/akun/detailakun`}>
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
                                         <Link to={`/menukeuangan/akun/editakun/${row.id}`}>
                                             <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                         </Link>
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-akun', row.id)}> */}
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => handleDelete(row.id)}> */}
+                                       
                                         <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-akun', row.id)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
