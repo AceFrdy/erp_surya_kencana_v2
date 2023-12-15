@@ -1,6 +1,5 @@
 import { clsx } from '@mantine/core';
-import React, { Dispatch, SetStateAction } from 'react';
-import { Link } from 'react-router-dom';
+import { Dispatch, SetStateAction } from 'react';
 
 interface LinkProps {
     prev: string;
@@ -15,156 +14,125 @@ interface LinksMetaProps {
     url: string;
 }
 
-const Pagination = ({
-    currentPage,
-    links,
-    lastPage,
-    linksMeta,
-    setUrl,
-}: {
-    currentPage: number;
-    lastPage: number;
-    linksMeta: LinksMetaProps[];
-    links: LinkProps;
-    setUrl: Dispatch<SetStateAction<string>>;
-}) => {
+interface MetaLinkProps {
+    current_page: number;
+    last_page: number;
+    from: number;
+    to: number;
+    per_page: number;
+    total: number;
+}
+
+const Pagination = ({ links, metaLink, linksMeta, setUrl }: { metaLink: MetaLinkProps; linksMeta: LinksMetaProps[]; links: LinkProps; setUrl: Dispatch<SetStateAction<string>> }) => {
     return (
-        <div className="col-span-12 h-11 w-full flex text-white ">
-            {linksMeta.length > 2 && (
-                <div className="h-11 grid w-full grid-cols-12">
-                    <div className="col-span-12 h-11 grid md:hidden grid-cols-12">
-                        {links.prev ? (
-                            <button className="col-span-2 h-full bg-emerald-600 flex justify-center items-center rounded-md text-sm font-medium" onClick={() => setUrl(links.prev)}>
-                                <LeftIcon />
+        <div className="flex w-full mt-8 items-center flex-col sm:flex-row gap-y-8">
+            <div className="w-full flex flex-col sm:flex-row justify-center items-center sm:justify-start">
+                <p>
+                    Showing <span>{metaLink.from}</span> to <span>{metaLink.to}</span> of <span>{metaLink.total}</span> entries
+                </p>
+                <p className="flex">
+                    <span className="hidden sm:flex mx-2">-</span> rows per page <span className="ml-1">{metaLink.per_page}</span>
+                </p>
+            </div>
+            <div className="w-full h-9 flex gap-x-2 text-white justify-center sm:justify-end">
+                {/* page > 3 */}
+                <button
+                    onClick={() => setUrl(links.prev)}
+                    className={clsx(
+                        links.prev ? 'bg-emerald-700 hover:bg-emerald-700' : 'disabled:bg-slate-200 cursor-not-allowed text-slate-400',
+                        'w-9 h-9 rounded-full  flex justify-center items-center'
+                    )}
+                    disabled={!links.prev}
+                >
+                    <LeftIcon />
+                </button>
+                {linksMeta.length >= 5 && (
+                    <button className={clsx('w-9 h-9 border border-emerald-700/50 text-emerald-700 hidden rounded-full sm:flex justify-center items-center')} disabled>
+                        ...
+                    </button>
+                )}
+                {/* page > 3 */}
+                {/* ------------------------------ */}
+                {/* page 1/2 */}
+                {linksMeta.length <= 5 ? (
+                    <div>
+                        {linksMeta.slice(1, metaLink.last_page + 1).map((item) => (
+                            <button
+                                onClick={() => setUrl(item.url)}
+                                className={clsx(item.active ? 'bg-emerald-700' : 'bg-emerald-600', ' w-9 h-9 rounded-full  hover:bg-emerald-700 flex justify-center items-center')}
+                                key={item.label}
+                            >
+                                {item.label}
                             </button>
-                        ) : (
-                            <span className="col-span-2 h-full bg-zinc-400/70 rounded-md flex justify-center items-center text-sm font-medium cursor-not-allowed">
-                                <LeftIcon />
-                            </span>
-                        )}
-                        {links.next ? (
-                            <button className="col-span-2 col-start-11 h-full bg-emerald-600 flex justify-center items-center rounded-md text-sm font-medium" onClick={() => setUrl(links.next)}>
-                                <RightIcon />
-                            </button>
-                        ) : (
-                            <span className="col-span-2 col-start-11 h-full bg-zinc-400/70 rounded-md flex justify-center items-center text-sm font-medium cursor-not-allowed">
-                                <RightIcon />
-                            </span>
-                        )}
+                        ))}
                     </div>
-                    <div className="col-span-12 h-11 md:grid hidden grid-cols-12">
-                        {linksMeta.length > 5 ? (
-                            <div className="col-span-2">
-                                {currentPage <= 2 ? (
-                                    <span className="w-full h-full bg-zinc-400/70 rounded-md flex justify-center items-center text-sm font-medium cursor-not-allowed">First</span>
-                                ) : (
+                ) : (
+                    // page > 3
+                    <div className="h-9 flex gap-x-2 text-white justify-end">
+                        {/* page > 3 but current page === 1 */}
+                        {metaLink.current_page === 1 ? (
+                            <div>
+                                {linksMeta.slice(1, metaLink.last_page + 1).map((item) => (
                                     <button
-                                        className="w-full h-full bg-emerald-600 flex justify-center items-center rounded-md text-sm font-medium hover:bg-emerald-700"
-                                        onClick={() => setUrl(links.first)}
+                                        onClick={() => setUrl(item.url)}
+                                        className={clsx(item.active ? 'bg-emerald-700' : 'bg-emerald-600', 'w-9 h-9 rounded-full  hover:bg-emerald-700 flex justify-center items-center')}
+                                        key={item.label}
                                     >
-                                        First
+                                        {item.label}
                                     </button>
-                                )}
+                                ))}
                             </div>
                         ) : (
-                            <div className="col-span-2"></div>
-                        )}
-                        <div className="col-span-8 grid h-11 grid-cols-9">
-                            {linksMeta.length > 5 ? (
-                                <div className="col-span-9 grid h-11 grid-cols-9">
-                                    {currentPage == 1 ? (
-                                        <div className="col-span-3 col-start-4 grid gap-x-2 h-11 grid-cols-3">
-                                            <span className="col-span-1 place-items-center grid rounded bg-zinc-400/70 cursor-not-allowed">...</span>
-                                            {linksMeta.slice(1, currentPage + 2).map((item) => (
-                                                <button
-                                                    onClick={() => setUrl(item.url)}
-                                                    key={item.label}
-                                                    className={clsx(item.active ? 'bg-emerald-500' : 'bg-emerald-600', 'col-span-1 place-items-center grid rounded hover:bg-emerald-700')}
-                                                >
-                                                    {item.label} ==1
-                                                </button>
-                                            ))}
-                                        </div>
-                                    ) : currentPage == lastPage ? (
-                                        <div className="col-span-3 col-start-4 grid gap-x-2 h-11 grid-cols-3">
-                                            {linksMeta.slice(currentPage - 1, currentPage + 1).map((item) => (
-                                                <button
-                                                    onClick={() => setUrl(item.url)}
-                                                    key={item.label}
-                                                    className={clsx(item.active ? 'bg-emerald-500' : 'bg-emerald-600', 'col-span-1 place-items-center grid rounded hover:bg-emerald-700')}
-                                                >
-                                                    {item.label} ==2
-                                                </button>
-                                            ))}
-                                            <span className="col-span-1 place-items-center cursor-not-allowed grid rounded bg-zinc-400/70">...</span>
-                                        </div>
-                                    ) : (
-                                        <div className="col-span-3 col-start-4 grid gap-x-2 h-11 grid-cols-3">
-                                            {linksMeta.slice(currentPage - 1, currentPage + 2).map((item) => (
-                                                <button
-                                                    onClick={() => setUrl(item.url)}
-                                                    key={item.label}
-                                                    className={clsx(item.active ? 'bg-emerald-500' : 'bg-emerald-600', 'col-span-1 place-items-center grid rounded hover:bg-emerald-700')}
-                                                >
-                                                    {item.label} ==3
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            ) : linksMeta.length <= 5 ? (
-                                <div className="col-span-9 grid h-11 grid-cols-9">
-                                    {linksMeta.length == 4 ? (
-                                        // page 4
-                                        <div className="col-span-12 grid grid-cols-8">
-                                            <div className="col-span-2 col-start-4 grid gap-x-5 h-11 grid-cols-2">
-                                                {linksMeta.slice(1, lastPage + 1).map((item) => (
-                                                    <button
-                                                        onClick={() => setUrl(item.url)}
-                                                        key={item.label}
-                                                        className={clsx(item.active ? 'bg-emerald-500' : 'bg-emerald-600', 'col-span-1 place-items-center grid rounded hover:bg-emerald-700')}
-                                                    >
-                                                        {item.label} ==4
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        // page 1
-                                        <div className="col-span-3 col-start-4 grid gap-x-2 h-11 grid-cols-3">
-                                            {linksMeta.slice(1, lastPage + 1).map((item) => (
-                                                <button
-                                                    onClick={() => setUrl(item.url)}
-                                                    key={item.label}
-                                                    className={clsx(item.active ? 'bg-emerald-500' : 'bg-emerald-600', 'col-span-1 place-items-center grid rounded hover:bg-emerald-700')}
-                                                >
-                                                    {item.label} ===0
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            ) : null}
-                        </div>
-                        {linksMeta.length > 5 ? (
-                            <div className="col-span-2 col-start-11">
-                                {currentPage > lastPage - 2 ? (
-                                    <span className="w-full h-full bg-zinc-400/70 rounded-md flex justify-center items-center text-sm font-medium cursor-not-allowed">Last</span>
+                            // page > 3 but current page !== 1
+                            <div className="h-9 flex gap-x-2 text-white justify-end">
+                                {/* page > 3 but current page === last page */}
+                                {metaLink.current_page === metaLink.last_page ? (
+                                    <div className="h-9 flex gap-x-2 text-white justify-end">
+                                        {linksMeta.slice(metaLink.last_page - 1, metaLink.last_page + 1).map((item) => (
+                                            <button
+                                                onClick={() => setUrl(item.url)}
+                                                className={clsx(item.active ? 'bg-emerald-700' : 'bg-emerald-600', 'w-9 h-9 rounded-full  hover:bg-emerald-700 flex justify-center items-center')}
+                                                key={item.label}
+                                            >
+                                                {item.label}
+                                            </button>
+                                        ))}
+                                    </div>
                                 ) : (
-                                    <button
-                                        className="w-full h-full bg-emerald-600 flex justify-center items-center rounded-md text-sm font-medium hover:bg-emerald-700"
-                                        onClick={() => setUrl(links.last)}
-                                    >
-                                        Last
-                                    </button>
+                                    <div className="h-9 flex gap-x-2 text-white justify-end">
+                                        {/* page > 3 but current page !== last page || current page !== 1 */}
+                                        {linksMeta.slice(metaLink.current_page - 1, metaLink.current_page + 1).map((item) => (
+                                            <button
+                                                onClick={() => setUrl(item.url)}
+                                                className={clsx(item.active ? 'bg-emerald-700' : 'bg-emerald-600', 'w-9 h-9 rounded-full  hover:bg-emerald-700 flex justify-center items-center')}
+                                                key={item.label}
+                                            >
+                                                {item.label}
+                                            </button>
+                                        ))}
+                                    </div>
                                 )}
                             </div>
-                        ) : (
-                            <div className="col-span-2 col-start-11" />
                         )}
                     </div>
-                </div>
-            )}
+                )}
+                {/* page > 3 */}
+                {linksMeta.length >= 5 && (
+                    <button className={clsx('w-9 h-9 rounded-full border border-emerald-700/50 text-emerald-700 hidden sm:flex justify-center items-center')} disabled>
+                        ...
+                    </button>
+                )}
+                <button
+                    onClick={() => setUrl(links.next)}
+                    className={clsx(
+                        links.next ? 'bg-emerald-700 hover:bg-emerald-700' : 'disabled:bg-slate-200 cursor-not-allowed text-slate-400',
+                        'w-9 h-9 rounded-full  flex justify-center items-center'
+                    )}
+                    disabled={!links.next}
+                >
+                    <RightIcon />
+                </button>
+            </div>
         </div>
     );
 };
