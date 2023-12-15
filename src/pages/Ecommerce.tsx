@@ -373,7 +373,7 @@ const Ecommerce = () => {
                                 <IconCreditCard />
                             </button>
                         </div> */}
-                        <button type="button" className="btn btn-gradient !mt-6 w-[50%] border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
+                        <button type="button" className="btn btn-gradient !mt-6 border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
                             E-commerce
                         </button>
                     </div>
