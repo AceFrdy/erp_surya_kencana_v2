@@ -1,5 +1,5 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
@@ -13,6 +13,8 @@ import { Link } from 'react-router-dom';
 // import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
 import IconSend from '../../../components/Icon/IconSend';
+import axios from 'axios';
+import Pagination from '../../../components/Pagination';
 // import * as Yup from 'yup';
 // import { Field, Form, Formik } from 'formik';
 
@@ -519,6 +521,61 @@ const rowData = [
     },
 ];
 
+interface SaleOrderListProps {
+    id: number;
+    sale_order_invoice: string;
+    product: {
+        product_barcode: string;
+        product_name: string;
+    };
+    sale_order_qty: number;
+    sale_order_total: number;
+    sale_order_sub_total: number;
+}
+
+interface MetaLinkProps {
+    current_page: number;
+    last_page: number;
+}
+interface MetaLinksLinkProps {
+    active: boolean;
+    label: string;
+    url: string;
+}
+
+interface LinksLinkProps {
+    first: string;
+    last: string;
+    next: string;
+    prev: string;
+}
+
+interface FormState {
+    product_category_id: number;
+    id: number;
+    name: string;
+    branch_name: string;
+    product_price: number;
+    product_modal: number;
+    product_pos: string;
+    product_ecommers: string;
+    product_responsibility: string;
+    product_image: File | null;
+    product_barcode: string;
+    product_ime: string;
+    product_weight: number;
+}
+
+interface CustomersList {
+    id: number;
+    name: string;
+}
+
+interface BranchDataProps {
+    id: number;
+    branch_name: string;
+}
+
 const showAlert = async (type: number) => {
     if (type === 11) {
         const swalWithBootstrapButtons = Swal.mixin({
@@ -577,19 +634,42 @@ const showAlert = async (type: number) => {
 };
 const Penjualan = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') || '';
     useEffect(() => {
         dispatch(setPageTitle('Penjualan'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
+    const [initialRecords, setInitialRecords] = useState<SaleOrderListProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
+    const [penjualan, setPenjualan] = useState([]);
+    const [customer, setCustomer] = useState<CustomersList[]>([]);
+    const [branch, setBranch] = useState<BranchDataProps[]>([]);
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
 
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
+    });
+
+    const [formData, setFormData] = useState<FormState>({
+        product_category_id: 0,
+        id: 0,
+        name: '',
+        branch_name: '',
+        product_price: 0,
+        product_modal: 0,
+        product_pos: '',
+        product_ecommers: '',
+        product_responsibility: '',
+        product_image: null,
+        product_barcode: '',
+        product_ime: '',
+        product_weight: 0,
     });
 
     // const randomColor = () => {
@@ -611,23 +691,23 @@ const Penjualan = () => {
     useEffect(() => {
         const from = (page - 1) * pageSize;
         const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
+        // setRecordsData([...initialRecords.slice(from, to)]);
     }, [page, pageSize, initialRecords]);
 
-    useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
-                return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
-                );
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search]);
+    // useEffect(() => {
+    //     setInitialRecords(() => {
+    //         return rowData.filter((item) => {
+    //             return (
+    //                 item.id.toString().includes(search.toLowerCase()) ||
+    //                 item.firstName.toLowerCase().includes(search.toLowerCase()) ||
+    //                 item.dob.toLowerCase().includes(search.toLowerCase()) ||
+    //                 item.email.toLowerCase().includes(search.toLowerCase()) ||
+    //                 item.phone.toLowerCase().includes(search.toLowerCase())
+    //             );
+    //         });
+    //     });
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -661,6 +741,112 @@ const Penjualan = () => {
 
         setCost(formatValue);
     };
+
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/customers-offline', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const customer = response.data.data.resource;
+                setInitialRecords(customer);
+                setCustomer(customer);
+                setRecordsData(customer);
+                console.log("CUSTOMER", customer);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+
+        axios
+            .get('https://erp.digitalindustryagency.com/api/branches', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const branch = response.data.data.resource.data;
+                setInitialRecords(branch);
+                setBranch(branch);
+                setRecordsData(branch);
+                console.log("BRANCH", branch);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    }, []);
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+        if (type === 'checkbox') {
+            const checkboxValue = (e.target as HTMLInputElement).checked ? 'yes' : '';
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: checkboxValue,
+            }));
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        }
+    };
+
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/sale-orders');
+
+    // console.log('alert', metaLink, metaLinksLink, linksLink);
+
+    useEffect(() => {
+        axios
+            .get(url, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                // console.log('data', response.data.data.resource.data_order);
+                const penjualan = response.data.data.resource.data_order.data;
+                setInitialRecords(penjualan);
+                setPenjualan(penjualan);
+                console.log("PENJUALAN", penjualan);
+                // page
+                // setMetaLink(response.data.data.resource.meta);
+                // setMetaLinksLink(response.data.data.resource.meta.links);
+                // setLinksLink(response.data.data.resource.links);
+            })
+            .catch((err: any) => {
+                console.log('PENJUALAN', err.message);
+            });
+    }, [url]);
+
+    // useEffect(() => {
+    //     axios
+    //         .get('https://erp.digitalindustryagency.com/api/sale-orders', {
+    //             headers: {
+    //                 Accept: 'application/json',
+    //                 Authorization: `Bearer ${token}`,
+    //             },
+    //         })
+    //         .then((response) => {
+    //             console.log('API Response:', response.data.data.resource.data_order);
+    //             const penjualan = response.data.data.resource.data_order;
+    //             console.log('Penjualan before setting state:', penjualan);
+    //             setPenjualan(penjualan);
+    //             console.log('Penjualan after setting state:', penjualan);
+    //             setInitialRecords(penjualan);
+    //             setRecordsData(penjualan);
+    //             console.log(penjualan);
+    //         })
+    //         .catch((error) => {
+    //             console.error('Error fetching data:', error);
+    //         });
+    // }, []);
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -680,9 +866,8 @@ const Penjualan = () => {
             </div> */}
             <div className="panel mt-6">
                 <h1 className="text-lg font-bold flex justify-center mb-4">Data Penjualan</h1>
-                
+
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    
                     <div className="ltr:mr-auto rtl:ml-auto">
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
@@ -693,61 +878,77 @@ const Penjualan = () => {
                         <DataTable
                             highlightOnHover
                             className="whitespace-nowrap table-hover"
-                            records={recordsData}
+                            records={initialRecords}
                             columns={[
-                                { accessor: 'id', title: 'No', sortable: true },
+                                // { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
                                 {
-                                    accessor: 'age',
+                                    accessor: 'sale_order_invoice',
                                     title: 'Barcode',
                                     sortable: true,
-                                    render: ({ id }) => (
-                                        <div className="flex items-center w-max">
-                                            <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
-                                            {/* <div>{firstName + ' ' + lastName}</div> */}
-                                        </div>
-                                    ),
+                                    // render: ({ id }) => (
+                                    //     <div className="flex items-center w-max">
+                                    //         <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
+                                    //         {/* <div>{firstName + ' ' + lastName}</div> */}
+                                    //     </div>
+                                    // ),
                                 },
-                                { accessor: 'firstName', title: 'Nama', sortable: true },
-                                { accessor: 'age', title: 'Qty', sortable: true },
+                                { accessor: 'product.product_name', title: 'Nama', sortable: true },
+                                { accessor: 'sale_order_qty', title: 'Qty', sortable: true },
                                 {
-                                    accessor: 'dob',
+                                    accessor: 'sale_order_total',
                                     title: 'Harga',
                                     sortable: true,
-                                    render: ({ dob }) => <div>{formatDate(dob)}</div>,
+                                    // render: ({ dob }) => <div>{formatDate(dob)}</div>,
                                 },
                                 {
-                                    accessor: 'age',
+                                    accessor: 'sale_order_sub_total',
                                     title: 'Sub Total',
                                     sortable: true,
                                 },
                             ]}
-                            totalRecords={initialRecords.length}
-                            recordsPerPage={pageSize}
-                            page={page}
-                            onPageChange={(p) => setPage(p)}
-                            recordsPerPageOptions={PAGE_SIZES}
-                            onRecordsPerPageChange={setPageSize}
+                            // totalRecords={initialRecords.length}
+                            // recordsPerPage={pageSize}
+                            // page={page}
+                            // onPageChange={(p) => setPage(p)}
+                            // recordsPerPageOptions={PAGE_SIZES}
+                            // onRecordsPerPageChange={setPageSize}
                             sortStatus={sortStatus}
                             onSortStatusChange={setSortStatus}
                             minHeight={200}
-                            paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
+                            // paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                         />
+                        <div className="flex w-full mt-8">
+                            <div className="w-full flex">
+                                <p>
+                                    Showing <span>1</span> to <span>10</span> of <span>10</span> entries
+                                </p>
+                            </div>
+                            {metaLink && linksLink && <Pagination currentPage={metaLink.current_page} linksMeta={metaLinksLink} lastPage={metaLink.last_page} links={linksLink} setUrl={setUrl} />}
+                        </div>
                     </div>
                     <form className="space-y-5 panel xl:col-span-1">
                         <h1 className="font-semibold text-xl dark:text-white-light mb-2 justify-center flex">Penjualan</h1>
                         <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
                             <div>
                                 <label htmlFor="gridCustomer">Customer</label>
-                                <select id="gridCustomer" className="form-select text-white-dark">
+                                <select id="gridCustomer" className="form-select text-white-dark" name="id" value={formData.id} onChange={handleChange}>
                                     <option>Choose...</option>
-                                    <option>...</option>
+                                    {customer.map((item) => (
+                                        <option key={item.id} value={item.id}>
+                                            {item.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div>
                                 <label htmlFor="gridCabang">Cabang</label>
-                                <select id="gridCabang" className="form-select text-white-dark">
+                                <select id="gridCabang" className="form-select text-white-dark" name="id" >
                                     <option>Choose...</option>
-                                    <option>...</option>
+                                    {branch.map((item) => (
+                                        <option value={item.id} key={item.id}>
+                                            {item.branch_name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
