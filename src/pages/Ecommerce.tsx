@@ -353,28 +353,28 @@ const Ecommerce = () => {
                 </div>
 
                 <div
-                    className="panel h-full overflow-hidden before:bg-[#1937cc] before:absolute before:-right-44 before:top-0 before:bottom-0 before:m-auto before:rounded-full before:w-96 before:h-96 grid grid-cols-1 content-between"
-                    style={{ background: 'linear-gradient(0deg,#00c6fb -227%,#005bea)' }}
+                    className="panel h-full overflow-hidden before:bg-[#304D30] before:absolute before:-right-44 before:top-0 before:bottom-0 before:m-auto before:rounded-full before:w-96 before:h-96 grid grid-cols-1 content-between"
+                    style={{ background: 'linear-gradient(0deg,#304D30 -227%,#B6C4B6)' }}
                 >
                     <div className="flex items-start justify-between text-white-light mb-16 z-[7]">
-                        <h5 className="font-semibold text-lg">Total Balance</h5>
+                        <h5 className="font-semibold text-lg text-dark">Login E-commerce</h5>
 
-                        <div className="relative text-xl whitespace-nowrap">
+                        {/* <div className="relative text-xl whitespace-nowrap">
                             $ 41,741.42
                             <span className="table text-[#d3d3d3] bg-[#4361ee] rounded p-1 text-xs mt-1 ltr:ml-auto rtl:mr-auto">+ 2453</span>
-                        </div>
+                        </div> */}
                     </div>
                     <div className="flex items-center justify-between z-10">
-                        <div className="flex items-center justify-between">
+                        {/* <div className="flex items-center justify-between">
                             <button type="button" className="shadow-[0_0_2px_0_#bfc9d4] rounded p-1 text-white-light hover:bg-[#1937cc] place-content-center ltr:mr-2 rtl:ml-2">
                                 <IconPlus />
                             </button>
                             <button type="button" className="shadow-[0_0_2px_0_#bfc9d4] rounded p-1 text-white-light hover:bg-[#1937cc] grid place-content-center">
                                 <IconCreditCard />
                             </button>
-                        </div>
-                        <button type="button" className="shadow-[0_0_2px_0_#bfc9d4] rounded p-1 text-white-light hover:bg-[#4361ee] z-10">
-                            Upgrade
+                        </div> */}
+                        <button type="button" className="btn btn-gradient !mt-6 w-[50%] border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
+                            E-commerce
                         </button>
                     </div>
                 </div>
