@@ -3,12 +3,20 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+interface AkunDataProps {
+ 
+    acc_type: string;
+    acc_group_name: string;
+    acc_info: string;
+    // branch_address: string;
+}
+
 const EditAkun = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') || '';
 
-    const [akunData, setAkunData] = useState({
+    const [formData, setFormData] = useState<AkunDataProps>({
         acc_type: '',
         acc_group_name: '',
         acc_info: '',
@@ -24,35 +32,41 @@ const EditAkun = () => {
             })
             .then((response) => {
                 const accountData = response.data.data.resource;
-                setAkunData({
+                setFormData((prev) => ({
+                    ...prev,
                     acc_type: accountData.acc_type,
                     acc_group_name: accountData.acc_group_name,
                     acc_info: accountData.acc_info,
                     // Set data lainnya sesuai dengan respons
-                });
+                }));
+                console.log('dataForm :', response.data.data.resource);
             })
             .catch((error) => {
                 console.error('Error fetching account data:', error);
                 toast.error('Error fetching data');
             });
-    }, [id, token]);
+    }, []);
 
-    const handleInputChange = (event:ChangeEvent<HTMLInputElement>) => {
-      event.preventDefault();
-       const { name, value } = event.target;
-        setAkunData(prevData => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
+  // Update the state for each input field
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const {name, value} = e.target ;
+    setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+    }));
+};
 
 
     const handleSubmit = async (event:FormEvent) => {
         event.preventDefault();
-        console.log('Submitting the following data:', akunData); // Log data yang akan dikirim
-
+        console.log('Submitting the following data:', formData); // Log data yang akan dikirim
+        const data = {
+            acc_type: formData.acc_type,
+            acc_group_name: formData.acc_group_name,
+            acc_info: formData.acc_info
+        };
         try {
-            const response = await axios.put(`https://erp.digitalindustryagency.com/api/accounts/${id}`, akunData, {
+            const response = await axios.put(`https://erp.digitalindustryagency.com/api/accounts/${id}`, data, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
@@ -91,7 +105,7 @@ const EditAkun = () => {
                 <form className="space-y-5" onSubmit={handleSubmit}>
                     <div>
                         <label htmlFor="gridState">Jenis Akun</label>
-                        <select id="gridState" name="acc_type" value={akunData.acc_type} onChange={handleInputChange} className="form-select text-white-dark">
+                        <select id="gridState" name="acc_type" value={formData.acc_type} onChange={handleInputChange} className="form-select text-white-dark">
                             <option>Modal</option>
                             <option>Choose...</option>
                             <option>Asset/Harta</option>
@@ -106,7 +120,7 @@ const EditAkun = () => {
                             <input
                                 id="actionWeb"
                                 name="acc_group_name"
-                                value={akunData.acc_group_name}
+                                value={formData.acc_group_name}
                                 onChange={handleInputChange}
                                 type="text"
                                 placeholder="Group..."
@@ -116,7 +130,7 @@ const EditAkun = () => {
                     </div>
                     <div>
                         <label htmlFor="actionWeb">Keterangan</label>
-                        <input id="actionWeb" name="acc_info" value={akunData.acc_info} onChange={handleInputChange} type="text" placeholder="Keterangan..." className="form-input" />
+                        <input id="actionWeb" name="acc_info" value={formData.acc_info} onChange={handleInputChange} type="text" placeholder="Keterangan..." className="form-input" />
                     </div>
                     <div className="flex">
                         <button type="submit" className="btn btn-primary !mt-6 mr-8">
