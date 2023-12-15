@@ -7,6 +7,7 @@ import IconPencil from '../../../components/Icon/IconPencil';
 import { Link } from 'react-router-dom';
 import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const rowData = [
     {
@@ -521,6 +522,21 @@ const rowData = [
     },
 ];
 
+interface PenjualanDataProps {
+    id: number;
+    user: {
+        id: number;
+        name: string;
+    };
+    branch: {
+        id: number;
+        name: string;
+    };
+    penjualan_name: string;
+    penjualan_contact: number;
+    penjualan_address: string;
+}
+
 const showAlert = async (type: number) => {
     if (type === 11) {
         const swalWithBootstrapButtons = Swal.mixin({
@@ -553,21 +569,22 @@ const showAlert = async (type: number) => {
 };
 const LaporanPenjualan = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') || '';
     useEffect(() => {
         dispatch(setPageTitle('Laporan Penjualan'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
+    const [initialRecords, setInitialRecords] = useState<PenjualanDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
-
+    const [penjualan, setPenjualan] = useState([]);
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
     });
-    
+
     // const randomColor = () => {
     //     const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
     //     const random = Math.floor(Math.random() * color.length);
@@ -590,21 +607,21 @@ const LaporanPenjualan = () => {
         setRecordsData([...initialRecords.slice(from, to)]);
     }, [page, pageSize, initialRecords]);
 
-    useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
-                return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.lastName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
-                );
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search]);
+    // useEffect(() => {
+    //     setInitialRecords(() => {
+    //         return rowData.filter((item) => {
+    //             return (
+    //                 item.id.toString().includes(search.toLowerCase()) ||
+    //                 item.firstName.toLowerCase().includes(search.toLowerCase()) ||
+    //                 item.lastName.toLowerCase().includes(search.toLowerCase()) ||
+    //                 item.dob.toLowerCase().includes(search.toLowerCase()) ||
+    //                 item.email.toLowerCase().includes(search.toLowerCase()) ||
+    //                 item.phone.toLowerCase().includes(search.toLowerCase())
+    //             );
+    //         });
+    //     });
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -612,6 +629,26 @@ const LaporanPenjualan = () => {
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
+
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/sale-reports', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const penjualan = response.data.data.resource.data;
+                setInitialRecords(penjualan);
+                setPenjualan(penjualan);
+                setRecordsData(penjualan);
+                console.log(penjualan);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    }, []);
 
     return (
         <div>
@@ -646,37 +683,39 @@ const LaporanPenjualan = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'email', title: 'Kode Penjualan', sortable: true },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
+                            { accessor: 'sale_report_invoice', title: 'Kode Penjualan', sortable: true },
                             {
-                                accessor: 'firstName',
+                                accessor: 'user.name',
                                 title: 'Customer',
                                 sortable: true,
                             },
-                            { accessor: 'lastName', title: 'Cabang', sortable: true },
+                            { accessor: 'branch.branch_name', title: 'Cabang', sortable: true },
                             { accessor: 'age', title: 'Qty Barang', sortable: true },
                             { accessor: 'age', title: 'Total', sortable: true },
                             {
-                                accessor: 'status',
+                                accessor: 'sale_report_status',
                                 title: 'Status',
                                 sortable: true,
-                                render: (data) => <span
-                                className={`badge whitespace-nowrap ${
-                                    data.status === 'completed'
-                                        ? 'bg-primary   '
-                                        : data.status === 'Pending'
-                                        ? 'bg-secondary'
-                                        : data.status === 'In Progress'
-                                        ? 'bg-success'
-                                        : data.status === 'Canceled'
-                                        ? 'bg-danger'
-                                        : 'bg-primary'
-                                }`}
-                            >
-                                {data.status}
-                            </span>,
+                                // render: (e) => (
+                                //     <span
+                                //         className={`badge whitespace-nowrap ${
+                                //             e.sale_report_status === 'completed'
+                                //                 ? 'bg-primary   '
+                                //                 : e.sale_report_status === 'Pending'
+                                //                 ? 'bg-secondary'
+                                //                 : e.sale_report_status === 'In Progress'
+                                //                 ? 'bg-success'
+                                //                 : e.sale_report_status === 'Canceled'
+                                //                 ? 'bg-danger'
+                                //                 : 'bg-primary'
+                                //         }`}
+                                //     >
+                                //         {e.sale_report_status}
+                                //     </span>
+                                // ),
                             },
                             {
                                 accessor: 'action',
