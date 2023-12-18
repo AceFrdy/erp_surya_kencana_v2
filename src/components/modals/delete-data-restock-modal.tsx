@@ -2,31 +2,38 @@ import { Fragment } from 'react';
 import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 
-const DeleteSeluruhDistribusiModal = () => {
+const DeleteDataRestockModal = () => {
     const { isOpen, type, onClose } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
 
-    const isModalOpen = isOpen && type === 'delete-seluruh-distribusi';
+    const isModalOpen = isOpen && type === 'delete-seluruh-restock';
     const navigate = useNavigate();
 
     const handleDelete = () => {
         axios
-            .delete('https://erp.digitalindustryagency.com/api/distributions', {
+            .delete(`https://erp.digitalindustryagency.com/api/distribution-restoks`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
-            .then((response) => {
+            .then(() => {
                 onClose();
-                toast.success('Hapus Data Distribusi Berhasil.');
+                const notification = {
+                    type: 'success',
+                    message: 'Data Restock Berhasil Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
             })
             .catch((err) => {
+                const notification = {
+                    type: 'error',
+                    message: 'Data Restock Gagal Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
                 console.log('DELETE CUSTOMER', err);
             });
     };
@@ -50,13 +57,13 @@ const DeleteSeluruhDistribusiModal = () => {
                         >
                             <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
                                 <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                    <div className="text-lg font-bold">Hapus Seluruh Distribusi</div>
+                                    <div className="text-lg font-bold">Hapus Data Restock</div>
                                 </div>
                                 <div className="p-5">
                                     <div>
                                         <form className="space-y-5">
                                             <div>
-                                                <h1>Apakah Anda yakin ingin menghapus Seluruh Distribusi</h1>
+                                                <h1>Apakah Anda yakin ingin menghapus Data Restock</h1>
                                             </div>
                                         </form>
                                     </div>
@@ -78,4 +85,4 @@ const DeleteSeluruhDistribusiModal = () => {
     );
 };
 
-export default DeleteSeluruhDistribusiModal;
+export default DeleteDataRestockModal;

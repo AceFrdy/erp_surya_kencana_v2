@@ -202,12 +202,12 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menupenjualan/restock/editrestock',
+        path: '/menupenjualan/restock/editrestock/:id',
         element: <EditRestock />,
         layout: 'default',
     },
     {
-        path: '/menupenjualan/restock/detailrestock',
+        path: '/menupenjualan/restock/detailrestock/:id',
         element: <DetailRestock />,
         layout: 'default',
     },
