@@ -5,7 +5,7 @@ import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import IconSend from '../../../components/Icon/IconSend';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
@@ -71,6 +71,7 @@ interface FormDataProps {
 
 const Distribusi = () => {
     const { onOpen } = useModal();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Distribusi'));
@@ -89,12 +90,6 @@ const Distribusi = () => {
         branch_id: 0,
         unit_stock_id: 0,
     });
-
-    // disabled branch
-    const [disabledBranch, setDisabledBranch] = useState<boolean>(false);
-
-    // not Found Data
-    const [notFoundData, setNotFoundData] = useState<string>('');
 
     // product
     const [productList, setProductList] = useState<ProductListProps[]>([]);
@@ -186,6 +181,30 @@ const Distribusi = () => {
             });
     };
 
+    const handleSubmitDistribution = (e: FormEvent) => {
+        e.preventDefault();
+
+        axios
+            .post(
+                'https://erp.digitalindustryagency.com/api/distribution-request',
+                {},
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
+            .then((response) => {
+                toast.success('Seluruh Data Distribusi Berhasil Ditambahkan');
+                navigate(0);
+            })
+            .catch((err: any) => {
+                toast.error('Seluruh Data Distribusi Gagal Ditambahkan');
+                console.log('seluruh data', err.message);
+            });
+    };
+
     // pagination
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
@@ -203,14 +222,11 @@ const Distribusi = () => {
                     },
                 })
                 .then((response) => {
-                    if (response.data.data.resource.data === 'Data not available') {
-                        setNotFoundData(response.data.data.resource.data);
-                        setDisabledBranch(false);
-                    } else {
+                    if (response.data.data.resource.data !== 'Data not available') {
                         setInitialRecords(response.data.data.resource.data);
-                        setDisabledBranch(true);
-                        setFormData((prev) => ({ ...prev, branch_id: response.data.data.resource.data[0].branch.id }));
-                        setNotFoundData('');
+                        if (response.data.data.resource.data.length > 0) {
+                            setFormData((prev) => ({ ...prev, branch_id: response.data.data.resource.data[0].branch.id }));
+                        }
                     }
 
                     // page
@@ -278,49 +294,13 @@ const Distribusi = () => {
 
     const [Edit, setEdit] = useState(false);
     return (
-        <div onClick={() => setShowCabang(false)}>
-            <Transition appear show={Edit} as={Fragment}>
-                <Dialog as="div" open={Edit} onClose={() => setEdit(false)}>
-                    <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
-                        <div className="fixed inset-0" />
-                    </Transition.Child>
-                    <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
-                        <div className="flex items-center justify-center min-h-screen px-4">
-                            <Transition.Child
-                                as={Fragment}
-                                enter="ease-out duration-300"
-                                enterFrom="opacity-0 scale-95"
-                                enterTo="opacity-100 scale-100"
-                                leave="ease-in duration-200"
-                                leaveFrom="opacity-100 scale-100"
-                                leaveTo="opacity-0 scale-95"
-                            >
-                                <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg my-8 text-black dark:text-white-dark">
-                                    <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                        <h5 className="font-bold text-lg">Edit Qty</h5>
-                                        {/* <button type="button" className="text-white-dark hover:text-dark" onClick={() => setEdit(false)}>
-                                            <svg>...</svg>
-                                        </button> */}
-                                    </div>
-                                    <div className="p-5">
-                                        <form>
-                                            <input type="text" placeholder="Some Text..." className="form-input" required />
-                                        </form>
-                                        <div className="flex justify-end items-center mt-8">
-                                            <button type="button" className="btn btn-outline-danger" onClick={() => setEdit(false)}>
-                                                Kembali
-                                            </button>
-                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setEdit(false)}>
-                                                Ubah
-                                            </button>
-                                        </div>
-                                    </div>
-                                </Dialog.Panel>
-                            </Transition.Child>
-                        </div>
-                    </div>
-                </Dialog>
-            </Transition>
+        <div
+            onClick={() => {
+                setShowCabang(false);
+                setShowProduct(false);
+                setShowUnit(false);
+            }}
+        >
             <ul className="flex space-x-2 rtl:space-x-reverse">
                 <li>
                     <Link to="/" className="text-primary hover:underline">
@@ -337,33 +317,45 @@ const Distribusi = () => {
             <div className="panel mt-6">
                 <h1 className="text-lg font-bold">Perkembangan Distribusi</h1>
                 <div className="flex mb-4 justify-end">
-                    <button type="button" className="btn btn-outline-danger mr-4" onClick={() => {}}>
+                    <button className="btn btn-outline-danger mr-4" onClick={() => onOpen('delete-seluruh-distribusi', 0)}>
                         <IconTrashLines className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
                         Batal
                     </button>
-                    <button type="button" className="btn btn-outline-primary" onClick={() => {}}>
-                        <IconSend className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                        Kirim
-                    </button>
+                    <form onSubmit={handleSubmitDistribution}>
+                        <button type="submit" className="btn btn-outline-primary">
+                            <IconSend className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                            Kirim
+                        </button>
+                    </form>
                 </div>
                 <form className="space-y-5" onSubmit={handleSubmitProduct}>
                     <div className="relative">
                         <label htmlFor="cabang">Tujuan Cabang</label>
-                        {disabledBranch ? (
-                            <input
-                                id="cabang"
-                                ref={CabangRef}
-                                type="text"
-                                className="form-input"
-                                placeholder="Tujuan Cabang"
-                                value={
-                                    disabledBranch && cabangList.find((item) => item.id === formData.branch_id)?.branch_name
-                                        ? cabangList.find((item) => item.id === formData.branch_id)?.branch_name
-                                        : ''
-                                }
-                                autoComplete="off"
-                                disabled={disabledBranch}
-                            />
+                        {initialRecords.length === 0 ? (
+                            <>
+                                <input id="cabang" ref={CabangRef} type="text" className="form-input" placeholder="Tujuan Cabang" onChange={handleCabangChange} autoComplete="off" />
+                                {showCabang && (
+                                    <div className="w-full flex absolute top-[70px] p-1 bg-white z-20 border border-zinc-100 rounded-md">
+                                        <div className="h-40 overflow-y-scroll w-full">
+                                            <div className="h-auto flex flex-col w-full pb-[120px]">
+                                                {filteredCabang.map((item) => (
+                                                    <button
+                                                        className="h-10 w-full hover:bg-green-100 text-start flex px-5 items-center rounded-md"
+                                                        key={item.id}
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            handleCabangClick(item.branch_name);
+                                                            setFormData((prev) => ({ ...prev, branch_id: item.id }));
+                                                        }}
+                                                    >
+                                                        {item.branch_name}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </>
                         ) : (
                             <input
                                 id="cabang"
@@ -371,31 +363,10 @@ const Distribusi = () => {
                                 type="text"
                                 className="form-input"
                                 placeholder="Tujuan Cabang"
-                                onChange={handleCabangChange}
+                                value={cabangList.find((item) => item.id === formData.branch_id)?.branch_name ? cabangList.find((item) => item.id === formData.branch_id)?.branch_name : ''}
                                 autoComplete="off"
-                                disabled={disabledBranch}
+                                disabled
                             />
-                        )}
-                        {showCabang && (
-                            <div className="w-full flex absolute top-[70px] p-1 bg-white z-20 border border-zinc-100 rounded-md">
-                                <div className="h-40 overflow-y-scroll w-full">
-                                    <div className="h-auto flex flex-col w-full pb-[120px]">
-                                        {filteredCabang.map((item) => (
-                                            <button
-                                                className="h-10 w-full hover:bg-green-100 text-start flex px-5 items-center rounded-md"
-                                                key={item.id}
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    handleCabangClick(item.branch_name);
-                                                    setFormData((prev) => ({ ...prev, branch_id: item.id }));
-                                                }}
-                                            >
-                                                {item.branch_name}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
                         )}
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -472,54 +443,43 @@ const Distribusi = () => {
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5"></div>
                 <h5 className="font-semibold text-lg dark:text-white-light mb-4 mt-4 flex justify-center">Data Distribusi</h5>
                 <div className="datatables">
-                    {notFoundData !== 'Data not available' ? (
-                        <DataTable
-                            highlightOnHover
-                            className="whitespace-nowrap table-hover"
-                            records={initialRecords}
-                            columns={[
-                                { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
-                                {
-                                    accessor: 'product.product_barcode',
-                                    title: 'Barcode',
-                                    sortable: true,
-                                },
-                                {
-                                    accessor: 'product.product_name',
-                                    title: 'Nama',
-                                    sortable: true,
-                                },
-                                { accessor: 'distribution_qty', title: 'Qty', sortable: true },
-                                {
-                                    accessor: 'action',
-                                    title: 'Opsi',
-                                    titleClassName: '!text-center',
-                                    render: (e) => (
-                                        <div className="flex items-center w-max mx-auto gap-2">
-                                            <button type="button" style={{ color: 'orange' }} onClick={() => setEdit(true)}>
-                                                {/* <Link to="/menupenjualan/distribution/editdistribution"> */}
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2" />
-                                                {/* </Link> */}
-                                            </button>
-                                            <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-data-distribusi', e.id)}>
-                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                            </button>
-                                        </div>
-                                    ),
-                                },
-                            ]}
-                            sortStatus={sortStatus}
-                            onSortStatusChange={setSortStatus}
-                            minHeight={200}
-                        />
-                    ) : (
-                        <div className="w-full h-[200px] flex justify-center flex-col border border-zinc-200 rounded-md items-center font-semibold gap-y-2">
-                            <div className="w-16 h-16 rounded-full bg-zinc-300 flex justify-center items-center">
-                                <IconDatabase className="w-8 h-8 text-white" />
-                            </div>
-                            Data Not Found
-                        </div>
-                    )}
+                    <DataTable
+                        highlightOnHover
+                        className="whitespace-nowrap table-hover"
+                        records={initialRecords}
+                        columns={[
+                            { accessor: '', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
+                            {
+                                accessor: 'product.product_barcode',
+                                title: 'Barcode',
+                                sortable: true,
+                            },
+                            {
+                                accessor: 'product.product_name',
+                                title: 'Nama',
+                                sortable: true,
+                            },
+                            { accessor: 'distribution_qty', title: 'Qty', sortable: true },
+                            {
+                                accessor: 'action',
+                                title: 'Opsi',
+                                titleClassName: '!text-center',
+                                render: (e) => (
+                                    <div className="flex items-center w-max mx-auto gap-2">
+                                        <button type="button" style={{ color: 'orange' }} onClick={() => onOpen('edit-distribusi', e.id)}>
+                                            <IconPencil className="ltr:mr-2 rtl:ml-2" />
+                                        </button>
+                                        <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-data-distribusi', e.id)}>
+                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                        </button>
+                                    </div>
+                                ),
+                            },
+                        ]}
+                        sortStatus={sortStatus}
+                        onSortStatusChange={setSortStatus}
+                        minHeight={200}
+                    />
                     {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                 </div>
             </div>

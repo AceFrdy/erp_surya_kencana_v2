@@ -1,21 +1,21 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-const DeleteSeluruhDistribusiModal = () => {
-    const { isOpen, type, onClose } = useModal();
+const EditDistribusiModal = () => {
+    const { isOpen, type, onClose, data } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
-
-    const isModalOpen = isOpen && type === 'delete-seluruh-distribusi';
     const navigate = useNavigate();
 
-    const handleDelete = () => {
+    const isModalOpen = isOpen && type === 'edit-distribusi';
+
+    const handleDelete = (id: number) => {
         axios
-            .delete('https://erp.digitalindustryagency.com/api/distributions', {
+            .delete(`https://erp.digitalindustryagency.com/api/users/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -23,8 +23,6 @@ const DeleteSeluruhDistribusiModal = () => {
             })
             .then(() => {
                 onClose();
-                toast.success('Hapus Data Distribusi Berhasil.');
-                navigate(0);
             })
             .catch((err) => {
                 console.log('DELETE CUSTOMER', err);
@@ -50,21 +48,25 @@ const DeleteSeluruhDistribusiModal = () => {
                         >
                             <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
                                 <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                    <div className="text-lg font-bold">Hapus Seluruh Distribusi</div>
+                                    <div className="text-lg font-bold">Edit Distribusi</div>
                                 </div>
                                 <div className="p-5">
                                     <div>
                                         <form className="space-y-5">
-                                            <div>
-                                                <h1>Apakah Anda yakin ingin menghapus Seluruh Distribusi</h1>
-                                            </div>
+                                            <input />
                                         </form>
                                     </div>
                                     <div className="flex justify-end items-center mt-8">
                                         <button type="button" className="btn btn-outline-danger" onClick={onClose}>
                                             Kembali
                                         </button>
-                                        <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleDelete}>
+                                        <button
+                                            type="button"
+                                            className="btn btn-primary ltr:ml-4 rtl:mr-4"
+                                            onClick={() => {
+                                                handleDelete(data);
+                                            }}
+                                        >
                                             Hapus
                                         </button>
                                     </div>
@@ -78,4 +80,4 @@ const DeleteSeluruhDistribusiModal = () => {
     );
 };
 
-export default DeleteSeluruhDistribusiModal;
+export default EditDistribusiModal;
