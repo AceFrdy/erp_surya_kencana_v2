@@ -9,11 +9,8 @@ import { useDispatch } from 'react-redux';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-
-import Swal from 'sweetalert2';
 import IconPlus from '../../../components/Icon/IconPlus';
 import { useModal } from '../../../hooks/use-modal';
-import { Divider } from '@mantine/core';
 
 
 interface DetailAkunProps {
@@ -115,22 +112,7 @@ const DetailAkun = () => {
         return '';
     };
 
-    const [cost, setCost] = useState('');
 
-    const handleCostChange = (e: { target: { value: any } }) => {
-        const inputValue = e.target.value;
-        let formatValue = '';
-
-        // Remove non-numeric characters
-        const numValue = inputValue.replace(/\D/g, '');
-
-        // Format the number with 'Rp.' prefix
-        if (numValue !== '') {
-            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-        }
-
-        setCost(formatValue);
-    };
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">

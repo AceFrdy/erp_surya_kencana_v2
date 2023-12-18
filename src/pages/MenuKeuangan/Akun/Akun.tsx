@@ -76,12 +76,9 @@ const Akun = () => {
 
             }) 
         
-
         }, 2000)
         return () => clearInterval(id);
     }, [initialRecords]);
-
-
 
     useEffect(() => {
         setPage(1);

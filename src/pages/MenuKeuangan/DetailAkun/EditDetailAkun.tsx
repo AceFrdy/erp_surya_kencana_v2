@@ -1,97 +1,127 @@
-import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import React, { ChangeEvent, FormEvent, useState, useEffect } from 'react';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import axios from 'axios';
-import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 
 interface DetailAkunDataProps {
-
-    detail_acc_type: string;
-    detail_acc_name: string;
-    detail_acc_info: string;
-    account_id: string;
-    // branch_address: string;
+  detail_acc_type: string;
+  detail_acc_name: string;
+  detail_acc_info: string;
+  account_id: number;
 }
+
 interface AccountType {
-    acc_group_name: string;
-    id: number;
-    // Tambahkan properti lain jika ada
+  acc_group_name: string;
+  id: number;
 }
-
 
 const EditDetailAkun = () => {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const token = localStorage.getItem('accessToken') || '';
-    const [accounts, setAccountTypes] = useState<AccountType[]>([]);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const token = localStorage.getItem('accessToken') || '';
 
-    const [formData, setFormData] = useState<DetailAkunDataProps>({
-        detail_acc_type: '',
-        detail_acc_name: '',
-        detail_acc_info: '',
-        account_id: ''
+  const [accounts, setAccount] = useState<AccountType[]>([]);
+
+  const [formData, setFormData] = useState<DetailAkunDataProps>({
+    detail_acc_type: '',
+    detail_acc_name: '',
+    detail_acc_info: '',
+    account_id: 0
+  });
+
+  useEffect(() => {
+    // Fetch account types from the API
+    axios.get('https://erp.digitalindustryagency.com/api/accounts', {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      
+        setAccount(response.data.data.resource.data);
+    })
+    .catch((error) => {
+      console.error('Error fetching account types:', error);
     });
+  }, [token]);
 
-    useEffect(() => {
-        // Fetch account types from the API
-        axios
-            .get(`https://erp.digitalindustryagency.com/api/accounts/`, {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                setAccountTypes(response.data.data.resource.data);
-            })
-            .catch((error) => {
-                console.error('Error fetching account types:', error);
-            });
-    }, [token]);
+  useEffect(()=> {
+    console.log(accounts);
+  });
 
-    useEffect(() => {
-        if (id) {
-            axios
-                .get(`https://erp.digitalindustryagency.com/api/detail-accounts/${id}`, {
-                    headers: {
-                        Accept: 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                .then((response) => {
-                    const accountData = response.data.data.resource;
-                    setFormData((prev) => ({
-                        ...prev,
-                        detail_acc_type: accountData.detail_acc_type,
-                        detail_acc_name: accountData.detail_acc_name,
-                        detail_acc_info: accountData.detail_acc_info,
-                        account_id: accountData.account_id
-                        // Set data lainnya sesuai dengan respons
-                    }));
-                    console.log('dataForm :', response);
-                })
-                .catch((error) => {
-                    console.error('Error fetching account data:', error);
-                    toast.error('Error fetching data');
-                });
-        }
-    }, [id, token]); // Tambahkan `id` ke dependency array
+  useEffect(() => {
+    // Fetch account details from the API
+    axios.get(`https://erp.digitalindustryagency.com/api/detail-accounts/${id}`, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      // Assuming response.data is the object with the details
+      console.log('Detail Akun Data:', response.data.data.resource);
+      const details = response.data.data.resource;
+      setFormData({
+        detail_acc_type: details.detail_acc_type,
+        detail_acc_name: details.detail_acc_name,
+        detail_acc_info: details.detail_acc_info,
+        account_id: details.account_id
+      });
 
-    const showAlert = async (type: number) => {
-        if (type == 20) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'success',
-                title: 'Data Berhasil Diubah',
-                padding: '10px 20px',
-            });
-        }
+    
+
+    })
+
+    .catch((error) => {
+      console.error('Error fetching account details:', error);
+    });
+  }, [id, token]);
+
+
+  
+
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+  
+    // Konversi `account_id` ke tipe data number
+    const data = {
+      detail_acc_type: formData.detail_acc_type,
+      detail_acc_name: formData.detail_acc_name,
+      detail_acc_info: formData.detail_acc_info,
+      account_id: Number(formData.account_id) // Convert to number if necessary
     };
+  
+  
+    try {
+      // Sebelum melakukan PUT request di handleSubmit:
+    console.log('Data yang akan dikirim:', data);
+      const response = await axios.put(`https://erp.digitalindustryagency.com/api/detail-accounts/${id}`, data, {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      toast.success('Data Berhasil Diedit');
+      navigate('/menukeuangan/akun/detailakun');
+    } catch (error:any) {
+      console.error('Error updating account:', error);
+      toast.error('Gagal Mengedit Data');
+      // Tampilkan pesan error dari response jika ada
+      if (error.response && error.response.data) {
+        const errors = error.response.data.errors;
+        for (const key in errors) {
+          errors[key].forEach((message:any) => {
+            toast.error(message);
+          });
+        }
+      }
+    }
+  };
+
+
     // Update the state for each input field
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -100,37 +130,6 @@ const EditDetailAkun = () => {
             [name]: value,
         }));
     };
-
-    const handleSubmit = async (event: FormEvent) => {
-        event.preventDefault();
-        console.log('Submitting the following data:', formData); // Log data yang akan dikirim
-        const data = {
-            detail_acc_type: formData.detail_acc_type,
-            detail_acc_name: formData.detail_acc_name,
-            detail_acc_info: formData.detail_acc_info,
-            account_id: formData.account_id,
-
-        };
-        try {
-            const response = await axios.put(`https://erp.digitalindustryagency.com/api/detail-accounts/${id}`, data, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
-            });
-            console.log('Response from server:', response.data); // Log response dari server
-            toast.success('Data berhasil diubah');
-            navigate('/menukeuangan/akun/detailakun');
-        } catch (error: any) {
-            console.error('Error updating account:', error); // Log error yang terjadi
-            toast.error('Gagal mengubah data');
-            if (error.response) {
-                console.error('Error response data:', error.response.data); // Log error response dari server
-            }
-        }
-    };
-
 
     return (
         <div>
@@ -141,10 +140,10 @@ const EditDetailAkun = () => {
                     </Link>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Detail Akun</span>
+                    <span>Akun</span>
                 </li>
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Edit Detail Akun</span>
+                    <span>Add Detail Akun</span>
                 </li>
             </ul>
             <div className="panel">
@@ -175,10 +174,12 @@ const EditDetailAkun = () => {
                             value={formData.account_id}
                             onChange={handleInputChange}
                         >
-                            {/* Render the options dynamically from the accounts state */}
-                            {accounts.map((account) => (
+                            <option value=""> silahkan pilih</option>
+                            {accounts.map((account) => ( 
                                 <option key={account.id} value={account.id}>
                                     {account.acc_group_name}
+                                    
+                                    
                                 </option>
                             ))}
                         </select>

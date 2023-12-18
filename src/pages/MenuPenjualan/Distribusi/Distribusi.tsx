@@ -1,17 +1,19 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { ChangeEvent, Fragment, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, Fragment, useEffect, useRef, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-import Swal from 'sweetalert2';
 import IconSend from '../../../components/Icon/IconSend';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import Pagination from '../../../components/Pagination';
 import IconDatabase from '../../../components/Icon/icon-database';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useModal } from '../../../hooks/use-modal';
 
 interface DistributionListProps {
     id: number;
@@ -60,7 +62,15 @@ interface LinksLinkProps {
     prev: string;
 }
 
+interface FormDataProps {
+    product_barcode: string;
+    distribution_qty: number;
+    branch_id: number;
+    unit_stock_id: number;
+}
+
 const Distribusi = () => {
+    const { onOpen } = useModal();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Distribusi'));
@@ -72,22 +82,24 @@ const Distribusi = () => {
     });
 
     const [initialRecords, setInitialRecords] = useState<DistributionListProps[]>([]);
-    const [cabangList, setCabangList] = useState<CabangListProps[]>([]);
-    const [productList, setProductList] = useState<ProductListProps[]>([]);
-    const [unitList, setUnitList] = useState<UnitListProps[]>([]);
+
+    const [formData, setFormData] = useState<FormDataProps>({
+        product_barcode: '',
+        distribution_qty: 0,
+        branch_id: 0,
+        unit_stock_id: 0,
+    });
+
+    // disabled branch
+    const [disabledBranch, setDisabledBranch] = useState<boolean>(false);
 
     // not Found Data
     const [notFoundData, setNotFoundData] = useState<string>('');
 
-    // pagination
-    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
-    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
-    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-
     // product
+    const [productList, setProductList] = useState<ProductListProps[]>([]);
     const [filteredProduct, setFilteredProduct] = useState<ProductListProps[]>(productList);
     const [showProduct, setShowProduct] = useState<boolean>(false);
-    const [selectedProduct, setSelectedProduct] = useState<string>('');
     const ProductRef = useRef<HTMLInputElement>(null);
 
     const handleProductChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -98,7 +110,6 @@ const Distribusi = () => {
     };
 
     const handleProductClick = (option: string) => {
-        setSelectedProduct(option);
         setShowProduct(false);
         if (ProductRef.current) {
             ProductRef.current.value = option;
@@ -106,9 +117,9 @@ const Distribusi = () => {
     };
 
     // unit
+    const [unitList, setUnitList] = useState<UnitListProps[]>([]);
     const [filteredUnit, setFilteredUnit] = useState<UnitListProps[]>(unitList);
     const [showUnit, setShowUnit] = useState<boolean>(false);
-    const [selectedUnit, setSelectedUnit] = useState<string>('');
     const UnitRef = useRef<HTMLInputElement>(null);
 
     const handleUnitChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -119,41 +130,102 @@ const Distribusi = () => {
     };
 
     const handleUnitClick = (option: string) => {
-        setSelectedUnit(option);
         setShowUnit(false);
         if (UnitRef.current) {
             UnitRef.current.value = option;
         }
     };
 
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distributions');
+    // branch
+    const [cabangList, setCabangList] = useState<CabangListProps[]>([]);
+    const [filteredCabang, setFilteredCabang] = useState<CabangListProps[]>(cabangList);
+    const [showCabang, setShowCabang] = useState<boolean>(false);
+    const CabangRef = useRef<HTMLInputElement>(null);
 
-    //
-    useEffect(() => {
+    const handleCabangChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const inputValue = e.target.value.toLowerCase();
+        const filtered = cabangList.filter((item) => item.branch_name.toLowerCase().includes(inputValue));
+        setFilteredCabang(filtered);
+        setShowCabang(true);
+    };
+
+    const handleCabangClick = (option: string) => {
+        setShowCabang(false);
+        if (CabangRef.current) {
+            CabangRef.current.value = option;
+        }
+    };
+
+    const handleSubmitProduct = (e: FormEvent) => {
+        e.preventDefault();
+
+        const data = {
+            product_barcode: formData.product_barcode,
+            distribution_qty: formData.distribution_qty,
+            branch_id: formData.branch_id,
+            unit_stock_id: formData.unit_stock_id,
+        };
+
         axios
-            .get(url, {
+            .post('https://erp.digitalindustryagency.com/api/distributions', data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
-            .then((response) => {
-                if ((response.data.data.resource.data = 'Data not available')) {
-                    setNotFoundData(response.data.data.resource.data);
-                } else {
-                    setInitialRecords(response.data.data.resource.data);
-                }
-
-                // page
-                setMetaLink(response.data.data.resource.meta);
-                setMetaLinksLink(response.data.data.resource.meta.links);
-                setLinksLink(response.data.data.resource.links);
+            .then(() => {
+                toast.success('Data Berhasil Ditambahkan');
+                handleCabangClick('');
+                handleProductClick('');
+                handleUnitClick('');
+                setFormData((prev) => ({ ...prev, distribution_qty: 0 }));
             })
             .catch((err: any) => {
-                console.log('DISTRIBUTION', err.message);
+                toast.error('Data Gagal Ditambahkan');
+                console.log('error', err.message);
             });
-    }, [url]);
+    };
 
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distributions');
+
+    // get distribution
+    useEffect(() => {
+        const id = setInterval(() => {
+            axios
+                .get(url, {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                .then((response) => {
+                    if (response.data.data.resource.data === 'Data not available') {
+                        setNotFoundData(response.data.data.resource.data);
+                        setDisabledBranch(false);
+                    } else {
+                        setInitialRecords(response.data.data.resource.data);
+                        setDisabledBranch(true);
+                        setFormData((prev) => ({ ...prev, branch_id: response.data.data.resource.data[0].branch.id }));
+                        setNotFoundData('');
+                    }
+
+                    // page
+                    setMetaLink(response.data.data.resource.meta);
+                    setMetaLinksLink(response.data.data.resource.meta.links);
+                    setLinksLink(response.data.data.resource.links);
+                })
+                .catch((err: any) => {
+                    console.log('DISTRIBUTION', err.message);
+                });
+        }, 5000);
+        return () => clearInterval(id);
+    }, [initialRecords]);
+
+    // get product, unit, branch
     useEffect(() => {
         axios
             .get('https://erp.digitalindustryagency.com/api/branches', {
@@ -192,7 +264,6 @@ const Distribusi = () => {
             })
             .then((response) => {
                 setProductList(response.data.data.resource.data);
-                console.log(response.data.data.resource.data);
             })
             .catch((err: any) => {
                 console.log('DISTRIBUTION', err.message);
@@ -207,7 +278,7 @@ const Distribusi = () => {
 
     const [Edit, setEdit] = useState(false);
     return (
-        <div>
+        <div onClick={() => setShowCabang(false)}>
             <Transition appear show={Edit} as={Fragment}>
                 <Dialog as="div" open={Edit} onClose={() => setEdit(false)}>
                     <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
@@ -275,13 +346,57 @@ const Distribusi = () => {
                         Kirim
                     </button>
                 </div>
-                <form className="space-y-5">
-                    <div>
-                        <label htmlFor="gridState">Lokasi Tujuan</label>
-                        <select id="gridState" className="form-select text-white-dark">
-                            <option>Choose...</option>
-                            <option>...</option>
-                        </select>
+                <form className="space-y-5" onSubmit={handleSubmitProduct}>
+                    <div className="relative">
+                        <label htmlFor="cabang">Tujuan Cabang</label>
+                        {disabledBranch ? (
+                            <input
+                                id="cabang"
+                                ref={CabangRef}
+                                type="text"
+                                className="form-input"
+                                placeholder="Tujuan Cabang"
+                                value={
+                                    disabledBranch && cabangList.find((item) => item.id === formData.branch_id)?.branch_name
+                                        ? cabangList.find((item) => item.id === formData.branch_id)?.branch_name
+                                        : ''
+                                }
+                                autoComplete="off"
+                                disabled={disabledBranch}
+                            />
+                        ) : (
+                            <input
+                                id="cabang"
+                                ref={CabangRef}
+                                type="text"
+                                className="form-input"
+                                placeholder="Tujuan Cabang"
+                                onChange={handleCabangChange}
+                                autoComplete="off"
+                                disabled={disabledBranch}
+                            />
+                        )}
+                        {showCabang && (
+                            <div className="w-full flex absolute top-[70px] p-1 bg-white z-20 border border-zinc-100 rounded-md">
+                                <div className="h-40 overflow-y-scroll w-full">
+                                    <div className="h-auto flex flex-col w-full pb-[120px]">
+                                        {filteredCabang.map((item) => (
+                                            <button
+                                                className="h-10 w-full hover:bg-green-100 text-start flex px-5 items-center rounded-md"
+                                                key={item.id}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    handleCabangClick(item.branch_name);
+                                                    setFormData((prev) => ({ ...prev, branch_id: item.id }));
+                                                }}
+                                            >
+                                                {item.branch_name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="relative">
@@ -298,6 +413,7 @@ const Distribusi = () => {
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         handleProductClick(item.product_barcode);
+                                                        setFormData((prev) => ({ ...prev, product_barcode: item.product_barcode }));
                                                     }}
                                                 >
                                                     {item.product_barcode}
@@ -310,7 +426,18 @@ const Distribusi = () => {
                         </div>
                         <div>
                             <label htmlFor="Qty">Qty</label>
-                            <input id="Qty" type="number" placeholder="Qty..." name={'qty'} className="form-input" />
+                            <input
+                                id="Qty"
+                                type="number"
+                                placeholder="Qty..."
+                                name={'qty'}
+                                value={formData.distribution_qty}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                    e.preventDefault();
+                                    setFormData((prev) => ({ ...prev, distribution_qty: parseFloat(e.target.value) }));
+                                }}
+                                className="form-input"
+                            />
                         </div>
                         <div className="relative">
                             <label htmlFor="satuan">Satuan</label>
@@ -326,6 +453,7 @@ const Distribusi = () => {
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         handleUnitClick(item.unit_stock_name);
+                                                        setFormData((prev) => ({ ...prev, unit_stock_id: item.id }));
                                                     }}
                                                 >
                                                     {item.unit_stock_name}
@@ -337,7 +465,7 @@ const Distribusi = () => {
                             )}
                         </div>
                     </div>
-                    <button type="submit" className="btn btn-outline-primary !mt-6 w-full mb-6" onClick={() => {}}>
+                    <button type="submit" className="btn btn-outline-primary !mt-6 w-full mb-6">
                         Tambah
                     </button>
                 </form>
@@ -366,17 +494,14 @@ const Distribusi = () => {
                                     accessor: 'action',
                                     title: 'Opsi',
                                     titleClassName: '!text-center',
-                                    render: () => (
+                                    render: (e) => (
                                         <div className="flex items-center w-max mx-auto gap-2">
-                                            {/* <button type="button" style={{ color: 'blue' }}>
-                                                    <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                                </button> */}
                                             <button type="button" style={{ color: 'orange' }} onClick={() => setEdit(true)}>
                                                 {/* <Link to="/menupenjualan/distribution/editdistribution"> */}
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2" />
                                                 {/* </Link> */}
                                             </button>
-                                            <button type="button" style={{ color: 'red' }} onClick={() => {}}>
+                                            <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-data-distribusi', e.id)}>
                                                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                             </button>
                                         </div>
