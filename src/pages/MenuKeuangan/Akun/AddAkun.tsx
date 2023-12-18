@@ -1,7 +1,6 @@
 import React, { ChangeEvent, FormEvent, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import Swal from 'sweetalert2';
 import { toast } from 'react-toastify'; 
 
 interface AkunDataProps {

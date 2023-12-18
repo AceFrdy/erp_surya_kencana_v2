@@ -56,7 +56,6 @@ const EditAkun = () => {
     }));
 };
 
-
     const handleSubmit = async (event:FormEvent) => {
         event.preventDefault();
         console.log('Submitting the following data:', formData); // Log data yang akan dikirim
@@ -65,6 +64,7 @@ const EditAkun = () => {
             acc_group_name: formData.acc_group_name,
             acc_info: formData.acc_info
         };
+        
         try {
             const response = await axios.put(`https://erp.digitalindustryagency.com/api/accounts/${id}`, data, {
                 headers: {

@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 // import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 // import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 // import { Dialog, Transition } from '@headlessui/react';
 // import IconPlus from '../../../components/Icon/IconPlus';
 import IconNotes from '../../../components/Icon/IconNotes';
@@ -15,6 +15,7 @@ import Swal from 'sweetalert2';
 import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import IconSend from '../../../components/Icon/IconSend';
+import axios from 'axios';
 
 const rowData = [
     {
@@ -565,6 +566,43 @@ const DetailRestock = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
+    const token = localStorage.getItem('accessToken') ?? '';
+    const { id } = useParams();
+
+    // get data
+    useEffect(() => {
+        axios
+            .get(`https://erp.digitalindustryagency.com/api/distribution-reports/${id}`, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                // setInitialRecords(response.data.data.resource.data);
+                console.log('initial', response.data.data);
+
+                // // page
+                // setMetaLink({
+                //     current_page: response.data.data.resource.current_page,
+                //     last_page: response.data.data.resource.last_page,
+                //     from: response.data.data.resource.from,
+                //     to: response.data.data.resource.to,
+                //     per_page: response.data.data.resource.per_page,
+                //     total: response.data.data.resource.total,
+                // });
+                // setMetaLinksLink(response.data.data.resource.links);
+                // setLinksLink({
+                //     first: response.data.data.resource.first_page_url,
+                //     last: response.data.data.resource.last_page_url,
+                //     next: response.data.data.resource.next_page_url,
+                //     prev: response.data.data.resource.prev_page_url,
+                // });
+            })
+            .catch((err: any) => {
+                console.log('GET DISTRIBRUTION REPORT', err.message);
+            });
+    }, []);
 
     useEffect(() => {
         setPage(1);
@@ -658,7 +696,7 @@ const DetailRestock = () => {
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>
-                
+
                 <h1 className="text-lg font-bold mb-4">Kode:SK0012023</h1>
                 <form className="space-y-5 mb-6">
                     <div>
@@ -672,7 +710,6 @@ const DetailRestock = () => {
                         <label htmlFor="Opcost">Operasional Cost</label>
                         <input id="Opcost" type="text" value={29103239} disabled onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
                     </div>
-                    
                 </form>
                 <h5 className="font-semibold text-lg dark:text-white-light mb-2">Detail Restock</h5>
                 <div className="datatables">

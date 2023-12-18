@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import IconNotes from '../../../components/Icon/IconNotes';
 import axios from 'axios';
+import Pagination from '../../../components/Pagination';
 
 interface DataInitial {
     id: number;
@@ -16,14 +17,33 @@ interface DataInitial {
     items_total: number;
     status: string;
 }
+
+interface MetaLinkProps {
+    current_page: number;
+    last_page: number;
+    from: number;
+    to: number;
+    per_page: number;
+    total: number;
+}
+interface MetaLinksLinkProps {
+    active: boolean;
+    label: string;
+    url: string;
+}
+
+interface LinksLinkProps {
+    first: string;
+    last: string;
+    next: string;
+    prev: string;
+}
+
 const LaporanDistribusi = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Laporan Distribusi'));
     });
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
 
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
@@ -34,20 +54,16 @@ const LaporanDistribusi = () => {
     const [initialRecords, setInitialRecords] = useState<DataInitial[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
 
-    useEffect(() => {
-        setPage(1);
-    }, [pageSize]);
-
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-reports');
 
     // get distribution report
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/distribution-reports', {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -55,17 +71,35 @@ const LaporanDistribusi = () => {
             })
             .then((response) => {
                 setInitialRecords(response.data.data.resource.data);
+                console.log('initial', response.data.data);
+
+                // page
+                setMetaLink({
+                    current_page: response.data.data.resource.current_page,
+                    last_page: response.data.data.resource.last_page,
+                    from: response.data.data.resource.from,
+                    to: response.data.data.resource.to,
+                    per_page: response.data.data.resource.per_page,
+                    total: response.data.data.resource.total,
+                });
+                setMetaLinksLink(response.data.data.resource.links);
+                setLinksLink({
+                    first: response.data.data.resource.first_page_url,
+                    last: response.data.data.resource.last_page_url,
+                    next: response.data.data.resource.next_page_url,
+                    prev: response.data.data.resource.prev_page_url,
+                });
             })
             .catch((err: any) => {
                 console.log('GET DISTRIBRUTION REPORT', err.message);
             });
-    }, []);
+    }, [url]);
 
     useEffect(() => {
         if (!initialRecords) {
             return;
         }
-        setInitialRecords(() => {
+        setRecordsData(() => {
             return initialRecords.filter((item) => {
                 return (
                     item.distribution_report_code.toLowerCase().includes(search.toLowerCase()) ||
@@ -80,7 +114,6 @@ const LaporanDistribusi = () => {
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
 
@@ -114,7 +147,7 @@ const LaporanDistribusi = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            { accessor: 'index', title: 'No', render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', render: (e) => recordsData.indexOf(e) + 1 },
                             { accessor: 'distribution_report_code', title: 'No Dokumen', sortable: true },
                             {
                                 accessor: 'branch.branch_name',
@@ -159,17 +192,11 @@ const LaporanDistribusi = () => {
                                 ),
                             },
                         ]}
-                        totalRecords={initialRecords.length}
-                        recordsPerPage={pageSize}
-                        page={page}
-                        onPageChange={(p) => setPage(p)}
-                        recordsPerPageOptions={PAGE_SIZES}
-                        onRecordsPerPageChange={setPageSize}
                         sortStatus={sortStatus}
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
-                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                     />
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                 </div>
             </div>
         </div>

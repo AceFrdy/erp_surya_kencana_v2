@@ -213,33 +213,30 @@ const Distribusi = () => {
 
     // get distribution
     useEffect(() => {
-        const id = setInterval(() => {
-            axios
-                .get(url, {
-                    headers: {
-                        Accept: 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                .then((response) => {
-                    if (response.data.data.resource.data !== 'Data not available') {
-                        setInitialRecords(response.data.data.resource.data);
-                        if (response.data.data.resource.data.length > 0) {
-                            setFormData((prev) => ({ ...prev, branch_id: response.data.data.resource.data[0].branch.id }));
-                        }
-                    }
-
+        axios
+            .get(url, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                if (response.data.data.resource.data !== 'Data not available') {
+                    setInitialRecords(response.data.data.resource.data);
                     // page
                     setMetaLink(response.data.data.resource.meta);
                     setMetaLinksLink(response.data.data.resource.meta.links);
                     setLinksLink(response.data.data.resource.links);
-                })
-                .catch((err: any) => {
-                    console.log('DISTRIBUTION', err.message);
-                });
-        }, 5000);
-        return () => clearInterval(id);
-    }, [initialRecords]);
+                    if (response.data.data.resource.data.length >= 1) {
+                        setFormData((prev) => ({ ...prev, branch_id: response.data.data.resource.data[0].branch.id }));
+                    }
+                    console.log(response.data.data.resource);
+                }
+            })
+            .catch((err: any) => {
+                console.log('DISTRIBUTION', err.message);
+            });
+    }, []);
 
     // get product, unit, branch
     useEffect(() => {
@@ -292,7 +289,19 @@ const Distribusi = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
 
-    const [Edit, setEdit] = useState(false);
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+            }
+        }
+        return localStorage.removeItem('notification');
+    }, []);
+
     return (
         <div
             onClick={() => {
@@ -448,7 +457,7 @@ const Distribusi = () => {
                         className="whitespace-nowrap table-hover"
                         records={initialRecords}
                         columns={[
-                            { accessor: '', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             {
                                 accessor: 'product.product_barcode',
                                 title: 'Barcode',
