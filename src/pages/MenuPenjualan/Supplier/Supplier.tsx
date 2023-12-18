@@ -572,7 +572,6 @@ const Suplier = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const [hapusSuplier, setHapusSuplier] = useState(false);
     const [suplier, setSuplier] = useState([]);
 
     useEffect(() => {

@@ -223,12 +223,12 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menupenjualan/penjualan/detailpenjualan',
+        path: '/menupenjualan/penjualan/detailpenjualan/:id',
         element: <DetailPenjualan />,
         layout: 'default',
     },
     {
-        path: '/menupenjualan/penjualan/editpenjualan',
+        path: '/menupenjualan/penjualan/editpenjualan/:id',
         element: <EditPenjualan />,
         layout: 'default',
     },
