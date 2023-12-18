@@ -648,7 +648,7 @@ const showAlert = async (type: number) => {
 const Penjualan = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const token = localStorage.getItem('accessToken') || '';
+    const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
         dispatch(setPageTitle('Penjualan'));
     });
@@ -707,20 +707,22 @@ const Penjualan = () => {
         // setRecordsData([...initialRecords.slice(from, to)]);
     }, [page, pageSize, initialRecords]);
 
-    // useEffect(() => {
-    //     setInitialRecords(() => {
-    //         return rowData.filter((item) => {
-    //             return (
-    //                 item.id.toString().includes(search.toLowerCase()) ||
-    //                 item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-    //                 item.dob.toLowerCase().includes(search.toLowerCase()) ||
-    //                 item.email.toLowerCase().includes(search.toLowerCase()) ||
-    //                 item.phone.toLowerCase().includes(search.toLowerCase())
-    //             );
-    //         });
-    //     });
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [search]);
+    useEffect(() => {
+        if (!initialRecords) {
+            return;
+        }
+
+        setInitialRecords(() => {
+            return initialRecords.filter((item) => {
+                return (
+                    item.id.toString().includes(search.toLowerCase()) ||
+                    item.sale_order_invoice.toLowerCase().includes(search.toLowerCase()) ||
+                    item.product.product_name.toLowerCase().includes(search.toLowerCase())
+                );
+            });
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -830,26 +832,29 @@ const Penjualan = () => {
     const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/sale-orders');
 
     useEffect(() => {
-        axios
-            .get(url, {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                const penjualan = response.data.data.resource.data_order.data;
-                setInitialRecords(penjualan);
-                // console.log('PENJUALAN', penjualan);
-                // page
-                // setMetaLink(response.data.data.resource.meta);
-                // setMetaLinksLink(response.data.data.resource.meta.links);
-                // setLinksLink(response.data.data.resource.links);
-            })
-            .catch((err: any) => {
-                console.log('PENJUALAN', err.message);
-            });
-    }, [url]);
+        const id = setInterval(() => {
+            axios
+                .get(url, {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                .then((response) => {
+                    const penjualan = response.data.data.resource.data_order.data;
+                    setInitialRecords(penjualan);
+                    console.log('PENJUALAN', penjualan);
+                    // page
+                    // setMetaLink(response.data.data.resource.meta);
+                    // setMetaLinksLink(response.data.data.resource.meta.links);
+                    // setLinksLink(response.data.data.resource.links);
+                })
+                .catch((err: any) => {
+                    console.log('PENJUALAN', err.message);
+                });
+        }, 2000);
+        return () => clearInterval(id);
+    }, []);
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -943,6 +948,23 @@ const Penjualan = () => {
                                     title: 'Sub Total',
                                     sortable: true,
                                 },
+                                {
+                                    accessor: 'action',
+                                    title: 'Opsi',
+                                    titleClassName: '!text-center',
+                                    render: (e) => (
+                                        <div className="flex items-center w-max mx-auto gap-2">
+                                            <button type="button" style={{ color: 'orange' }}>
+                                                <Link to={`/menupenjualan/penjualan/editpenjualan/${e.id}`}>
+                                                    <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                                </Link>
+                                            </button>
+                                            {/* <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-unit', e.id)}>
+                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2" />
+                                            </button> */}
+                                        </div>
+                                    ),
+                                },
                             ]}
                             // totalRecords={initialRecords.length}
                             // recordsPerPage={pageSize}
@@ -1006,7 +1028,15 @@ const Penjualan = () => {
                             </div>
                             <div>
                                 <label htmlFor="gridDiskon">Diskon Penjualan</label>
-                                <input id="gridDiskon" type="text" placeholder="Diskon penjualan" className="form-input" name="sale_order_discount" value={formData.sale_order_discount} onChange={handleChange}/>
+                                <input
+                                    id="gridDiskon"
+                                    type="text"
+                                    placeholder="Diskon penjualan"
+                                    className="form-input"
+                                    name="sale_order_discount"
+                                    value={formData.sale_order_discount}
+                                    onChange={handleChange}
+                                />
                             </div>
                             <div>
                                 <label htmlFor="gridCabang">Cabang</label>

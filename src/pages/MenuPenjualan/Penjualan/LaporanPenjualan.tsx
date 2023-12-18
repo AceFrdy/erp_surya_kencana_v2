@@ -524,6 +524,7 @@ const rowData = [
 
 interface PenjualanDataProps {
     id: number;
+    sale_order_invoice: string;
     user: {
         id: number;
         name: string;
@@ -532,9 +533,7 @@ interface PenjualanDataProps {
         id: number;
         name: string;
     };
-    penjualan_name: string;
-    penjualan_contact: number;
-    penjualan_address: string;
+    sale_report_status: string;
 }
 
 const showAlert = async (type: number) => {
@@ -578,7 +577,6 @@ const LaporanPenjualan = () => {
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [initialRecords, setInitialRecords] = useState<PenjualanDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
-    const [penjualan, setPenjualan] = useState([]);
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -607,21 +605,22 @@ const LaporanPenjualan = () => {
         setRecordsData([...initialRecords.slice(from, to)]);
     }, [page, pageSize, initialRecords]);
 
-    // useEffect(() => {
-    //     setInitialRecords(() => {
-    //         return rowData.filter((item) => {
-    //             return (
-    //                 item.id.toString().includes(search.toLowerCase()) ||
-    //                 item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-    //                 item.lastName.toLowerCase().includes(search.toLowerCase()) ||
-    //                 item.dob.toLowerCase().includes(search.toLowerCase()) ||
-    //                 item.email.toLowerCase().includes(search.toLowerCase()) ||
-    //                 item.phone.toLowerCase().includes(search.toLowerCase())
-    //             );
-    //         });
-    //     });
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [search]);
+    useEffect(() => {
+        if (!initialRecords) {
+            return;
+        }
+        setRecordsData(() => {
+            return initialRecords.filter((item) => {
+                return (
+                    // item.sale_order_invoice.toLowerCase().includes(search.toLowerCase()) ||
+                    item.user.name.toLowerCase().includes(search.toLowerCase())
+                    // item.branch.name.toLowerCase().includes(search.toLowerCase())
+
+                );
+            });
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [search, recordsData]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -641,8 +640,6 @@ const LaporanPenjualan = () => {
             .then((response) => {
                 const penjualan = response.data.data.resource.data;
                 setInitialRecords(penjualan);
-                setPenjualan(penjualan);
-                setRecordsData(penjualan);
                 console.log(penjualan);
             })
             .catch((error) => {
@@ -675,17 +672,16 @@ const LaporanPenjualan = () => {
                         </button>
                     </Link> */}
                     <div className="ltr:ml-auto rtl:mr-auto">
-                        <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
-                    </div>
+                    <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />                    </div>
                 </div>
                 <h5 className="font-semibold text-lg dark:text-white-light mb-2">Laporan Penjualan</h5>
                 <div className="datatables">
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={initialRecords}
+                        records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
                             { accessor: 'sale_report_invoice', title: 'Kode Penjualan', sortable: true },
                             {
                                 accessor: 'user.name',
@@ -693,38 +689,38 @@ const LaporanPenjualan = () => {
                                 sortable: true,
                             },
                             { accessor: 'branch.branch_name', title: 'Cabang', sortable: true },
-                            { accessor: 'age', title: 'Qty Barang', sortable: true },
-                            { accessor: 'age', title: 'Total', sortable: true },
+                            { accessor: 'sale_report_grand_total', title: 'Qty Barang', sortable: true },
+                            { accessor: 'sale_report_money', title: 'Total', sortable: true },
                             {
                                 accessor: 'sale_report_status',
                                 title: 'Status',
                                 sortable: true,
-                                // render: (e) => (
-                                //     <span
-                                //         className={`badge whitespace-nowrap ${
-                                //             e.sale_report_status === 'completed'
-                                //                 ? 'bg-primary   '
-                                //                 : e.sale_report_status === 'Pending'
-                                //                 ? 'bg-secondary'
-                                //                 : e.sale_report_status === 'In Progress'
-                                //                 ? 'bg-success'
-                                //                 : e.sale_report_status === 'Canceled'
-                                //                 ? 'bg-danger'
-                                //                 : 'bg-primary'
-                                //         }`}
-                                //     >
-                                //         {e.sale_report_status}
-                                //     </span>
-                                // ),
+                                render: (e) => (
+                                    <span
+                                        className={`badge whitespace-nowrap ${
+                                            e.sale_report_status === 'completed'
+                                                ? 'bg-primary   '
+                                                : e.sale_report_status === 'Pending'
+                                                ? 'bg-secondary'
+                                                : e.sale_report_status === 'In Progress'
+                                                ? 'bg-success'
+                                                : e.sale_report_status === 'Canceled'
+                                                ? 'bg-danger'
+                                                : 'bg-primary'
+                                        }`}
+                                    >
+                                        {e.sale_report_status}
+                                    </span>
+                                ),
                             },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
-                                render: () => (
+                                render: (e) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menupenjualan/penjualan/detailpenjualan">
+                                            <Link to={`/menupenjualan/penjualan/detailpenjualan/${e.id}`}>
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
