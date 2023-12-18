@@ -282,7 +282,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menukeuangan/akun/detailakun/:id',
+        path: '/menukeuangan/akun/detailakun',
         element: <DetailAkun />,
         layout: 'default',
     },
@@ -292,7 +292,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menukeuangan/akun/editdetailakun',
+        path: '/menukeuangan/akun/editdetailakun/:id',
         element: <EditDetailAkun />,
         layout: 'default',
     },
