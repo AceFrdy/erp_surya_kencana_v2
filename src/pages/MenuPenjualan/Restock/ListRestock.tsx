@@ -13,6 +13,7 @@ import IconPlus from '../../../components/Icon/IconPlus';
 import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import Pagination from '../../../components/Pagination';
 
 const rowData = [
     {
@@ -527,45 +528,43 @@ const rowData = [
     },
 ];
 
-const showAlert = async (type: number) => {
-    if (type === 11) {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
-                popup: 'sweet-alerts',
-            },
-            buttonsStyling: false,
-        });
-        swalWithBootstrapButtons
-            .fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true,
-                padding: '2em',
-            })
-            .then((result) => {
-                if (result.value) {
-                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
-                }
-            });
-    }
-};
+interface DataInitial {
+    id: number;
+    distribution_report_code: string;
+    suplier_id: number;
+    operating_cost: number;
+    items_total: number;
+    grand_total_price: number;
+    status: string;
+}
+
+interface MetaLinkProps {
+    current_page: number;
+    last_page: number;
+    from: number;
+    to: number;
+    per_page: number;
+    total: number;
+}
+interface MetaLinksLinkProps {
+    active: boolean;
+    label: string;
+    url: string;
+}
+
+interface LinksLinkProps {
+    first: string;
+    last: string;
+    next: string;
+    prev: string;
+}
+
 const ListRestock = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('List Restock'));
     });
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
+    const [initialRecords, setInitialRecords] = useState<DataInitial[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
 
     const [search, setSearch] = useState('');
@@ -574,53 +573,67 @@ const ListRestock = () => {
         direction: 'asc',
     });
     const token = localStorage.getItem('accessToken') ?? '';
-    const [listRestok, setListRestok] = useState({});
 
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-reports');
+
+    // get distribution report
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/distribution-restok', {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {
-                setListRestok(response.data.data.resource.data);
+                setInitialRecords(response.data.data.resource.data);
+                console.log('initial', response.data.data);
+
+                // page
+                setMetaLink({
+                    current_page: response.data.data.resource.current_page,
+                    last_page: response.data.data.resource.last_page,
+                    from: response.data.data.resource.from,
+                    to: response.data.data.resource.to,
+                    per_page: response.data.data.resource.per_page,
+                    total: response.data.data.resource.total,
+                });
+                setMetaLinksLink(response.data.data.resource.links);
+                setLinksLink({
+                    first: response.data.data.resource.first_page_url,
+                    last: response.data.data.resource.last_page_url,
+                    next: response.data.data.resource.next_page_url,
+                    prev: response.data.data.resource.prev_page_url,
+                });
             })
-            .catch((err) => {
-                console.log(err);
+            .catch((err: any) => {
+                console.log('GET DISTRIBRUTION REPORT', err.message);
             });
-    }, []);
+    }, [url]);
 
     useEffect(() => {
-        setPage(1);
-    }, [pageSize]);
-
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
-
-    useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
+        if (!initialRecords) {
+            return;
+        }
+        setRecordsData(() => {
+            return initialRecords.filter((item) => {
                 return (
                     item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
+                    item.distribution_report_code.toLowerCase().includes(search.toLowerCase()) ||
+                    item.status.toLowerCase().includes(search.toLowerCase())
                 );
             });
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search]);
+    }, [search, initialRecords]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
 
@@ -639,15 +652,8 @@ const ListRestock = () => {
                     <span> List Restock </span>
                 </li>
             </ul>
-            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
-            </div> */}
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
-                        <button type="button" className=" px-2 btn btn-outline-info">
-                            <IconPlus className="flex mx-2" fill={true} /> Add
-                        </button>
-                    </Link> */}
                     <div className="ltr:ml-auto rtl:mr-auto">
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
@@ -659,15 +665,15 @@ const ListRestock = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'age', title: 'Kode Dokumen', sortable: true },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'distribution_report_code', title: 'Kode Dokumen', sortable: true },
                             {
-                                accessor: 'firstName',
+                                accessor: 'suplier_id',
                                 title: 'Supplier',
                                 sortable: true,
                             },
-                            { accessor: 'email', title: 'Operasional', sortable: true },
-                            { accessor: 'phone', title: 'Total', sortable: true },
+                            { accessor: 'operating_cost', title: 'Operasional', sortable: true },
+                            { accessor: 'grand_total_price', title: 'Total', sortable: true },
                             {
                                 accessor: 'status',
                                 title: 'Status',
@@ -691,7 +697,7 @@ const ListRestock = () => {
                                 ),
                             },
                             {
-                                accessor: 'age',
+                                accessor: 'items_total',
                                 title: 'Distribution Qty',
                                 sortable: true,
                             },
@@ -718,17 +724,11 @@ const ListRestock = () => {
                                 ),
                             },
                         ]}
-                        totalRecords={initialRecords.length}
-                        recordsPerPage={pageSize}
-                        page={page}
-                        onPageChange={(p) => setPage(p)}
-                        recordsPerPageOptions={PAGE_SIZES}
-                        onRecordsPerPageChange={setPageSize}
                         sortStatus={sortStatus}
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
-                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                     />
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                 </div>
             </div>
         </div>
