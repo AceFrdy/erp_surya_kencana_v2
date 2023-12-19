@@ -16,6 +16,8 @@ import IconSend from '../../../components/Icon/IconSend';
 import axios from 'axios';
 import Pagination from '../../../components/Pagination';
 import { toast } from 'react-toastify';
+import { useModal } from '../../../hooks/use-modal';
+import { formatPrice } from '../../../utils';
 // import * as Yup from 'yup';
 // import { Field, Form, Formik } from 'formik';
 
@@ -646,6 +648,7 @@ const showAlert = async (type: number) => {
     }
 };
 const Penjualan = () => {
+    const { onOpen } = useModal();
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') ?? '';
@@ -684,18 +687,6 @@ const Penjualan = () => {
         sale_order_discount: 0,
         branch_id: 0,
     });
-
-    // const randomColor = () => {
-    //     const color = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
-    //     const random = Math.floor(Math.random() * color.length);
-    //     return color[random];
-    // };
-
-    // const randomStatus = () => {
-    //     const status = ['PAID', 'APPROVED', 'FAILED', 'CANCEL', 'SUCCESS', 'PENDING', 'COMPLETE'];
-    //     const random = Math.floor(Math.random() * status.length);
-    //     return status[random];
-    // };
 
     useEffect(() => {
         setPage(1);
@@ -843,11 +834,11 @@ const Penjualan = () => {
                 .then((response) => {
                     const penjualan = response.data.data.resource.data_order.data;
                     setInitialRecords(penjualan);
-                    console.log('PENJUALAN', penjualan);
+                    // console.log('PENJUALAN', penjualan);
                     // page
-                    // setMetaLink(response.data.data.resource.meta);
-                    // setMetaLinksLink(response.data.data.resource.meta.links);
-                    // setLinksLink(response.data.data.resource.links);
+                    setMetaLink(response.data.data.resource.meta);
+                    setMetaLinksLink(response.data.data.resource.meta.links);
+                    setLinksLink(response.data.data.resource.links);
                 })
                 .catch((err: any) => {
                     console.log('PENJUALAN', err.message);
@@ -942,11 +933,13 @@ const Penjualan = () => {
                                     accessor: 'sale_order_total',
                                     title: 'Harga',
                                     sortable: true,
+                                    render: (e) => formatPrice(e.sale_order_total),
                                 },
                                 {
                                     accessor: 'sale_order_sub_total',
                                     title: 'Sub Total',
                                     sortable: true,
+                                    render: (e) => formatPrice(e.sale_order_sub_total),
                                 },
                                 {
                                     accessor: 'action',
@@ -959,9 +952,9 @@ const Penjualan = () => {
                                                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                                 </Link>
                                             </button>
-                                            {/* <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-unit', e.id)}>
-                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2" />
-                                            </button> */}
+                                            <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-data-penjualan', e.id)}>
+                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                            </button>
                                         </div>
                                     ),
                                 },

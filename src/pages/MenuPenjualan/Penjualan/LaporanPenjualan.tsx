@@ -640,7 +640,6 @@ const LaporanPenjualan = () => {
             .then((response) => {
                 const penjualan = response.data.data.resource.data;
                 setInitialRecords(penjualan);
-                console.log(penjualan);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
