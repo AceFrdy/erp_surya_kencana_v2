@@ -15,6 +15,9 @@ import Swal from 'sweetalert2';
 import IconSend from '../../../components/Icon/IconSend';
 import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
 import axios from 'axios';
+import { formatPrice } from '../../../utils';
+import { useModal } from '../../../hooks/use-modal';
+import Pagination from '../../../components/Pagination';
 // import * as Yup from 'yup';
 // import { Field, Form, Formik } from 'formik';
 
@@ -579,6 +582,7 @@ const showAlert = async (type: number) => {
 };
 
 interface DetailPenjualan {
+    id: number;
     sale_report_invoice: string;
     sale_order_qty: number;
     product: {
@@ -588,9 +592,31 @@ interface DetailPenjualan {
     sale_order_sub_total: number;
 }
 
+interface MetaLinkProps {
+    current_page: number;
+    last_page: number;
+    from: number;
+    to: number;
+    per_page: number;
+    total: number;
+}
+interface MetaLinksLinkProps {
+    active: boolean;
+    label: string;
+    url: string;
+}
+
+interface LinksLinkProps {
+    first: string;
+    last: string;
+    next: string;
+    prev: string;
+}
+
 const DetailPenjualan = () => {
+    const { onOpen } = useModal();
     const dispatch = useDispatch();
-    const token = localStorage.getItem('accessToken') || '';
+    const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
         dispatch(setPageTitle('Detail Penjualan'));
     });
@@ -610,6 +636,11 @@ const DetailPenjualan = () => {
         direction: 'asc',
     });
     const { id } = useParams();
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>(`https://erp.digitalindustryagency.com/api/sale-reports/${id}`);
 
     useEffect(() => {
         setPage(1);
@@ -670,7 +701,7 @@ const DetailPenjualan = () => {
 
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/sale-reports/${id}`, {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -684,6 +715,10 @@ const DetailPenjualan = () => {
                 setCash(response.data.data.resource.sale_report_money);
                 setDebt(response.data.data.resource.sale_report_debt);
 
+                // page
+                setMetaLink(response.data.data.resource.meta);
+                setMetaLinksLink(response.data.data.resource.meta.links);
+                setLinksLink(response.data.data.resource.links);
             })
             .catch((err: any) => {
                 console.log('GET SALE REPORT', err.message);
@@ -745,32 +780,31 @@ const DetailPenjualan = () => {
                                     accessor: 'sale_order_total',
                                     title: 'Harga',
                                     sortable: true,
+                                    render: (e) => formatPrice(e.sale_order_total),
                                 },
                                 {
                                     accessor: 'sale_order_sub_total',
                                     title: 'Sub Total',
                                     sortable: true,
+                                    render: (e) => formatPrice(e.sale_order_sub_total),
                                 },
-                                // {
-                                //     accessor: 'action',
-                                //     title: 'Opsi',
-                                //     titleClassName: '!text-center',
-                                //     render: () => (
-                                //         <div className="flex items-center w-max mx-auto gap-2">
-                                //             {/* <button type="button" style={{ color: 'blue' }}>
-                                //             <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                //         </button> */}
-                                //             <button type="button" style={{ color: 'orange' }}>
-                                //                 <Link to="/menupenjualan/restock/editrestock">
-                                //                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                //                 </Link>
-                                //             </button>
-                                //             <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                //                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                //             </button>
-                                //         </div>
-                                //     ),
-                                // },
+                                {
+                                    accessor: 'action',
+                                    title: 'Opsi',
+                                    titleClassName: '!text-center',
+                                    render: (e) => (
+                                        <div className="flex items-center w-max mx-auto gap-2">
+                                            {/* <button type="button" style={{ color: 'orange' }}>
+                                                <Link to="/menupenjualan/penjualan/laporanpenjualan">
+                                                    <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                                </Link>
+                                            </button> */}
+                                            <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-data-detail-penjualan', e.id)}>
+                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                            </button>
+                                        </div>
+                                    ),
+                                },
                             ]}
                             totalRecords={initialRecords.length}
                             recordsPerPage={pageSize}
@@ -783,6 +817,7 @@ const DetailPenjualan = () => {
                             minHeight={200}
                             paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                         />
+                        {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                     </div>
                     <form className="space-y-5 panel xl:col-span-1">
                         <h1 className="font-semibold text-xl dark:text-white-light mb-2 justify-center flex">Penjualan</h1>
@@ -790,18 +825,10 @@ const DetailPenjualan = () => {
                             <div>
                                 <label htmlFor="gridCustomer">Customer</label>
                                 <input value={customer} className="form-input text-black border-zinc-300" disabled />
-                                {/* <select id="gridCustomer" disabled className="form-select text-white-dark">
-                                    <option>Trickster</option>
-                                    <option>Choose...</option>
-                                </select> */}
                             </div>
                             <div>
                                 <label htmlFor="gridCabang">Cabang</label>
                                 <input value={branch} className="form-input text-black border-zinc-300" disabled />
-                                {/* <select id="gridCabang" disabled className="form-select text-white-dark">
-                                    <option>Gedung Utama</option>
-                                    <option>Choose...</option>
-                                </select> */}
                             </div>
                         </div>
                         <div>
