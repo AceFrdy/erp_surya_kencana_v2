@@ -73,24 +73,22 @@ const Produk = () => {
 
     // get produk
     useEffect(() => {
-        const id = setInterval(() => {
-            axios
-                .get('https://erp.digitalindustryagency.com/api/products', {
-                    headers: {
-                        Accept: 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                .then((response) => {
-                    const product = response.data.data.resource.data;
-                    setInitialRecords(product);
-                })
-                .catch((error) => {
-                    console.error('Error fetching data:', error);
-                });
-        }, 2000);
-        return () => clearInterval(id);
-    }, [initialRecords]);
+        axios
+            .get('https://erp.digitalindustryagency.com/api/products', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const product = response.data.data.resource.data;
+                setInitialRecords(product);
+                console.log(product);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    }, []);
 
     return (
         <div>
@@ -125,7 +123,7 @@ const Produk = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             {
@@ -133,8 +131,8 @@ const Produk = () => {
                                 title: 'Foto',
                                 sortable: true,
                                 render: (e) => (
-                                    <div className="flex items-center w-max">
-                                        <img className="w-16 h-16 ltr:mr-2 rtl:ml-2 object-cover" src={e.product_image} alt="" />
+                                    <div className="flex items-center w-max ">
+                                        <img className="w-16 h-16 ltr:mr-2 rtl:ml-2 object-cover rounded-md overflow-hidden" src={e.product_image} alt="" />
                                     </div>
                                 ),
                             },
@@ -146,11 +144,6 @@ const Produk = () => {
                             {
                                 accessor: 'product_name',
                                 title: 'Nama',
-                                sortable: true,
-                            },
-                            {
-                                accessor: 'product_stock',
-                                title: 'Qty',
                                 sortable: true,
                             },
                             {
@@ -178,16 +171,9 @@ const Produk = () => {
                                 ),
                             },
                         ]}
-                        totalRecords={initialRecords.length}
-                        recordsPerPage={pageSize}
-                        page={page}
-                        onPageChange={(p) => setPage(p)}
-                        recordsPerPageOptions={PAGE_SIZES}
-                        onRecordsPerPageChange={setPageSize}
                         sortStatus={sortStatus}
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
-                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                     />
                 </div>
             </div>
