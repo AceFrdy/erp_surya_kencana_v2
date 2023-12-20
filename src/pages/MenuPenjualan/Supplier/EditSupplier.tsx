@@ -115,6 +115,7 @@ const EditSupplier = () => {
                                     type="text"
                                     placeholder="Nama Supplier..."
                                     className="form-input"
+name='suplier_name'
                                     value={formData.suplier_name}
                                     onChange={(e) => handleInputChange('suplier_name', e.target.value)}
                                 />

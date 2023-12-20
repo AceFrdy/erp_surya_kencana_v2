@@ -76,7 +76,7 @@ const Sidebar = () => {
                     <div className="flex justify-between items-center px-2 py-3">
                         <NavLink to="/" className="main-logo flex items-center shrink-0">
                             {/* <img className="w-8 ml-[5px] flex-none" src="/assets/images/logo.svg" alt="logo" /> */}
-                            <span className="text-2xl ltr:ml-1.5 rtl:mr-1.5 font-semibold align-middle lg:inline dark:text-white-light">{t('ERP Sinar Kencana')}</span>
+                            <span className="text-2xl ltr:ml-1.5 rtl:mr-1.5 font-semibold align-middle hover:text-primary lg:inline dark:text-white-light">{t('ERP Sinar Kencana')}</span>
                         </NavLink>
 
                         <button
@@ -499,10 +499,10 @@ const Sidebar = () => {
                                 <svg className="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                 </svg>
-                                <span>{t('user_and_pages')}</span>
+                                <span>{t('Menu Pengguna')}</span>
                             </h2>
                             <li className="menu nav-item">
-                                <NavLink to="/hakakses" className="group">
+                                <NavLink to="/menupengguna/hakakses" className="group">
                                     <div className="flex items-center">
                                         <svg className="group-hover:!text-primary shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path
@@ -523,7 +523,7 @@ const Sidebar = () => {
                                 </NavLink>
                             </li>
 
-                            <li className="menu nav-item">
+                            {/* <li className="menu nav-item">
                                 <button type="button" className={`${currentMenu === 'users' ? 'active' : ''} nav-link group w-full`} onClick={() => toggleMenu('users')}>
                                     <div className="flex items-center">
                                         <svg className="group-hover:!text-primary shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -545,14 +545,14 @@ const Sidebar = () => {
                                 <AnimateHeight duration={300} height={currentMenu === 'users' ? 'auto' : 0}>
                                     <ul className="sub-menu text-gray-500">
                                         <li>
-                                            <NavLink to="/users/profile">{t('profile')}</NavLink>
+                                            <NavLink to="/menupengguna/akun">{t('Akun')}</NavLink>
                                         </li>
                                         <li>
-                                            <NavLink to="/users/user-account-settings">{t('account_settings')}</NavLink>
+                                            <NavLink to="/menupengguna/akun/akundetail">{t('Akun Detail')}</NavLink>
                                         </li>
                                     </ul>
                                 </AnimateHeight>
-                            </li>
+                            </li> */}
 
                             
 

@@ -533,12 +533,12 @@ const DetailCabang = () => {
                 </div>
             </div>
             <h1 className="text-lg dark:text-white-light mb-5 font-semibold mb-6">Detail Cabang</h1>
-            <div className="mb-5">
+            <div className="mx-5">
                 <div className="flex justify-center grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-                    <div className="panel h-full mr-4 col-span-2">
+                    <div className="panel h-full w-full col-span-2">
                         <div className="flex justify-between dark:text-white-light mb-5">
                             <h5 className="font-semibold text-lg ">Expenses</h5>
-                            <div className="dropdown">
+                            {/* <div className="dropdown">
                                 <Dropdown
                                     offset={[0, 5]}
                                     placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
@@ -560,7 +560,7 @@ const DetailCabang = () => {
                                         </li>
                                     </ul>
                                 </Dropdown>
-                            </div>
+                            </div> */}
                         </div>
                         <div className=" text-[#e95f2b] text-3xl font-bold my-10">
                             <span>$ 45,141 </span>
@@ -571,35 +571,19 @@ const DetailCabang = () => {
                             <div className="w-full rounded-full h-5 p-1 bg-dark-light overflow-hidden shadow-3xl dark:shadow-none dark:bg-dark-light/10">
                                 <div
                                     className="bg-gradient-to-r from-[#4361ee] to-[#805dca] w-full h-full rounded-full relative before:absolute before:inset-y-0 ltr:before:right-0.5 rtl:before:left-0.5 before:bg-white before:w-2 before:h-2 before:rounded-full before:m-auto"
-                                    style={{ width: '65%' }}
+                                    style={{ width: '57%' }}
                                 ></div>
                             </div>
                             <span className="ltr:ml-5 rtl:mr-5 dark:text-white-light">57%</span>
                         </div>
                     </div>
-                    <div className="panel overflow-hidden col-span-2 dark:text-white-light mb-5">
+                    <div className="panel overflow-hidden col-span-2 dark:text-white-light ">
                         <div className="flex items-center justify-between">
                             <div>
                                 <div className="text-lg font-bold">Top Sales Product</div>
                                 <div className="text-info"> Berdasarkan Tahun 2022 </div>
                             </div>
-                            <div className="dropdown">
-                                <Dropdown
-                                    offset={[0, 5]}
-                                    placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                    btnClassName="hover:opacity-80"
-                                    button={<IconHorizontalDots className="hover:opacity-80 opacity-70" />}
-                                >
-                                    <ul>
-                                        <li>
-                                            <button type="button">View Report</button>
-                                        </li>
-                                        <li>
-                                            <button type="button">Edit Report</button>
-                                        </li>
-                                    </ul>
-                                </Dropdown>
-                            </div>
+                            
                         </div>
                         <div className="relative mt-10">
                             <div className="absolute -bottom-12 ltr:-right-12 rtl:-left-12 w-24 h-24">

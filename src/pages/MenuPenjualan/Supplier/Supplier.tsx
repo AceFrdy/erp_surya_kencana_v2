@@ -671,23 +671,23 @@ const Suplier = () => {
                                 title: 'Address',
                                 sortable: true,
                             },
-                            // {
-                            //     accessor: 'action',
-                            //     title: 'Opsi',
-                            //     titleClassName: '!text-center',
-                            //     render: (row) => (
-                            //         <div className="flex items-center w-max mx-auto gap-2">
-                            //             <button type="button" style={{ color: 'orange' }}>
-                            //                 <Link to={`/menupenjualan/supplier/editsupplier/${row.id}`}>
-                            //                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                            //                 </Link>
-                            //             </button>
-                            //             <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                            //                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                            //             </button>
-                            //         </div>
-                            //     ),
-                            // },
+                            {
+                                accessor: 'action',
+                                title: 'Opsi',
+                                titleClassName: '!text-center',
+                                render: (row) => (
+                                    <div className="flex items-center w-max mx-auto gap-2">
+                                        <button type="button" style={{ color: 'orange' }}>
+                                            <Link to={`/menupenjualan/supplier/editsupplier/${row.id}`}>
+                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                            </Link>
+                                        </button>
+                                        <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                        </button>
+                                    </div>
+                                ),
+                            },
                         ]}
                         totalRecords={initialRecords.length}
                         recordsPerPage={pageSize}

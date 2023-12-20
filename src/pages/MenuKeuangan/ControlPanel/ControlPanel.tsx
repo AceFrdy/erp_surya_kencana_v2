@@ -678,9 +678,9 @@ const ControlPanel = () => {
             {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
             </div> */}
             <div className="panel mt-6 dark:text-white-light mb-5">
-                <h1 className="text-lg font-bold font- flex justify-start py-4">Data Penjualan</h1>
+                <h1 className="text-lg font-bold flex justify-start py-4">Data Penjualan</h1>
                 <div className="flex justify-center grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-                    <div className="panel bg-gradient-to-r col-span-4 from-blue-500 to-blue-900">
+                    <div className="panel col-span-4 text-black dark:text-white bg-gradient-to-r to-[#35654d] from-[#7ed56f] dark:from-[#35654d] dark:to-[#7ed56f]">
                         {/* <div className='flex'>
                         <IconCashBanknotes className='w-20 h-20' />
                         </div> */}
@@ -756,7 +756,7 @@ const ControlPanel = () => {
                                     render: () => (
                                         <div className="flex">
                                             <label className="inline-flex">
-                                                <input type="checkbox" className="form-checkbox outline-info w-8 h-8" defaultChecked />
+                                                <input type="checkbox" className="form-checkbox outline-info " defaultChecked />
                                             </label>
                                         </div>
                                     ),
@@ -768,7 +768,7 @@ const ControlPanel = () => {
                                     render: () => (
                                         <div className="flex">
                                             <label className="inline-flex">
-                                                <input type="checkbox" className="form-checkbox outline-info w-8 h-8" defaultChecked />
+                                                <input type="checkbox" className="form-checkbox outline-info" defaultChecked />
                                             </label>
                                         </div>
                                     ),
@@ -780,7 +780,7 @@ const ControlPanel = () => {
                                     render: () => (
                                         <div className="flex ">
                                             <label className="inline-flex">
-                                                <input type="checkbox" className="form-checkbox outline-info w-8 h-8" defaultChecked />
+                                                <input type="checkbox" className="form-checkbox outline-info " defaultChecked />
                                             </label>
                                         </div>
                                     ),
