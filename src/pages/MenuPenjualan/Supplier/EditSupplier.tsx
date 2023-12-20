@@ -67,7 +67,7 @@ const EditSupplier = () => {
             })
             .then((response) => {
                 console.log('suplier data successfully updated:', response.data);
-                navigate('/menupenjualan/supplier');
+                navigate('/menupenjualan/cabang/listcabang');
                 toast.success('Data berhasil diedit', {
                     position: 'top-right',
                     autoClose: 3000,
@@ -84,7 +84,7 @@ const EditSupplier = () => {
     };
 
     const handleCancel = () => {
-        navigate('/menupenjualan/supplier');
+        navigate('/menupenjualan/cabang/listcabang');
     };
 
     if (loading) {
@@ -125,7 +125,6 @@ name='suplier_name'
                                     type="text"
                                     placeholder="Alamat Supplier..."
                                     className="form-input"
-name='suplier_address'
                                     value={formData.suplier_address}
                                     onChange={(e) => handleInputChange('suplier_address', e.target.value)}
                                 />
@@ -135,7 +134,6 @@ name='suplier_address'
                                     type="text"
                                     placeholder="No Handphone..."
                                     className="form-input"
-name='suplier_contact'
                                     value={formData.suplier_contact}
                                     onChange={(e) => handleInputChange('suplier_contact', e.target.value)}
                                 />
