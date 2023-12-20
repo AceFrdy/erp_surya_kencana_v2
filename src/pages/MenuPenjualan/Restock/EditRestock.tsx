@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { setPageTitle } from '../../../store/themeConfigSlice';
+import axios from 'axios';
 
 const showAlert = async (type: number) => {
     if (type == 20) {
@@ -19,43 +20,83 @@ const showAlert = async (type: number) => {
         });
     }
 };
+interface ProductListProps {
+    id: number;
+    product_barcode: string;
+    product_name: string;
+}
+
+interface FormDataProps {
+    product_name: string;
+    product_qty: number;
+    product_price: number;
+}
+
 const EditRestock = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('List Restock'));
     });
-    const [operasionalCost, setOperasionalCost] = useState('');
-    const [cost, setCost] = useState('');
+    const [formData, setFormData] = useState<FormDataProps>({
+        product_name: '',
+        product_qty: 0,
+        product_price: 0,
+    });
+    const { id } = useParams();
+    const token = localStorage.getItem('accessToken') ?? '';
 
-    const handleOperasioanalCostChange = (e: { target: { value: any } }) => {
-        const inputValue = e.target.value;
-        let formattedValue = '';
+    useEffect(() => {
+        axios
+            .get(`https://erp.digitalindustryagency.com/api/distribution-restok/${id}`, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                console.log('data show', response.data);
+            })
+            .catch((err: any) => {
+                console.log('data show error', err.message);
+            });
+    }, []);
 
-        // Remove non-numeric characters
-        const numericValue = inputValue.replace(/\D/g, '');
+    const [productList, setProductList] = useState<ProductListProps[]>([]);
+    const [filteredProduct, setFilteredProduct] = useState<ProductListProps[]>(productList);
+    const [showProduct, setShowProduct] = useState<boolean>(false);
+    const ProductRef = useRef<HTMLInputElement>(null);
 
-        // Format the number with 'Rp.' prefix
-        if (numericValue !== '') {
-            formattedValue = `Rp. ${parseInt(numericValue, 10).toLocaleString('id-ID')}`;
-        }
-
-        setOperasionalCost(formattedValue);
+    const handleProductChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const inputValue = e.target.value.toLowerCase();
+        const filtered = productList.filter((item) => item.product_name.toLowerCase().includes(inputValue));
+        setFilteredProduct(filtered);
+        setShowProduct(true);
     };
 
-    const handleCostChange = (e: { target: { value: any } }) => {
-        const inputValue = e.target.value;
-        let formatValue = '';
-
-        // Remove non-numeric characters
-        const numValue = inputValue.replace(/\D/g, '');
-
-        // Format the number with 'Rp.' prefix
-        if (numValue !== '') {
-            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
+    const handleProductClick = (option: string) => {
+        setShowProduct(false);
+        if (ProductRef.current) {
+            ProductRef.current.value = option;
         }
-
-        setCost(formatValue);
     };
+
+    // get product
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/products', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setProductList(response.data.data.resource.data);
+            })
+            .catch((err: any) => {
+                console.log('DISTRIBUTION', err.message);
+            });
+    }, []);
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -74,38 +115,63 @@ const EditRestock = () => {
                 </li>
             </ul>
             <div className="panel mt-6">
-                <h1 className="text-xl font-bold mb-4">Edit Data</h1>
+                <h1 className="text-xl font-bold mb-8">Edit Data</h1>
                 <form className="space-y-5">
-                    <div>
-                        <label htmlFor="gridState">Supplier</label>
-                        <select id="gridState" className="form-select text-white-dark">
-                            <option>Trickster</option>
-                            <option>Chose...</option>
-                        </select>
+                    <div className="relative">
+                        <label htmlFor="nama">Nama Produk</label>
+                        <input id="nama" ref={ProductRef} type="text" className="form-input" placeholder="Nama Produk" onChange={handleProductChange} autoComplete="off" />
+                        {showProduct && (
+                            <div className="w-full flex absolute top-[70px] p-1 bg-white z-20 border border-zinc-100 rounded-md">
+                                <div className="h-40 overflow-y-scroll w-full">
+                                    <div className="h-auto flex flex-col w-full pb-[120px]">
+                                        {filteredProduct.map((item) => (
+                                            <button
+                                                className="h-10 w-full hover:bg-green-100 text-start flex px-5 items-center rounded-md"
+                                                key={item.id}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    handleProductClick(item.product_name);
+                                                    setFormData((prev) => ({ ...prev, product_name: item.product_name }));
+                                                }}
+                                            >
+                                                {item.product_name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
-                    <div>
-                        <label htmlFor="Opcost">Operasional Cost</label>
-                        <input id="Opcost" type="text" value={1028237} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div>
-                            <label htmlFor="Produk">Produk</label>
-                            <input id="Produk" type="Text" placeholder="Produk..." value="Baju" className="form-input" />
+                    <div className="flex gap-x-8 w-full">
+                        <div className="w-full">
+                            <label htmlFor="product_qty">Qty</label>
+                            <input
+                                id="product_qty"
+                                type="number"
+                                placeholder=""
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                    e.preventDefault();
+                                    setFormData((prev) => ({ ...prev, product_qty: parseFloat(e.target.value) }));
+                                }}
+                                value={formData.product_qty}
+                                className="form-input"
+                            />
                         </div>
-                        <div>
-                            <label htmlFor="Qty">Qty</label>
-                            <input id="Qty" type="Text" placeholder="Qty..." value="224" className="form-input" />
+                        <div className="relative w-full">
+                            <label htmlFor="product_price">Harga</label>
+                            <input
+                                id="product_price"
+                                type="number"
+                                value={formData.product_price}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                    e.preventDefault();
+                                    setFormData((prev) => ({ ...prev, product_price: parseFloat(e.target.value) }));
+                                }}
+                                placeholder="Harga"
+                                className="form-input pl-10"
+                            />
+                            <p className="absolute top-9 left-3">Rp.</p>
                         </div>
-                        <div>
-                            <label htmlFor="Cost">Harga</label>
-                            <input id="Cost" type="text" value={224456} onChange={handleCostChange} placeholder="Rp." className="form-input" />
-                        </div>
-                    </div>
-                    <div>
-                        <label className="flex items-center mt-1 cursor-pointer">
-                            <input type="checkbox" className="form-checkbox" />
-                            <span className="text-white-dark">Check me out</span>
-                        </label>
                     </div>
                     <div className="flex">
                         <Link to="/menupenjualan/restock/listrestock">

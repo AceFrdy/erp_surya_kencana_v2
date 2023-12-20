@@ -2,8 +2,6 @@ import { Fragment } from 'react';
 import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 
 const DeleteSeluruhDistribusiModal = () => {
@@ -23,11 +21,21 @@ const DeleteSeluruhDistribusiModal = () => {
             })
             .then((response) => {
                 onClose();
-                toast.success('Hapus Data Distribusi Berhasil.');
+                const notification = {
+                    type: 'success',
+                    message: 'Data Distribusi Berhasil Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE CUSTOMER', err);
+                console.log('DELETE DISTRIBUSI', err);
+                const notification = {
+                    type: 'error',
+                    message: 'Data Distribusi Gagal Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 

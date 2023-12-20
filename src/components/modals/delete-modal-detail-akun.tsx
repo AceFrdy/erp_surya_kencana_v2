@@ -2,14 +2,14 @@ import { Fragment } from 'react';
 import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
-const DeleteProductModal = () => {
+const DeleteDetailAkunModal = () => {
     const { isOpen, type, onClose, data } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
 
     const isModalOpen = isOpen && type === 'delete-detail-akun';
+    const navigate = useNavigate();
 
     const handleDelete = (id: number) => {
         axios
@@ -21,10 +21,21 @@ const DeleteProductModal = () => {
             })
             .then(() => {
                 onClose();
-                toast.success('Product Berhasil Dihapus.');
+                const notification = {
+                    type: 'success',
+                    message: 'Detail Akun Berhasil Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             })
             .catch((err) => {
                 console.log('DELETE PRODUCT', err);
+                const notification = {
+                    type: 'error',
+                    message: 'Detail Akun Gagal Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
@@ -81,4 +92,4 @@ const DeleteProductModal = () => {
     );
 };
 
-export default DeleteProductModal;
+export default DeleteDetailAkunModal;

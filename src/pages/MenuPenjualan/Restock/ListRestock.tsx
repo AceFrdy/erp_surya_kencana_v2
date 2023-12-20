@@ -4,40 +4,29 @@ import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
 import IconPencil from '../../../components/Icon/IconPencil';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import IconNotes from '../../../components/Icon/IconNotes';
 import axios from 'axios';
 import Pagination from '../../../components/Pagination';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
+import IconArchive from '../../../components/Icon/IconArchive';
 
 interface DataInitial {
     id: number;
     distribution_report_code: string;
-    suplier_id: number;
+    suplier: {
+        id: number;
+        suplier_name: string;
+    };
     operating_cost: number;
     items_total: number;
     grand_total_price: number;
     status: string;
 }
 
-interface MetaLinkProps {
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-    per_page: number;
-    total: number;
-}
-interface MetaLinksLinkProps {
-    active: boolean;
-    label: string;
-    url: string;
-}
-
-interface LinksLinkProps {
-    first: string;
-    last: string;
-    next: string;
-    prev: string;
+interface SuplierProps {
+    id: number;
+    suplier_name: string;
 }
 
 const ListRestock = () => {
@@ -54,12 +43,30 @@ const ListRestock = () => {
         direction: 'asc',
     });
     const token = localStorage.getItem('accessToken') ?? '';
+    const navigate = useNavigate();
+
+    const handleFinished = (idRestock: number) => {
+        axios
+            .post(
+                `https://erp.digitalindustryagency.com/api/distribution-reports-approved-restok/${idRestock}`,
+                {},
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
+            .then((response) => {
+                navigate(0);
+            });
+    };
 
     // pagination
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-reports');
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-report-restoks');
 
     // get distribution report
     useEffect(() => {
@@ -102,9 +109,9 @@ const ListRestock = () => {
         setRecordsData(() => {
             return initialRecords.filter((item) => {
                 return (
-                    item.id.toString().includes(search.toLowerCase()) ||
                     item.distribution_report_code.toLowerCase().includes(search.toLowerCase()) ||
-                    item.status.toLowerCase().includes(search.toLowerCase())
+                    item.status.toLowerCase().includes(search.toLowerCase()) ||
+                    item.suplier.suplier_name.toLowerCase().includes(search.toLowerCase())
                 );
             });
         });
@@ -148,12 +155,18 @@ const ListRestock = () => {
                             { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
                             { accessor: 'distribution_report_code', title: 'Kode Dokumen', sortable: true },
                             {
-                                accessor: 'suplier_id',
+                                accessor: 'suplier.suplier_name',
                                 title: 'Supplier',
                                 sortable: true,
                             },
-                            { accessor: 'operating_cost', title: 'Operasional', sortable: true },
-                            { accessor: 'grand_total_price', title: 'Total', sortable: true },
+                            { accessor: 'operating_cost', title: 'Operasional', sortable: true, render: (e) => formatPrice(e.operating_cost) },
+                            {
+                                accessor: 'items_total',
+                                title: 'Distribution Qty',
+                                sortable: true,
+                                textAlignment: 'center',
+                            },
+                            { accessor: 'grand_total_price', title: 'Total', sortable: true, render: (e) => formatPrice(e.grand_total_price) },
                             {
                                 accessor: 'status',
                                 title: 'Status',
@@ -177,11 +190,6 @@ const ListRestock = () => {
                                 ),
                             },
                             {
-                                accessor: 'items_total',
-                                title: 'Distribution Qty',
-                                sortable: true,
-                            },
-                            {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
@@ -192,14 +200,11 @@ const ListRestock = () => {
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        <button type="button" style={{ color: 'orange' }}>
-                                            <Link to={`/menupenjualan/restock/editrestock/${e.id}`}>
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
+                                        <form className="flex items-center" onSubmit={handleFinished}>
+                                            <button type="submit" style={{ color: 'blue' }}>
+                                                <IconArchive className="ltr:mr-2 rtl:ml-2 " />
+                                            </button>
+                                        </form>
                                     </div>
                                 ),
                             },
