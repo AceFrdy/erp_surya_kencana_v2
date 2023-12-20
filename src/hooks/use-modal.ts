@@ -9,7 +9,11 @@ export type ModalType =
     | 'delete-data-distribusi'
     | 'delete-seluruh-distribusi'
     | 'edit-distribusi'
-    | 'delete-restock';
+    | 'delete-restock'
+    | 'delete-detail-akun'
+    | 'delete-seluruh-restock'
+    | 'finish-restock'
+    | 'finish-distribusi';
 
 interface ModalStore {
     type: ModalType | null;
