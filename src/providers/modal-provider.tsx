@@ -9,6 +9,7 @@ import DeleteSeluruhDistribusiModal from '../components/modals/delete-seluruh-di
 import EditDistribusiModal from '../components/modals/edit-distribusi-modal';
 import DeleteRestockModal from '../components/modals/delete-restock-modal';
 import DeleteDataRestockModal from '../components/modals/delete-data-restock-modal';
+import DeleteDataPenjualanModal from '../components/modals/delete-data-penjualan-modal';
 
 const ModalProvider = () => {
     return (
@@ -23,7 +24,7 @@ const ModalProvider = () => {
             <EditDistribusiModal />
             <DeleteRestockModal />
             <DeleteDataRestockModal />
-            <DeleteDetailAkunModal />
+            <DeleteDataPenjualanModal />
         </>
     );
 };
