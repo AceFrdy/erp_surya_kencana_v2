@@ -1,16 +1,13 @@
 import { lazy } from 'react';
-import Karyawan from '../pages/MenuHumanResource/Karyawan/Karyawan';
-import AddKaryawan from '../pages/MenuHumanResource/Karyawan/AddKaryawan';
-import EditKaryawan from '../pages/MenuHumanResource/Karyawan/EditKaryawan';
-import Jabatan from '../pages/MenuHumanResource/Jabatan/Jabatan';
-import DetailJabatan from '../pages/MenuHumanResource/Jabatan/DetailJabatan';
-<<<<<<< HEAD:src/router/routes.tsx
-import HakAkses from '../pages/MenuPengguna/HakAkses';
-import User from '../pages/MenuPengguna/User';
-import DetailUser from '../pages/MenuPengguna/DetailUser';
-=======
-import AddProduk from '../pages/MenuPenjualan/Product/InputProduk';
->>>>>>> fb3e62dfcf37d1607cfd45c6d21e9868126fdec5:src/router/routes.jsx
+const Karyawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/Karyawan'));
+const AddKaryawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/AddKaryawan'));
+const EditKaryawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/EditKaryawan'));
+const Jabatan = lazy(() => import('../pages/MenuHumanResource/Jabatan/Jabatan'));
+const DetailJabatan = lazy(() => import('../pages/MenuHumanResource/Jabatan/DetailJabatan'));
+const HakAkses = lazy(() => import('../pages/MenuPengguna/HakAkses'));
+const User = lazy(() => import('../pages/MenuPengguna/User'));
+const DetailUser = lazy(() => import('../pages/MenuPengguna/DetailUser'));
+const AddProduk = lazy(() => import('../pages/MenuPenjualan/Product/InputProduk'));
 const Index = lazy(() => import('../pages/Index'));
 const Ecommerce = lazy(() => import('../pages/Ecommerce'));
 const Kategoriproduk = lazy(() => import('../pages/MenuPenjualan/KategoriProduk/KategoriProduk'));
