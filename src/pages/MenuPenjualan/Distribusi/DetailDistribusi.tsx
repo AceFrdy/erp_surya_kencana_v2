@@ -34,6 +34,8 @@ const DetailDistribusi = () => {
     const { id } = useParams();
     const [initialRecords, setInitialRecords] = useState<DetailDistribution[]>([]);
     const [branchName, setBranchName] = useState<string>('');
+    const [statusKode, setStatusKode] = useState<string>('');
+    const [distribusiCode, setDistribusiCode] = useState<string>('');
 
     // get distribution report by id
     useEffect(() => {
@@ -47,6 +49,8 @@ const DetailDistribusi = () => {
             .then((response) => {
                 setInitialRecords(response.data.data.resource.distributions);
                 setBranchName(response.data.data.resource.branch.branch_name);
+                setStatusKode(response.data.data.resource.status);
+                setDistribusiCode(response.data.data.resource.distributions[0].distribution_code);
             })
             .catch((err: any) => {
                 console.log('GET DISTRIBRUTION REPORT', err.message);
@@ -81,12 +85,12 @@ const DetailDistribusi = () => {
                             <IconArrowBackward className="flex mx-2" fill={true} /> Kembali
                         </button>
                     </Link>
-                    {/* <div className="ltr:ml-auto rtl:mr-auto">
-                        <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
-                    </div> */}
                 </div>
 
-                <h1 className="text-lg font-bold mb-4">Kode:SK0012023</h1>
+                <h1 className="text-lg font-bold mb-4 flex items-center">
+                    Kode: {distribusiCode}{' '}
+                    <span className={`badge whitespace-nowrap ml-2 ${statusKode === 'selesai' ? 'bg-primary' : statusKode === 'pending' ? 'bg-secondary' : 'bg-success'}`}>{statusKode}</span>
+                </h1>
                 <form className="space-y-5">
                     <div>
                         <p>Lokasi Tujuan</p>

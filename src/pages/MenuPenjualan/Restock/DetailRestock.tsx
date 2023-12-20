@@ -25,6 +25,7 @@ const DetailRestock = () => {
     });
     const [initialRecords, setInitialRecords] = useState<InitialProps[]>([]);
     const [statusKode, setStatusKode] = useState<string>('');
+    const [distribusiCode, setDistribusiCode] = useState<string>('');
 
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -45,7 +46,7 @@ const DetailRestock = () => {
             .then((response) => {
                 setInitialRecords(response.data.data.resource.distributions);
                 setStatusKode(response.data.data.resource.status);
-                console.log(response.data.data.resource);
+                setDistribusiCode(response.data.data.resource.distributions[0].distribution_code);
             })
             .catch((err: any) => {
                 console.log('GET DISTRIBRUTION REPORT', err.message);
@@ -86,7 +87,7 @@ const DetailRestock = () => {
                 </div>
 
                 <h1 className="text-lg font-bold mb-4 flex items-center">
-                    Kode: {initialRecords[0].distribution_code}{' '}
+                    Kode: {distribusiCode}{' '}
                     <span className={`badge whitespace-nowrap ml-2 ${statusKode === 'selesai' ? 'bg-primary' : statusKode === 'pending' ? 'bg-secondary' : 'bg-success'}`}>{statusKode}</span>
                 </h1>
                 <div className="flex gap-x-8 items-center w-full mb-8">
