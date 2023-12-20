@@ -9,6 +9,8 @@ import IconPlus from '../../../components/Icon/IconPlus';
 import axios from 'axios';
 import { orderBy } from 'lodash';
 import { useModal } from '../../../hooks/use-modal';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface CustomersDataProps {
     id: number;
@@ -37,23 +39,20 @@ const CustomerOffline = () => {
     const { onOpen } = useModal();
 
     useEffect(() => {
-        const id = setInterval(() => {
-            axios
-                .get('https://erp.digitalindustryagency.com/api/customers-offline', {
-                    headers: {
-                        Accept: 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                .then((response) => {
-                    setInitialRecords(orderBy(response.data.data.resource, 'created_at', 'desc'));
-                })
-                .catch((err) => {
-                    console.log(err.message);
-                });
-        }, 2000);
-        return () => clearInterval(id);
-    }, [initialRecords]);
+        axios
+            .get('https://erp.digitalindustryagency.com/api/customers-offline', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setInitialRecords(orderBy(response.data.data.resource, 'created_at', 'desc'));
+            })
+            .catch((err) => {
+                console.log(err.message);
+            });
+    }, []);
 
     useEffect(() => {
         setPage(1);
@@ -83,6 +82,19 @@ const CustomerOffline = () => {
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
+
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+            }
+        }
+        return localStorage.removeItem('notification');
+    }, []);
 
     return (
         <div>

@@ -22,11 +22,21 @@ const DeleteAkunModal = () => {
             })
             .then(() => {
                 onClose();
-                toast.success('Akun Berhasil Dihapus.');
-                // navigate(0);
+                const notification = {
+                    type: 'success',
+                    message: 'Akun Berhasil Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             })
             .catch((err) => {
                 console.log('DELETE Akun', err);
+                const notification = {
+                    type: 'error',
+                    message: 'Error Gagal Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 

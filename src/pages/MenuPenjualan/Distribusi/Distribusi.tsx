@@ -1,5 +1,5 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { ChangeEvent, FormEvent, Fragment, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
@@ -7,13 +7,12 @@ import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link, useNavigate } from 'react-router-dom';
 import IconSend from '../../../components/Icon/IconSend';
-import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import Pagination from '../../../components/Pagination';
-import IconDatabase from '../../../components/Icon/icon-database';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useModal } from '../../../hooks/use-modal';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
 
 interface DistributionListProps {
     id: number;
@@ -39,27 +38,6 @@ interface UnitListProps {
 interface CabangListProps {
     id: number;
     branch_name: string;
-}
-
-interface MetaLinkProps {
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-    per_page: number;
-    total: number;
-}
-interface MetaLinksLinkProps {
-    active: boolean;
-    label: string;
-    url: string;
-}
-
-interface LinksLinkProps {
-    first: string;
-    last: string;
-    next: string;
-    prev: string;
 }
 
 interface FormDataProps {
@@ -169,15 +147,21 @@ const Distribusi = () => {
                 },
             })
             .then(() => {
-                toast.success('Data Berhasil Ditambahkan');
-                handleCabangClick('');
-                handleProductClick('');
-                handleUnitClick('');
-                setFormData((prev) => ({ ...prev, distribution_qty: 0 }));
+                const notification = {
+                    type: 'success',
+                    message: 'Distribusi Berhasil Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             })
             .catch((err: any) => {
-                toast.error('Data Gagal Ditambahkan');
                 console.log('error', err.message);
+                const notification = {
+                    type: 'error',
+                    message: 'Distribusi Gagal Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
@@ -196,12 +180,21 @@ const Distribusi = () => {
                 }
             )
             .then((response) => {
-                toast.success('Seluruh Data Distribusi Berhasil Ditambahkan');
+                const notification = {
+                    type: 'success',
+                    message: 'Data Distribusi Berhasil Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
             })
             .catch((err: any) => {
-                toast.error('Seluruh Data Distribusi Gagal Ditambahkan');
-                console.log('seluruh data', err.message);
+                console.log('ERROR DISTRIBUSI', err.message);
+                const notification = {
+                    type: 'error',
+                    message: 'Data Distribusi Gagal Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 

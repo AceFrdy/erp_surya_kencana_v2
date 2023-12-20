@@ -16,6 +16,7 @@ import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import IconSend from '../../../components/Icon/IconSend';
 import axios from 'axios';
+import { formatPrice } from '../../../utils';
 
 const rowData = [
     {
@@ -520,6 +521,14 @@ const rowData = [
     },
 ];
 
+interface InitialProps {
+    id: number;
+    product_name: string;
+    distribution_qty: number;
+    product_price: number;
+    total_price: number;
+}
+
 const showAlert = async (type: number) => {
     if (type === 11) {
         const swalWithBootstrapButtons = Swal.mixin({
@@ -555,10 +564,7 @@ const DetailRestock = () => {
     useEffect(() => {
         dispatch(setPageTitle('Detail Restock'));
     });
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
+    const [initialRecords, setInitialRecords] = useState<InitialProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
 
     const [search, setSearch] = useState('');
@@ -579,8 +585,8 @@ const DetailRestock = () => {
                 },
             })
             .then((response) => {
-                // setInitialRecords(response.data.data.resource.data);
-                console.log('initial', response.data.data);
+                setInitialRecords(response.data.data.resource.distributions);
+                console.log('data', response.data.data.resource);
 
                 // // page
                 // setMetaLink({
@@ -603,70 +609,25 @@ const DetailRestock = () => {
                 console.log('GET DISTRIBRUTION REPORT', err.message);
             });
     }, []);
+    // console.log('initial', initialRecords);
 
     useEffect(() => {
-        setPage(1);
-    }, [pageSize]);
-
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
-
-    useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
-                return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
-                );
+        if (!initialRecords) {
+            return;
+        }
+        setRecordsData(() => {
+            return initialRecords.filter((item) => {
+                return item.product_name.toLowerCase().includes(search.toLowerCase());
             });
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search]);
+    }, [search, initialRecords]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
-    const [operasionalCost, setOperasionalCost] = useState('');
-    const [cost, setCost] = useState('');
-
-    const handleOperasioanalCostChange = (e: { target: { value: any } }) => {
-        const inputValue = e.target.value;
-        let formattedValue = '';
-
-        // Remove non-numeric characters
-        const numericValue = inputValue.replace(/\D/g, '');
-
-        // Format the number with 'Rp.' prefix
-        if (numericValue !== '') {
-            formattedValue = `Rp. ${parseInt(numericValue, 10).toLocaleString('id-ID')}`;
-        }
-
-        setOperasionalCost(formattedValue);
-    };
-
-    const handleCostChange = (e: { target: { value: any } }) => {
-        const inputValue = e.target.value;
-        let formatValue = '';
-
-        // Remove non-numeric characters
-        const numValue = inputValue.replace(/\D/g, '');
-
-        // Format the number with 'Rp.' prefix
-        if (numValue !== '') {
-            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-        }
-
-        setCost(formatValue);
-    };
 
     return (
         <div>
@@ -708,7 +669,7 @@ const DetailRestock = () => {
                     </div>
                     <div>
                         <label htmlFor="Opcost">Operasional Cost</label>
-                        <input id="Opcost" type="text" value={29103239} disabled onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
+                        {/* <input id="Opcost" type="text" value={29103239} disabled onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" /> */}
                     </div>
                 </form>
                 <h5 className="font-semibold text-lg dark:text-white-light mb-2">Detail Restock</h5>
@@ -718,50 +679,20 @@ const DetailRestock = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'phone', title: 'Kode Dokumen', sortable: true },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'product_name', title: 'Nama Produk', sortable: true },
                             {
-                                accessor: 'firstName',
-                                title: 'Supplier',
+                                accessor: 'product_price',
+                                title: 'Harga',
                                 sortable: true,
+                                render: (e) => formatPrice(e.product_price),
                             },
-                            { accessor: 'email', title: 'Biaya Operasional', sortable: true },
-                            { accessor: 'age', title: 'Total', sortable: true },
-                            // { accessor: 'email', title: 'Table Barang', sortable: true },
-                            // { accessor: 'phone', title: 'Total', sortable: true },
-                            // {
-                            //     accessor: 'action',
-                            //     title: 'Opsi',
-                            //     titleClassName: '!text-center',
-                            //     render: () => (
-                            //         <div className="flex items-center w-max mx-auto gap-2">
-                            //             <button type="button" style={{ color: 'blue' }}>
-                            //                 <Link to="/menupenjualan/restock/detailrestock">
-                            //                     <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                            //                 </Link>
-                            //             </button>
-                            //             <button type="button" style={{ color: 'orange' }}>
-                            //                 <Link to="/menupenjualan/restock/editrestock">
-                            //                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                            //                 </Link>
-                            //             </button>
-                            //             {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                            //                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                            //             </button> */}
-                            //         </div>
-                            //     ),
-                            // },
+                            { accessor: 'distribution_qty', title: 'Qty', sortable: true },
+                            { accessor: 'total_price', title: 'Total Harga', sortable: true, render: (e) => formatPrice(e.total_price) },
                         ]}
-                        totalRecords={initialRecords.length}
-                        recordsPerPage={pageSize}
-                        page={page}
-                        onPageChange={(p) => setPage(p)}
-                        recordsPerPageOptions={PAGE_SIZES}
-                        onRecordsPerPageChange={setPageSize}
                         sortStatus={sortStatus}
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
-                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                     />
                 </div>
             </div>

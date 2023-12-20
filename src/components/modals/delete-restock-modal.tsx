@@ -35,7 +35,7 @@ const DeleteRestockModal = () => {
                     message: 'Data Restock Berhasil Dihapus',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
-                navigate(0);
+                // navigate(0);
             });
     };
 

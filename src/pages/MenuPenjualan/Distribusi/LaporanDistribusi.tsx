@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import IconNotes from '../../../components/Icon/IconNotes';
 import axios from 'axios';
 import Pagination from '../../../components/Pagination';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
 
 interface DataInitial {
     id: number;
@@ -16,27 +17,6 @@ interface DataInitial {
     };
     items_total: number;
     status: string;
-}
-
-interface MetaLinkProps {
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-    per_page: number;
-    total: number;
-}
-interface MetaLinksLinkProps {
-    active: boolean;
-    label: string;
-    url: string;
-}
-
-interface LinksLinkProps {
-    first: string;
-    last: string;
-    next: string;
-    prev: string;
 }
 
 const LaporanDistribusi = () => {
@@ -71,7 +51,6 @@ const LaporanDistribusi = () => {
             })
             .then((response) => {
                 setInitialRecords(response.data.data.resource.data);
-                console.log('initial', response.data.data);
 
                 // page
                 setMetaLink({
