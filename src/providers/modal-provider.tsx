@@ -23,7 +23,6 @@ const ModalProvider = () => {
             <EditDistribusiModal />
             <DeleteRestockModal />
             <DeleteDataRestockModal />
-            <DeleteDetailAkunModal />
         </>
     );
 };
