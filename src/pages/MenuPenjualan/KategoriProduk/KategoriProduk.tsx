@@ -155,8 +155,10 @@ const KategoriProduk = () => {
     const currentItems = tableData.slice(indexOfFirstItem, indexOfLastItem);
     const [addKategori, setAddKategori] = useState(false);
     const [editKategori, setEditKategori] = useState(false);
+    const [deleteKategori, setDeleteKategori] = useState(false);
     const token = localStorage.getItem('accessToken') || '';
     const [editedCategoryId, setEditedCategoryId] = useState<number | null>(null);
+    const [deleteCategoryId, setDeleteCategoryId] = useState<number | null>(null);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page); // Memperbarui state currentPage saat halaman berubah
@@ -177,7 +179,7 @@ const KategoriProduk = () => {
                 })
                 .then((response) => {
                     const categories = response.data.data.resource.data;
-                    setCategories(categories); // Set categories state with fetched data
+                    setCategories(categories); 
                     // console.log('CATEGORIES', response.data.data);
                 })
                 .catch((error) => {
@@ -254,7 +256,7 @@ const KategoriProduk = () => {
 
     const handleEditKategori = () => {
         if (!editedCategoryId) {
-            return; // Ensure we have a valid category ID
+            return; 
         }
 
         const editedData = {
@@ -272,7 +274,7 @@ const KategoriProduk = () => {
                 },
             })
             .then((response) => {
-                console.log('API Response:', response.data); // Log the response for debugging
+                console.log('API Response:', response.data); 
                 console.log('kategori data successfully updated:', response.data);
                 navigate('/menupenjualan/product/kategoriproduk');
                 toast.success('Data berhasil diedit', {
@@ -280,7 +282,7 @@ const KategoriProduk = () => {
                     autoClose: 3000,
                 });
                 setEditKategori(false);
-                setEditedCategoryId(null); // Reset edited category ID
+                setEditedCategoryId(null); 
             })
             .catch((error) => {
                 if (error.response && error.response.data) {
@@ -295,9 +297,30 @@ const KategoriProduk = () => {
             });
     };
 
-    const handleDeleteKategori = (categoryId: number) => {
+    const handleDeleteButtonClick = (categoryId: number | null) => {
+        const deleteCategory = categories.find((category) => category.id === categoryId);
+        if (deleteCategory) {
+            setFormData({
+                product_category_name: deleteCategory.product_category_name,
+                errors: {},
+            });
+            setDeleteCategoryId(categoryId);
+            setDeleteKategori(true);
+        }
+    };
+
+    const handleDeleteKategori = () => {
+        if (!deleteCategoryId) {
+            return;
+        }
+
+        const deleteData = {
+            id: deleteCategoryId,
+            product_category_name: formData.product_category_name,
+        };
+        console.log('Delete Data:', deleteData);
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/product-categories/${categoryId}`, {
+            .delete(`https://erp.digitalindustryagency.com/api/product-categories/${deleteCategoryId}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -310,7 +333,7 @@ const KategoriProduk = () => {
                     position: 'top-right',
                     autoClose: 3000,
                 });
-                // You may want to update the state or fetch the updated category list after deletion
+                setDeleteKategori(false);
             })
             .catch((error) => {
                 console.error('Error deleting kategori data:', error);
@@ -437,6 +460,57 @@ const KategoriProduk = () => {
                         </div>
                     </Dialog>
                 </Transition>
+                <Transition appear show={deleteKategori} as={Fragment}>
+                    <Dialog as="div" open={deleteKategori} onClose={() => setDeleteKategori(false)}>
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0"
+                            enterTo="opacity-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100"
+                            leaveTo="opacity-0"
+                        >
+                            <div className="fixed inset-0" />
+                        </Transition.Child>
+                        <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
+                            <div className="flex items-start justify-center min-h-screen px-4">
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ease-out duration-300"
+                                    enterFrom="opacity-0 scale-95"
+                                    enterTo="opacity-100 scale-100"
+                                    leave="ease-in duration-200"
+                                    leaveFrom="opacity-100 scale-100"
+                                    leaveTo="opacity-0 scale-95"
+                                >
+                                    <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
+                                        <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                                            <div className="text-lg font-bold">Delete Kategori</div>
+                                        </div>
+                                        <div className="p-5">
+                                            <div>
+                                                <form className="space-y-5">
+                                                    <div>
+                                                        <h1>Apakah Anda yakin ingin menghapus Kategori</h1>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div className="flex justify-end items-center mt-8">
+                                                <button type="button" className="btn btn-outline-danger" onClick={() => setDeleteKategori(false)}>
+                                                    Kembali
+                                                </button>
+                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleDeleteKategori}>
+                                                    Hapus
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </Dialog.Panel>
+                                </Transition.Child>
+                            </div>
+                        </div>
+                    </Dialog>
+                </Transition>
             </div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
                 <li>
@@ -486,7 +560,7 @@ const KategoriProduk = () => {
                                                 <button type="button" style={{ color: 'orange' }} onClick={() => handleEditButtonClick(category.id)}>
                                                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                                 </button>
-                                                <button type="button" style={{ color: 'red' }} onClick={() => handleDeleteKategori(category.id)}>
+                                                <button type="button" style={{ color: 'red' }} onClick={() => handleDeleteButtonClick(category.id)}>
                                                     <IconTrashLines />
                                                 </button>
                                             </td>

@@ -1,39 +1,38 @@
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
-const DeleteAkunModal = () => {
-    const { isOpen, type, onClose, data } = useModal();
+const DeleteSeluruhDistribusiModal = () => {
+    const { isOpen, type, onClose } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
+
+    const isModalOpen = isOpen && type === 'delete-seluruh-distribusi';
     const navigate = useNavigate();
 
-    const isModalOpen = isOpen && type === 'delete-akun';
-
-    const handleDelete = (id: number) => {
+    const handleDelete = () => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/accounts/${id}}`, {
+            .delete('https://erp.digitalindustryagency.com/api/distributions', {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
-            .then(() => {
+            .then((response) => {
                 onClose();
                 const notification = {
                     type: 'success',
-                    message: 'Akun Berhasil Dihapus',
+                    message: 'Data Distribusi Berhasil Dihapus',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE Akun', err);
+                console.log('DELETE DISTRIBUSI', err);
                 const notification = {
                     type: 'error',
-                    message: 'Error Gagal Dihapus',
+                    message: 'Data Distribusi Gagal Dihapus',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
@@ -59,13 +58,13 @@ const DeleteAkunModal = () => {
                         >
                             <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
                                 <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                    <div className="text-lg font-bold">Hapus Akun</div>
+                                    <div className="text-lg font-bold">Hapus Seluruh Distribusi</div>
                                 </div>
                                 <div className="p-5">
                                     <div>
                                         <form className="space-y-5">
                                             <div>
-                                                <h1>Apakah Anda yakin ingin menghapus Akun</h1>
+                                                <h1>Apakah Anda yakin ingin menghapus Seluruh Distribusi</h1>
                                             </div>
                                         </form>
                                     </div>
@@ -73,13 +72,7 @@ const DeleteAkunModal = () => {
                                         <button type="button" className="btn btn-outline-danger" onClick={onClose}>
                                             Kembali
                                         </button>
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary ltr:ml-4 rtl:mr-4"
-                                            onClick={() => {
-                                                handleDelete(data);
-                                            }}
-                                        >
+                                        <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleDelete}>
                                             Hapus
                                         </button>
                                     </div>
@@ -93,4 +86,4 @@ const DeleteAkunModal = () => {
     );
 };
 
-export default DeleteAkunModal;
+export default DeleteSeluruhDistribusiModal;

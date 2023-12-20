@@ -1,20 +1,19 @@
-import React, { Fragment } from 'react';
+import { Fragment } from 'react';
 import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
 
-const DeleteAkunModal = () => {
+const DeleteDataPenjualanModal = () => {
     const { isOpen, type, onClose, data } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
-    const navigate = useNavigate();
 
-    const isModalOpen = isOpen && type === 'delete-akun';
+    const isModalOpen = isOpen && type === 'delete-data-penjualan';
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/accounts/${id}}`, {
+            .delete(`https://erp.digitalindustryagency.com/api/sale-orders/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -22,21 +21,10 @@ const DeleteAkunModal = () => {
             })
             .then(() => {
                 onClose();
-                const notification = {
-                    type: 'success',
-                    message: 'Akun Berhasil Dihapus',
-                };
-                localStorage.setItem('notification', JSON.stringify(notification));
-                navigate(0);
+                toast.success('Hapus Data Penjualan Berhasil.');
             })
             .catch((err) => {
-                console.log('DELETE Akun', err);
-                const notification = {
-                    type: 'error',
-                    message: 'Error Gagal Dihapus',
-                };
-                localStorage.setItem('notification', JSON.stringify(notification));
-                navigate(0);
+                console.log('DELETE PENJUALAN', err);
             });
     };
 
@@ -59,13 +47,13 @@ const DeleteAkunModal = () => {
                         >
                             <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
                                 <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                    <div className="text-lg font-bold">Hapus Akun</div>
+                                    <div className="text-lg font-bold">Hapus Penjualan</div>
                                 </div>
                                 <div className="p-5">
                                     <div>
                                         <form className="space-y-5">
                                             <div>
-                                                <h1>Apakah Anda yakin ingin menghapus Akun</h1>
+                                                <h1>Apakah Anda yakin ingin menghapus Penjualan</h1>
                                             </div>
                                         </form>
                                     </div>
@@ -93,4 +81,4 @@ const DeleteAkunModal = () => {
     );
 };
 
-export default DeleteAkunModal;
+export default DeleteDataPenjualanModal;

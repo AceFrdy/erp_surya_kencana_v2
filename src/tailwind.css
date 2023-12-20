@@ -58,6 +58,18 @@ input::-webkit-inner-spin-button {
 input[type='number'] {
     -moz-appearance: textfield;
 }
+.css-13cymwt-control {
+    @apply dark:!bg-[#121e32] dark:!border-[#17263c];
+}
+.css-feonkk-Input2 {
+    @apply dark:!text-white-dark;
+}
+.css-1nmdiq5-menu {
+    @apply dark:!bg-[#121e32] dark:!border-[#17263c];
+}
+.css-t3ipsp-control {
+    @apply !border-primary !shadow-none dark:!bg-[#121e32];
+}
 
 @layer components {
     html {

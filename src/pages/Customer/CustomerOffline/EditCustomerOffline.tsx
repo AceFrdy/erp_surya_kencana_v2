@@ -44,19 +44,20 @@ const EditCustomerOffline = () => {
                     },
                 })
                 .then((response) => {
+                    const notification = {
+                        type: 'success',
+                        message: 'Customer Berhasil Diperbarui',
+                    };
+                    localStorage.setItem('notification', JSON.stringify(notification));
                     navigate('/customer/offline');
-                    toast.success('Data berhasil ditambahkan', {
-                        position: 'top-right',
-                        autoClose: 3000,
-                    });
                 });
         } catch (error: any) {
-            if (error.response && error.response.data) {
-                console.error('Server Response Data:', error.response.data);
-                // ... your existing error handling code
-            }
-            console.error('Error adding customer data:', error);
-            toast.error('Error adding data');
+            const notification = {
+                type: 'error',
+                message: 'Customer Gagal Diperbarui',
+            };
+            localStorage.setItem('notification', JSON.stringify(notification));
+            navigate(0);
         }
     };
 
@@ -86,6 +87,19 @@ const EditCustomerOffline = () => {
             .catch((err) => {
                 console.log(err);
             });
+    }, []);
+
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+            }
+        }
+        return localStorage.removeItem('notification');
     }, []);
 
     return (

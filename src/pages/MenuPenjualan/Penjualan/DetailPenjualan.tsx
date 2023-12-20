@@ -7,13 +7,17 @@ import { useDispatch } from 'react-redux';
 // import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 // import { Dialog, Transition } from '@headlessui/react';
 // import IconPlus from '../../../components/Icon/IconPlus';
 // import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
 import IconSend from '../../../components/Icon/IconSend';
 import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
+import axios from 'axios';
+import { formatPrice } from '../../../utils';
+import { useModal } from '../../../hooks/use-modal';
+import Pagination from '../../../components/Pagination';
 // import * as Yup from 'yup';
 // import { Field, Form, Formik } from 'formik';
 
@@ -576,22 +580,67 @@ const showAlert = async (type: number) => {
         });
     }
 };
+
+interface DetailPenjualan {
+    id: number;
+    sale_report_invoice: string;
+    sale_order_qty: number;
+    product: {
+        product_name: string;
+    };
+    sale_order_total: number;
+    sale_order_sub_total: number;
+}
+
+interface MetaLinkProps {
+    current_page: number;
+    last_page: number;
+    from: number;
+    to: number;
+    per_page: number;
+    total: number;
+}
+interface MetaLinksLinkProps {
+    active: boolean;
+    label: string;
+    url: string;
+}
+
+interface LinksLinkProps {
+    first: string;
+    last: string;
+    next: string;
+    prev: string;
+}
+
 const DetailPenjualan = () => {
+    const { onOpen } = useModal();
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
         dispatch(setPageTitle('Detail Penjualan'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
+    const [initialRecords, setInitialRecords] = useState<DetailPenjualan[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
-
+    const [customer, setCustomer] = useState<string>('');
+    const [branch, setBranch] = useState<string>('');
+    const [grandTotal, setGrandTotal] = useState<string>('');
+    const [cash, setCash] = useState<string>('');
+    const [debt, setDebt] = useState<string>('');
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
     });
+    const { id } = useParams();
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>(`https://erp.digitalindustryagency.com/api/sale-reports/${id}`);
 
     useEffect(() => {
         setPage(1);
@@ -605,13 +654,12 @@ const DetailPenjualan = () => {
 
     useEffect(() => {
         setInitialRecords(() => {
-            return rowData.filter((item) => {
+            return initialRecords.filter((item) => {
                 return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
+                    // item.firstName.toLowerCase().includes(search.toLowerCase()) ||
+                    // item.dob.toLowerCase().includes(search.toLowerCase()) ||
+                    // item.email.toLowerCase().includes(search.toLowerCase()) ||
+                    item.product.product_name.toLowerCase().includes(search.toLowerCase())
                 );
             });
         });
@@ -650,6 +698,33 @@ const DetailPenjualan = () => {
 
         setCost(formatValue);
     };
+
+    useEffect(() => {
+        axios
+            .get(url, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setInitialRecords(response.data.data.resource.sale_order);
+                setCustomer(response.data.data.resource.user.name);
+                setBranch(response.data.data.resource.branch.branch_name);
+                setGrandTotal(response.data.data.resource.sale_report_grand_total);
+                setCash(response.data.data.resource.sale_report_money);
+                setDebt(response.data.data.resource.sale_report_debt);
+
+                // page
+                setMetaLink(response.data.data.resource.meta);
+                setMetaLinksLink(response.data.data.resource.meta.links);
+                setLinksLink(response.data.data.resource.links);
+            })
+            .catch((err: any) => {
+                console.log('GET SALE REPORT', err.message);
+            });
+    }, []);
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -669,7 +744,7 @@ const DetailPenjualan = () => {
             </div> */}
             <div className="panel mt-6">
                 <h1 className="text-lg font-bold flex justify-center">Detail Penjualan</h1>
-                
+
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
                     <Link to="/menupenjualan/penjualan/laporanpenjualan">
                         <button type="button" className=" px-2 btn btn-outline-info">
@@ -687,51 +762,49 @@ const DetailPenjualan = () => {
                             className="whitespace-nowrap table-hover"
                             records={recordsData}
                             columns={[
-                                { accessor: 'id', title: 'No', sortable: true },
+                                { accessor: 'id', title: 'No', render: (e) => recordsData.indexOf(e) + 1 },
                                 {
-                                    accessor: 'age',
+                                    accessor: 'sale_order_invoice',
                                     title: 'Barcode',
                                     sortable: true,
-                                    render: ({ id }) => (
-                                        <div className="flex items-center w-max">
-                                            <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
-                                            {/* <div>{firstName + ' ' + lastName}</div> */}
+                                    // render: ({ id }) => (
+                                    //     <div className="flex items-center w-max">
+                                    //         <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
+                                    //         {/* <div>{firstName + ' ' + lastName}</div> */}
+                                    //     </div>
+                                    // ),
+                                },
+                                { accessor: 'product.product_name', title: 'Nama', sortable: true },
+                                { accessor: 'sale_order_qty', title: 'Qty', sortable: true },
+                                {
+                                    accessor: 'sale_order_total',
+                                    title: 'Harga',
+                                    sortable: true,
+                                    render: (e) => formatPrice(e.sale_order_total),
+                                },
+                                {
+                                    accessor: 'sale_order_sub_total',
+                                    title: 'Sub Total',
+                                    sortable: true,
+                                    render: (e) => formatPrice(e.sale_order_sub_total),
+                                },
+                                {
+                                    accessor: 'action',
+                                    title: 'Opsi',
+                                    titleClassName: '!text-center',
+                                    render: (e) => (
+                                        <div className="flex items-center w-max mx-auto gap-2">
+                                            {/* <button type="button" style={{ color: 'orange' }}>
+                                                <Link to="/menupenjualan/penjualan/laporanpenjualan">
+                                                    <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                                </Link>
+                                            </button> */}
+                                            <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-data-detail-penjualan', e.id)}>
+                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                            </button>
                                         </div>
                                     ),
                                 },
-                                { accessor: 'firstName', title: 'Nama', sortable: true },
-                                { accessor: 'age', title: 'Qty', sortable: true },
-                                {
-                                    accessor: 'dob',
-                                    title: 'Harga',
-                                    sortable: true,
-                                    render: ({ dob }) => <div>{formatDate(dob)}</div>,
-                                },
-                                {
-                                    accessor: 'age',
-                                    title: 'Sub Total',
-                                    sortable: true,
-                                },
-                                // {
-                                //     accessor: 'action',
-                                //     title: 'Opsi',
-                                //     titleClassName: '!text-center',
-                                //     render: () => (
-                                //         <div className="flex items-center w-max mx-auto gap-2">
-                                //             {/* <button type="button" style={{ color: 'blue' }}>
-                                //             <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                //         </button> */}
-                                //             <button type="button" style={{ color: 'orange' }}>
-                                //                 <Link to="/menupenjualan/restock/editrestock">
-                                //                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                //                 </Link>
-                                //             </button>
-                                //             <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                //                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                //             </button>
-                                //         </div>
-                                //     ),
-                                // },
                             ]}
                             totalRecords={initialRecords.length}
                             recordsPerPage={pageSize}
@@ -744,36 +817,31 @@ const DetailPenjualan = () => {
                             minHeight={200}
                             paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                         />
+                        {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                     </div>
                     <form className="space-y-5 panel xl:col-span-1">
                         <h1 className="font-semibold text-xl dark:text-white-light mb-2 justify-center flex">Penjualan</h1>
                         <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
                             <div>
                                 <label htmlFor="gridCustomer">Customer</label>
-                                <select id="gridCustomer" disabled className="form-select text-white-dark">
-                                    <option>Trickster</option>
-                                    <option>Choose...</option>
-                                </select>
+                                <input value={customer} className="form-input text-black border-zinc-300" disabled />
                             </div>
                             <div>
                                 <label htmlFor="gridCabang">Cabang</label>
-                                <select id="gridCabang" disabled className="form-select text-white-dark">
-                                    <option>Gedung Utama</option>
-                                    <option>Choose...</option>
-                                </select>
+                                <input value={branch} className="form-input text-black border-zinc-300" disabled />
                             </div>
                         </div>
                         <div>
                             <label htmlFor="gridTotal">Total </label>
-                            <input id="gridTotal" type="text" disabled placeholder="Enter Total" defaultValue="2.234.445" className="form-input" />
+                            <input value={grandTotal} className="form-input text-black border-zinc-300" disabled />
                         </div>
                         <div>
                             <label htmlFor="Cost">Cash</label>
-                            <input id="Cost" type="text" disabled value="2.335.000" onChange={handleCostChange} defaultValue="12.0000.000" placeholder="Rp." className="form-input" />
+                            <input value={cash} className="form-input text-black border-zinc-300" disabled />
                         </div>
                         <div>
                             <label htmlFor="gridTotal">Kembalian </label>
-                            <input id="gridTotal" disabled type="text" placeholder="Enter Kembalian" defaultValue="10.293.003" className="form-input" />
+                            <input value={debt} className="form-input text-black border-zinc-300" disabled />
                         </div>
                         {/* <div>
                             <label className="flex items-center mt-1 cursor-pointer">

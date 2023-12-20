@@ -1,6 +1,21 @@
 import { StoreApi, UseBoundStore, create } from 'zustand';
 
-export type ModalType = 'delete-customer-offline' | 'delete-cabang' | 'delete-unit' | 'delete-akun' | 'delete-product';
+export type ModalType =
+    | 'delete-customer-offline'
+    | 'delete-cabang'
+    | 'delete-unit'
+    | 'delete-akun'
+    | 'delete-product'
+    | 'delete-data-distribusi'
+    | 'delete-seluruh-distribusi'
+    | 'edit-distribusi'
+    | 'delete-restock'
+    | 'delete-detail-akun'
+    | 'delete-seluruh-restock'
+    | 'finish-restock'
+    | 'finish-distribusi'
+    | 'delete-data-detail-penjualan'
+    | 'delete-data-penjualan';
 
 interface ModalStore {
     type: ModalType | null;

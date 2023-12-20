@@ -288,18 +288,54 @@ const showAlert = async (type: number) => {
         });
     }
 };
+
+interface BranchDataProps {
+    id: number;
+    branch_name: string;
+}
+
+interface StockDataProps {
+    id: number;
+    branch_id: number;
+    stock_qty: number;
+    stock_qty_unit: number;
+    filteredStockData: string;
+}
+
+interface PenjualanDataProps {
+    id: number;
+    sale_report_invoice: string;
+    branch: {
+        id: number;
+        branch_name: string;
+    };
+    user: {
+        id: number;
+        name: string;
+    };
+    sale_report_grand_total: number;
+    filteredPenjualan: string;
+    sale_report_status: string;
+}
+
 const DetailCabang = () => {
     const dispatch = useDispatch();
-    const token = localStorage.getItem('accessToken') || '';
+    const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
-        dispatch(setPageTitle('Detail Cabang'));
+        dispatch(setPageTitle('DetailCabang'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
-    const [branch, setBranch] = useState([]);
+    const [initialRecords, setInitialRecords] = useState([]);
+    const [recordsData, setRecordsData] = useState<PenjualanDataProps[]>([]);
+    const [recordsDataStock, setRecordsDataStock] = useState<StockDataProps[]>([]);
+    const [branch, setBranch] = useState<BranchDataProps[]>([]);
+    const [penjualan, setPenjualan] = useState<PenjualanDataProps[]>([]);
+    const [selectedBranch, setSelectedBranch] = useState<BranchDataProps | null>(null);
+    const [stock, setStock] = useState<StockDataProps[]>([]);
+    const [filteredSales, setFilteredSales] = useState<PenjualanDataProps[]>([]);
+    const [filteredStock, setFilteredStock] = useState<StockDataProps[]>([]);
 
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
@@ -319,20 +355,20 @@ const DetailCabang = () => {
         setRecordsData([...initialRecords.slice(from, to)]);
     }, [page, pageSize, initialRecords]);
 
-    useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
-                return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
-                );
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search]);
+    // useEffect(() => {
+    //     setInitialRecords(() => {
+    //         return rowData.filter((item) => {
+    //             return (
+    //                 item.id.toString().includes(search.toLowerCase()) ||
+    //                 item.firstName.toLowerCase().includes(search.toLowerCase()) ||
+    //                 item.dob.toLowerCase().includes(search.toLowerCase()) ||
+    //                 item.email.toLowerCase().includes(search.toLowerCase()) ||
+    //                 item.phone.toLowerCase().includes(search.toLowerCase())
+    //             );
+    //         });
+    //     });
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -352,14 +388,7 @@ const DetailCabang = () => {
     useEffect(() => {
         dispatch(setPageTitle('Tabs'));
     });
-    // const [tabs, setTabs] = useState<string[]>([]);
-    // const toggleCode = (name: string) => {
-    //     if (tabs.includes(name)) {
-    //         setTabs((value) => value.filter((d) => d !== name));
-    //     } else {
-    //         setTabs([...tabs, name]);
-    //     }
-    // };
+
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [codeArr, setCodeArr] = useState<string[]>([]);
 
@@ -371,7 +400,7 @@ const DetailCabang = () => {
         }
     };
 
-    const handleGetBranch = () => {
+    useEffect(() => {
         axios
             .get('https://erp.digitalindustryagency.com/api/branches', {
                 headers: {
@@ -383,11 +412,52 @@ const DetailCabang = () => {
                 const branch = response.data.data.resource.data;
                 setInitialRecords(branch);
                 setBranch(branch);
-                setRecordsData(branch);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
+
+        axios
+            .get('https://erp.digitalindustryagency.com/api/sale-reports', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setBranch(response.data.data.resource.data);
+                setPenjualan(response.data.data.resource.data);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+
+        axios
+            .get('https://erp.digitalindustryagency.com/api/stocks', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setStock(response.data.data.resource.data);
+                console.log(response.data.data.resource.data);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    }, []);
+
+    const handleBranchSelect = (selectedBranch: BranchDataProps) => {
+        setSelectedBranch(selectedBranch);
+        const filteredPenjualan: PenjualanDataProps[] = penjualan.filter((data) => data.branch.id === selectedBranch.id);
+        setFilteredSales(filteredPenjualan);
+        const filteredStockData: StockDataProps[] = stock.filter((data) => data.branch_id === selectedBranch.id);
+        setFilteredStock(filteredStockData);
+
+        // Update the records data to display filtered sales
+        setRecordsData(filteredPenjualan);
+        setRecordsDataStock(filteredStockData);
     };
 
     return (
@@ -415,14 +485,34 @@ const DetailCabang = () => {
                                     btnClassName="btn btn-outline-primary dropdown-toggle"
                                     button={
                                         <>
-                                            Cabang
-                                            <span>
-                                                <IconCaretDown className="ltr:ml-1 rtl:mr-1 inline-block" />
-                                            </span>
+                                            {selectedBranch ? (
+                                                <>
+                                                    {selectedBranch.branch_name}
+                                                    <span>
+                                                        <IconCaretDown className="ltr:ml-1 rtl:mr-1 inline-block" />
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    Cabang
+                                                    <span>
+                                                        <IconCaretDown className="ltr:ml-1 rtl:mr-1 inline-block" />
+                                                    </span>
+                                                </>
+                                            )}
                                         </>
                                     }
                                 >
                                     <ul className="!min-w-[170px]">
+                                        {branch.map((recordsData) => (
+                                            <li key={recordsData.id}>
+                                                <button type="button" onClick={() => handleBranchSelect(recordsData)}>
+                                                    {recordsData.branch_name}
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    {/* <ul className="!min-w-[170px]">
                                         <li>
                                             <button type="button">Cabang 1</button>
                                         </li>
@@ -435,7 +525,7 @@ const DetailCabang = () => {
                                         <li>
                                             <button type="button">Cabang 4</button>
                                         </li>
-                                    </ul>
+                                    </ul> */}
                                 </Dropdown>
                             </div>
                         </div>
@@ -554,61 +644,84 @@ const DetailCabang = () => {
                     </Tab.List>
                     <Tab.Panels>
                         <Tab.Panel>
-                            <div className="grid xl:grid-cols-1 gap-6 grid-cols-1 ">
-                                <div className="active pt-5 datatables panel xl:col-span-2">
-                                    <DataTable
-                                        highlightOnHover
-                                        className="whitespace-nowrap table-hover"
-                                        records={recordsData}
-                                        columns={[
-                                            { accessor: 'id', title: 'No', sortable: true },
-                                            {
-                                                accessor: 'id',
-                                                title: 'No Dokumen',
-                                                sortable: true,
-                                            },
-                                            {
-                                                accessor: 'firstName',
-                                                title: 'Pelanggan',
-                                                sortable: true,
-                                            },
-                                            { accessor: 'age', title: 'Qty', sortable: true },
-                                            { accessor: 'age', title: 'Total', sortable: true },
-                                            {
-                                                accessor: 'status',
-                                                title: 'Status',
-                                                sortable: true,
-                                                render: (data) => (
-                                                    <span
-                                                        className={`badge whitespace-nowrap ${
-                                                            data.status === 'completed'
-                                                                ? 'bg-primary   '
-                                                                : data.status === 'Pending'
-                                                                ? 'bg-secondary'
-                                                                : data.status === 'In Progress'
-                                                                ? 'bg-success'
-                                                                : data.status === 'Canceled'
-                                                                ? 'bg-danger'
-                                                                : 'bg-primary'
-                                                        }`}
-                                                    >
-                                                        {data.status}
-                                                    </span>
-                                                ),
-                                            },
-                                        ]}
-                                        totalRecords={initialRecords.length}
-                                        recordsPerPage={pageSize}
-                                        page={page}
-                                        onPageChange={(p) => setPage(p)}
-                                        recordsPerPageOptions={PAGE_SIZES}
-                                        onRecordsPerPageChange={setPageSize}
-                                        sortStatus={sortStatus}
-                                        onSortStatusChange={setSortStatus}
-                                        minHeight={200}
-                                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
-                                    />
-                                </div>
+                            <div className="active pt-5 panel">
+                                <DataTable
+                                    highlightOnHover
+                                    className="whitespace-nowrap table-hover"
+                                    records={filteredSales}
+                                    columns={[
+                                        { accessor: 'id', title: 'No', render: (e) => filteredSales.indexOf(e) + 1 },
+                                        {
+                                            accessor: 'sale_report_invoice',
+                                            title: 'No Dokumen',
+                                            sortable: true,
+                                        },
+                                        {
+                                            accessor: 'user.name',
+                                            title: 'Pelanggan',
+                                            sortable: true,
+                                        },
+                                        // { accessor: 'age', title: 'Qty', sortable: true },
+                                        { accessor: 'sale_report_grand_total', title: 'Total', sortable: true },
+                                        {
+                                            accessor: 'sale_report_status',
+                                            title: 'Status',
+                                            sortable: true,
+                                            render: (data) => (
+                                                <span
+                                                    className={`badge whitespace-nowrap ${
+                                                        data.sale_report_status === 'completed'
+                                                            ? 'bg-primary   '
+                                                            : data.sale_report_status === 'Pending'
+                                                            ? 'bg-secondary'
+                                                            : data.sale_report_status === 'In Progress'
+                                                            ? 'bg-success'
+                                                            : data.sale_report_status === 'Canceled'
+                                                            ? 'bg-danger'
+                                                            : 'bg-primary'
+                                                    }`}
+                                                >
+                                                    {data.sale_report_status}
+                                                </span>
+                                            ),
+                                        },
+                                        // {
+                                        //     accessor: 'age',
+                                        //     title: 'Distribution Qty',
+                                        //     sortable: true,
+                                        // },
+                                        // {
+                                        //     accessor: 'action',
+                                        //     title: 'Opsi',
+                                        //     titleClassName: '!text-center',
+                                        //     render: () => (
+                                        //         <div className="flex items-center w-max mx-auto gap-2">
+                                        //             {/* <button type="button" style={{ color: 'blue' }}>
+                                        //     <IconNotes className="ltr:mr-2 rtl:ml-2 " />
+                                        // </button> */}
+                                        //             <button type="button" style={{ color: 'orange' }}>
+                                        //                 <Link to="/menupenjualan/cabang/listcabang/editcabang/:id">
+                                        //                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                        //                 </Link>
+                                        //             </button>
+                                        //             {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                        //     <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                        // </button> */}
+                                        //         </div>
+                                        //     ),
+                                        // },
+                                    ]}
+                                    totalRecords={initialRecords.length}
+                                    recordsPerPage={pageSize}
+                                    page={page}
+                                    onPageChange={(p) => setPage(p)}
+                                    recordsPerPageOptions={PAGE_SIZES}
+                                    onRecordsPerPageChange={setPageSize}
+                                    sortStatus={sortStatus}
+                                    onSortStatusChange={setSortStatus}
+                                    minHeight={200}
+                                    paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
+                                />
                             </div>
                         </Tab.Panel>
                         <Tab.Panel>
@@ -617,19 +730,13 @@ const DetailCabang = () => {
                                     <DataTable
                                         highlightOnHover
                                         className="whitespace-nowrap table-hover"
-                                        records={recordsData}
+                                        records={filteredStock}
                                         columns={[
-                                            { accessor: 'id', title: 'No', sortable: true },
+                                            { accessor: 'id', title: 'No', sortable: true, render: (e) => filteredStock.indexOf(e) + 1  },
                                             {
-                                                accessor: 'id',
+                                                accessor: 'product_id',
                                                 title: 'Barcode',
                                                 sortable: true,
-                                                render: ({ id }) => (
-                                                    <div className="flex items-center w-max">
-                                                        <img className="w-14 h-14 rounded-full ltr:mr-2 rtl:ml-2 object-cover" src={`/assets/images/profile-${id}.jpeg`} alt="" />
-                                                        {/* <div>{firstName + ' ' + lastName}</div> */}
-                                                    </div>
-                                                ),
                                             },
                                             {
                                                 accessor: 'firstName',
@@ -637,7 +744,7 @@ const DetailCabang = () => {
                                                 sortable: true,
                                             },
                                             { accessor: 'lastName', title: 'Kategori', sortable: true },
-                                            { accessor: 'age', title: 'Qty', sortable: true },
+                                            { accessor: 'stock_qty', title: 'Qty', sortable: true },
                                             {
                                                 accessor: 'action',
                                                 title: 'Opsi',

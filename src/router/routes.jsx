@@ -4,9 +4,13 @@ import AddKaryawan from '../pages/MenuHumanResource/Karyawan/AddKaryawan';
 import EditKaryawan from '../pages/MenuHumanResource/Karyawan/EditKaryawan';
 import Jabatan from '../pages/MenuHumanResource/Jabatan/Jabatan';
 import DetailJabatan from '../pages/MenuHumanResource/Jabatan/DetailJabatan';
+<<<<<<< HEAD:src/router/routes.tsx
 import HakAkses from '../pages/MenuPengguna/HakAkses';
 import User from '../pages/MenuPengguna/User';
 import DetailUser from '../pages/MenuPengguna/DetailUser';
+=======
+import AddProduk from '../pages/MenuPenjualan/Product/InputProduk';
+>>>>>>> fb3e62dfcf37d1607cfd45c6d21e9868126fdec5:src/router/routes.jsx
 const Index = lazy(() => import('../pages/Index'));
 const Ecommerce = lazy(() => import('../pages/Ecommerce'));
 const Kategoriproduk = lazy(() => import('../pages/MenuPenjualan/KategoriProduk/KategoriProduk'));
@@ -14,7 +18,6 @@ const Produk = lazy(() => import('../pages/MenuPenjualan/Product/Produk'));
 const Unit = lazy(() => import('../pages/MenuPenjualan/Unit/Unit'));
 const AddUnit = lazy(() => import('../pages/MenuPenjualan/Unit/AddUnit'));
 const EditUnit = lazy(() => import('../pages/MenuPenjualan/Unit/EditUnit'));
-const AddProduk = lazy(() => import('../pages/MenuPenjualan/Product/InputProduk'));
 const EditProduk = lazy(() => import('../pages/MenuPenjualan/Product/EditProduk'));
 const ListCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/ListCabang'));
 const AddCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/AddCabang'));
@@ -205,12 +208,12 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menupenjualan/restock/editrestock',
+        path: '/menupenjualan/restock/editrestock/:id',
         element: <EditRestock />,
         layout: 'default',
     },
     {
-        path: '/menupenjualan/restock/detailrestock',
+        path: '/menupenjualan/restock/detailrestock/:id',
         element: <DetailRestock />,
         layout: 'default',
     },
@@ -226,12 +229,12 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menupenjualan/penjualan/detailpenjualan',
+        path: '/menupenjualan/penjualan/detailpenjualan/:id',
         element: <DetailPenjualan />,
         layout: 'default',
     },
     {
-        path: '/menupenjualan/penjualan/editpenjualan',
+        path: '/menupenjualan/penjualan/editpenjualan/:id',
         element: <EditPenjualan />,
         layout: 'default',
     },
@@ -285,7 +288,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menukeuangan/akun/detailakun/:id',
+        path: '/menukeuangan/akun/detailakun',
         element: <DetailAkun />,
         layout: 'default',
     },
@@ -295,7 +298,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menukeuangan/akun/editdetailakun',
+        path: '/menukeuangan/akun/editdetailakun/:id',
         element: <EditDetailAkun />,
         layout: 'default',
     },

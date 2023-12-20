@@ -1,85 +1,85 @@
-import React, { ChangeEvent, FormEvent, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import Swal from 'sweetalert2';
-import { toast } from 'react-toastify'; 
+import { toast } from 'react-toastify';
+import { useNavigate, Link } from 'react-router-dom';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface AkunDataProps {
- 
     acc_type: string;
     acc_group_name: string;
     acc_info: string;
-    // branch_address: string;
 }
 
+const typeAccount = ['Asset/Harta', 'Kewajiban/Hutang', 'Modal', 'Pendapatan', 'Biaya'];
+
 const AddAkun = () => {
-    const navigate = useNavigate(); // hook untuk navigasi
-    const [accType, setAccType] = useState('');
-    const [accGroupName, setAccGroupName] = useState('');
-    const [accInfo, setAccInfo] = useState('');
-    const token = localStorage.getItem('accessToken') || '';
-    const [formData, setFormData] = useState<AkunDataProps>({ 
+    const navigate = useNavigate();
+    const token = localStorage.getItem('accessToken') ?? '';
+    const [formData, setFormData] = useState<AkunDataProps>({
         acc_type: '',
         acc_group_name: '',
         acc_info: '',
-        });
+    });
 
- 
-        // Handle Submit Form
-        const handleSubmit = async (event:FormEvent) => {
-            event.preventDefault();
-            try {
-                await axios.post(
-                    'https://erp.digitalindustryagency.com/api/accounts',
-                    {
-                        acc_type: formData.acc_type,
-                        acc_group_name: formData.acc_group_name,
-                        acc_info: formData.acc_info,
-                    },
-                    {
-                        headers: {
-                            Accept: 'application/json',
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-                // Redirect dan menampilkan toast sukses
-                toast.success('Data Berhasil Ditambah', {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-                navigate('/menukeuangan/akun/akun');
-            } catch (error) {
-                console.error('Error adding account:', error);
-                // Menampilkan toast error
-                toast.error('Gagal Menambah Data', {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-            }
+    // Handle Submit Form
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+
+        const data = {
+            acc_type: formData.acc_type,
+            acc_group_name: formData.acc_group_name,
+            acc_info: formData.acc_info,
         };
-    
-    
+        console.log(data);
+
+        await axios
+            .post('https://erp.digitalindustryagency.com/api/accounts', data, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const notification = {
+                    type: 'success',
+                    message: 'Akun Berhasil Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate('/menukeuangan/akun/akun');
+            })
+            .catch((err: any) => {
+                console.error('Error adding account:', err);
+                const notification = {
+                    type: 'error',
+                    message: 'Akun Gagal Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
+            });
+    };
 
     // Update the state for each input field
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const {name, value} = e.target ;
+        const { name, value } = e.target;
         setFormData((prevData) => ({
             ...prevData,
             [name]: value,
         }));
     };
-    
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+            }
+        }
+        return localStorage.removeItem('notification');
+    }, []);
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse mb-10">
@@ -103,26 +103,26 @@ const AddAkun = () => {
                         <select
                             id="gridState"
                             className="form-select text-white-dark"
-                            name='acc_type'
+                            name="acc_type"
                             value={formData.acc_type}
                             onChange={handleInputChange} // Modified to use the general handler
                         >
                             <option>Choose...</option>
-                            <option>Asset/Harta</option>
-                            <option>Kewajiban/Hutang</option>
-                            <option>Modal</option>
-                            <option>Pendapatan</option>
-                            <option>Biaya</option>
+                            {typeAccount.map((item) => (
+                                <option value={item} key={item}>
+                                    {item}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="actionGroup">Group:</label>
+                        <label htmlFor="actionGroup">Group</label>
                         <input
                             id="actionGroup"
                             type="text"
                             placeholder="Group..."
-                            name='acc_group_name'
-                            className="form-input ltr:rounded-l-none rtl:rounded-r-none"
+                            name="acc_group_name"
+                            className="form-input"
                             value={formData.acc_group_name}
                             onChange={handleInputChange} // Modified to use the general handler
                         />
@@ -134,19 +134,18 @@ const AddAkun = () => {
                             type="text"
                             placeholder="Keterangan..."
                             className="form-input"
-                            name='acc_info'
+                            name="acc_info"
                             value={formData.acc_info}
                             onChange={handleInputChange} // Modified to use the general handler
+                            minLength={5}
                         />
                     </div>
                     <div className="flex">
-                    <button type="submit" className="btn btn-primary !mt-6 mr-8">
-                        Tambah
-                    </button>
+                        <button type="submit" className="btn btn-primary !mt-6 mr-8">
+                            Tambah
+                        </button>
                         <Link to="/menukeuangan/akun/akun">
-                            <button type="submit" className="btn btn-primary !mt-6">
-                                Kembali
-                            </button>
+                            <button className="btn btn-primary !mt-6">Kembali</button>
                         </Link>
                     </div>
                 </form>
