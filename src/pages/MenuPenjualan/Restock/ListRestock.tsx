@@ -200,7 +200,7 @@ const ListRestock = () => {
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        <form className="flex items-center" onSubmit={handleFinished}>
+                                        <form className="flex items-center" onSubmit={() => {}}>
                                             <button type="submit" style={{ color: 'blue' }}>
                                                 <IconArchive className="ltr:mr-2 rtl:ml-2 " />
                                             </button>
