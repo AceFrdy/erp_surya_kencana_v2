@@ -357,7 +357,7 @@ const Ecommerce = () => {
                     style={{ background: 'linear-gradient(0deg,#304D30 -227%,#B6C4B6)' }}
                 >
                     <div className="flex items-start justify-between text-white-light mb-16 z-[7]">
-                        <h5 className="font-semibold text-lg text-dark">Login E-commerce</h5>
+                        <h5 className="font-semibold text-lg text-dark dark:text-white">Login E-commerce</h5>
 
                         {/* <div className="relative text-xl whitespace-nowrap">
                             $ 41,741.42
