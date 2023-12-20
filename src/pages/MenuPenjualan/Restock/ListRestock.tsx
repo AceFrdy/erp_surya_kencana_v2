@@ -1,15 +1,19 @@
-import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
-import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import IconPencil from '../../../components/Icon/IconPencil';
-import { Link, useNavigate } from 'react-router-dom';
-import IconNotes from '../../../components/Icon/IconNotes';
 import axios from 'axios';
+import sortBy from 'lodash/sortBy';
+import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+
 import Pagination from '../../../components/Pagination';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
+import { useModal } from '../../../hooks/use-modal';
+import IconNotes from '../../../components/Icon/IconNotes';
 import IconArchive from '../../../components/Icon/IconArchive';
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface DataInitial {
     id: number;
@@ -24,13 +28,9 @@ interface DataInitial {
     status: string;
 }
 
-interface SuplierProps {
-    id: number;
-    suplier_name: string;
-}
-
 const ListRestock = () => {
     const dispatch = useDispatch();
+    const { onOpen } = useModal();
     useEffect(() => {
         dispatch(setPageTitle('List Restock'));
     });
@@ -43,24 +43,6 @@ const ListRestock = () => {
         direction: 'asc',
     });
     const token = localStorage.getItem('accessToken') ?? '';
-    const navigate = useNavigate();
-
-    const handleFinished = (idRestock: number) => {
-        axios
-            .post(
-                `https://erp.digitalindustryagency.com/api/distribution-reports-approved-restok/${idRestock}`,
-                {},
-                {
-                    headers: {
-                        Accept: 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            )
-            .then((response) => {
-                navigate(0);
-            });
-    };
 
     // pagination
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
@@ -124,6 +106,19 @@ const ListRestock = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
 
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+            }
+        }
+        return localStorage.removeItem('notification');
+    }, []);
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -172,19 +167,7 @@ const ListRestock = () => {
                                 title: 'Status',
                                 sortable: true,
                                 render: (data) => (
-                                    <span
-                                        className={`badge whitespace-nowrap ${
-                                            data.status === 'completed'
-                                                ? 'bg-primary   '
-                                                : data.status === 'Pending'
-                                                ? 'bg-secondary'
-                                                : data.status === 'In Progress'
-                                                ? 'bg-success'
-                                                : data.status === 'Canceled'
-                                                ? 'bg-danger'
-                                                : 'bg-primary'
-                                        }`}
-                                    >
+                                    <span className={`badge whitespace-nowrap ${data.status === 'selesai' ? 'bg-primary' : data.status === 'pending' ? 'bg-secondary' : 'bg-success'}`}>
                                         {data.status}
                                     </span>
                                 ),
@@ -200,11 +183,11 @@ const ListRestock = () => {
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        <form className="flex items-center" onSubmit={() => {}}>
-                                            <button type="submit" style={{ color: 'blue' }}>
+                                        {e.status !== 'selesai' && (
+                                            <button type="submit" style={{ color: 'blue' }} onClick={() => onOpen('finish-restock', e.id)}>
                                                 <IconArchive className="ltr:mr-2 rtl:ml-2 " />
                                             </button>
-                                        </form>
+                                        )}
                                     </div>
                                 ),
                             },

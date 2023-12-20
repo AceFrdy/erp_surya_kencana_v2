@@ -75,15 +75,18 @@ const DetailDistribusi = () => {
                 </li>
             </ul>
             <div className="panel mt-6">
-                <h1 className="text-lg font-bold">Perkembangan Distribusi</h1>
-                <div className="flex mb-4 justify-end">
-                    <Link to="/menupenjualan/distribution/laporandistribution">
-                        <button type="button" className="btn btn-outline-primary">
-                            <IconArrowBackward className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                            Kembali
+                <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
+                    <Link to="/menupenjualan/restock/listrestock">
+                        <button type="button" className=" px-2 btn btn-outline-info">
+                            <IconArrowBackward className="flex mx-2" fill={true} /> Kembali
                         </button>
                     </Link>
+                    {/* <div className="ltr:ml-auto rtl:mr-auto">
+                        <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                    </div> */}
                 </div>
+
+                <h1 className="text-lg font-bold mb-4">Kode:SK0012023</h1>
                 <form className="space-y-5">
                     <div>
                         <p>Lokasi Tujuan</p>

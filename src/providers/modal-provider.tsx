@@ -10,6 +10,8 @@ import EditDistribusiModal from '../components/modals/edit-distribusi-modal';
 import DeleteRestockModal from '../components/modals/delete-restock-modal';
 import DeleteDataRestockModal from '../components/modals/delete-data-restock-modal';
 import DeleteDataPenjualanModal from '../components/modals/delete-data-penjualan-modal';
+import FinishRestock from '../components/modals/finish-restock';
+import FinishDistribusi from '../components/modals/finish-distribusi';
 
 const ModalProvider = () => {
     return (
@@ -25,6 +27,9 @@ const ModalProvider = () => {
             <DeleteRestockModal />
             <DeleteDataRestockModal />
             <DeleteDataPenjualanModal />
+            <DeleteDetailAkunModal />
+            <FinishRestock />
+            <FinishDistribusi />
         </>
     );
 };
