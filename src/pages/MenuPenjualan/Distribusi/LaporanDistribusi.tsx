@@ -1,12 +1,19 @@
-import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
-import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
-import IconNotes from '../../../components/Icon/IconNotes';
 import axios from 'axios';
+import sortBy from 'lodash/sortBy';
+import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+
 import Pagination from '../../../components/Pagination';
+import { useModal } from '../../../hooks/use-modal';
+import IconNotes from '../../../components/Icon/IconNotes';
+import IconArchive from '../../../components/Icon/IconArchive';
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface DataInitial {
     id: number;
@@ -18,28 +25,8 @@ interface DataInitial {
     status: string;
 }
 
-interface MetaLinkProps {
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-    per_page: number;
-    total: number;
-}
-interface MetaLinksLinkProps {
-    active: boolean;
-    label: string;
-    url: string;
-}
-
-interface LinksLinkProps {
-    first: string;
-    last: string;
-    next: string;
-    prev: string;
-}
-
 const LaporanDistribusi = () => {
+    const { onOpen } = useModal();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Laporan Distribusi'));
@@ -71,7 +58,6 @@ const LaporanDistribusi = () => {
             })
             .then((response) => {
                 setInitialRecords(response.data.data.resource.data);
-                console.log('initial', response.data.data);
 
                 // page
                 setMetaLink({
@@ -117,6 +103,19 @@ const LaporanDistribusi = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
 
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+            }
+        }
+        return localStorage.removeItem('notification');
+    }, []);
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -160,19 +159,7 @@ const LaporanDistribusi = () => {
                                 title: 'Status',
                                 sortable: true,
                                 render: (data) => (
-                                    <span
-                                        className={`badge whitespace-nowrap ${
-                                            data.status === 'completed'
-                                                ? 'bg-primary   '
-                                                : data.status === 'Pending'
-                                                ? 'bg-secondary'
-                                                : data.status === 'In Progress'
-                                                ? 'bg-success'
-                                                : data.status === 'Canceled'
-                                                ? 'bg-danger'
-                                                : 'bg-primary'
-                                        }`}
-                                    >
+                                    <span className={`badge whitespace-nowrap ${data.status === 'selesai' ? 'bg-primary' : data.status === 'pending' ? 'bg-secondary' : 'bg-success'}`}>
                                         {data.status}
                                     </span>
                                 ),
@@ -188,6 +175,11 @@ const LaporanDistribusi = () => {
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
+                                        {e.status !== 'selesai' && (
+                                            <button type="submit" style={{ color: 'blue' }} onClick={() => onOpen('finish-distribusi', e.id)}>
+                                                <IconArchive className="ltr:mr-2 rtl:ml-2 " />
+                                            </button>
+                                        )}
                                     </div>
                                 ),
                             },

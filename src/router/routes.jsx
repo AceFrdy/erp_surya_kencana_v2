@@ -1,9 +1,13 @@
 import { lazy } from 'react';
-import Karyawan from '../pages/MenuHumanResource/Karyawan/Karyawan';
-import AddKaryawan from '../pages/MenuHumanResource/Karyawan/AddKaryawan';
-import EditKaryawan from '../pages/MenuHumanResource/Karyawan/EditKaryawan';
-import Jabatan from '../pages/MenuHumanResource/Jabatan/Jabatan';
-import DetailJabatan from '../pages/MenuHumanResource/Jabatan/DetailJabatan';
+const Karyawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/Karyawan'));
+const AddKaryawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/AddKaryawan'));
+const EditKaryawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/EditKaryawan'));
+const Jabatan = lazy(() => import('../pages/MenuHumanResource/Jabatan/Jabatan'));
+const DetailJabatan = lazy(() => import('../pages/MenuHumanResource/Jabatan/DetailJabatan'));
+const HakAkses = lazy(() => import('../pages/MenuPengguna/HakAkses'));
+const User = lazy(() => import('../pages/MenuPengguna/User'));
+const DetailUser = lazy(() => import('../pages/MenuPengguna/DetailUser'));
+const AddProduk = lazy(() => import('../pages/MenuPenjualan/Product/InputProduk'));
 const Index = lazy(() => import('../pages/Index'));
 const Ecommerce = lazy(() => import('../pages/Ecommerce'));
 const Kategoriproduk = lazy(() => import('../pages/MenuPenjualan/KategoriProduk/KategoriProduk'));
@@ -11,7 +15,6 @@ const Produk = lazy(() => import('../pages/MenuPenjualan/Product/Produk'));
 const Unit = lazy(() => import('../pages/MenuPenjualan/Unit/Unit'));
 const AddUnit = lazy(() => import('../pages/MenuPenjualan/Unit/AddUnit'));
 const EditUnit = lazy(() => import('../pages/MenuPenjualan/Unit/EditUnit'));
-const AddProduk = lazy(() => import('../pages/MenuPenjualan/Product/InputProduk'));
 const EditProduk = lazy(() => import('../pages/MenuPenjualan/Product/EditProduk'));
 const ListCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/ListCabang'));
 const AddCabang = lazy(() => import('../pages/MenuPenjualan/Cabang/AddCabang'));
@@ -423,6 +426,22 @@ const routes = [
     {
         path: '/menuhumanresource/jabatan/detailjabatan',
         element: <DetailJabatan />,
+        layout: 'default',
+    },
+    //Hak Akses
+    {
+        path: '/menupengguna/hakakses',
+        element: <HakAkses />,
+        layout: 'default',
+    },
+    {
+        path: '/menupengguna/akun',
+        element: <User />,
+        layout: 'default',
+    },
+    {
+        path: '/menupengguna/akun/akundetail',
+        element: <DetailUser />,
         layout: 'default',
     },
 ];

@@ -9,7 +9,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import IconSend from '../../../components/Icon/IconSend';
 import axios from 'axios';
-import { formatPrice } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useModal } from '../../../hooks/use-modal';
@@ -40,26 +40,6 @@ interface FormDataProps {
 interface FormRestockProps {
     suplier_id: number;
     operating_cost: number;
-}
-interface MetaLinkProps {
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-    per_page: number;
-    total: number;
-}
-interface MetaLinksLinkProps {
-    active: boolean;
-    label: string;
-    url: string;
-}
-
-interface LinksLinkProps {
-    first: string;
-    last: string;
-    next: string;
-    prev: string;
 }
 const Restock = () => {
     const navigate = useNavigate();
@@ -176,7 +156,7 @@ const Restock = () => {
         }
     };
 
-    // product
+    // suplier
     const [suplierList, setSuplierList] = useState<SuplierListProps[]>([]);
     const [filteredSuplier, setFilteredSuplier] = useState<SuplierListProps[]>(suplierList);
     const [showSuplier, setShowSuplier] = useState<boolean>(false);
@@ -230,7 +210,7 @@ const Restock = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distributions');
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-restok');
 
     //get data
     useEffect(() => {
@@ -242,12 +222,8 @@ const Restock = () => {
                 },
             })
             .then((response) => {
-                if (response.data.data.resource.data.length === 0) {
-                    setInitialRecords([]);
-                } else if (response.data.data.resource.data === 'Data not available') {
-                    setInitialRecords([]);
-                } else {
-                    setInitialRecords(response.data.data.resource.data);
+                setInitialRecords(response.data.data.resource.data);
+                if (response.data.data.resource.data.length !== 0) {
                     setMetaLink(response.data.data.resource.meta);
                     setMetaLinksLink(response.data.data.resource.meta.links);
                     setLinksLink(response.data.data.resource.links);
@@ -364,7 +340,6 @@ const Restock = () => {
                         records={initialRecords}
                         columns={[
                             { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
-                            { accessor: 'distribution_code', title: 'Kode Distribusi', sortable: true },
                             { accessor: 'product_name', title: 'Nama Produk', sortable: true },
                             { accessor: 'product_price', title: 'Harga', sortable: true, render: (e) => formatPrice(e.product_price) },
                             { accessor: 'distribution_qty', title: 'Qty', sortable: true },
@@ -376,7 +351,7 @@ const Restock = () => {
                                 render: (e) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menupenjualan/restock/editrestock">
+                                            <Link to={`/menupenjualan/restock/editrestock/${e.id}`}>
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>

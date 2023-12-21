@@ -4,17 +4,15 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 interface AkunDataProps {
- 
     acc_type: string;
     acc_group_name: string;
     acc_info: string;
-    // branch_address: string;
 }
 
 const EditAkun = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const token = localStorage.getItem('accessToken') || '';
+    const token = localStorage.getItem('accessToken') ?? '';
 
     const [formData, setFormData] = useState<AkunDataProps>({
         acc_type: '',
@@ -39,51 +37,68 @@ const EditAkun = () => {
                     acc_info: accountData.acc_info,
                     // Set data lainnya sesuai dengan respons
                 }));
-                console.log('dataForm :', response.data.data.resource);
             })
             .catch((error) => {
                 console.error('Error fetching account data:', error);
-                toast.error('Error fetching data');
             });
     }, []);
 
-  // Update the state for each input field
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const {name, value} = e.target ;
-    setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-    }));
-};
+    // Update the state for each input field
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
 
-    const handleSubmit = async (event:FormEvent) => {
-        event.preventDefault();
-        console.log('Submitting the following data:', formData); // Log data yang akan dikirim
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
+
         const data = {
             acc_type: formData.acc_type,
             acc_group_name: formData.acc_group_name,
-            acc_info: formData.acc_info
+            acc_info: formData.acc_info,
         };
-        
-        try {
-            const response = await axios.put(`https://erp.digitalindustryagency.com/api/accounts/${id}`, data, {
+
+        axios
+            .put(`https://erp.digitalindustryagency.com/api/accounts/${id}`, data, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
                     Accept: 'application/json',
                 },
+            })
+            .then((response) => {
+                const notification = {
+                    type: 'success',
+                    message: 'Akun Berhasil Diperbarui',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate('/menukeuangan/akun/akun');
+            })
+            .catch((err: any) => {
+                console.error('ERROR_UPDATING_ACCOUNT:', err); // Log error yang terjadi
+                const notification = {
+                    type: 'error',
+                    message: 'Akun Gagal Diperbarui',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                // navigate(0);
             });
-            console.log('Response from server:', response.data); // Log response dari server
-            toast.success('Data berhasil diubah');
-            navigate('/menukeuangan/akun/akun');
-        } catch (error:any) {
-            console.error('Error updating account:', error); // Log error yang terjadi
-            toast.error('Gagal mengubah data');
-            if (error.response) {
-                console.error('Error response data:', error.response.data); // Log error response dari server
+    };
+
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
             }
         }
-    };
+        return localStorage.removeItem('notification');
+    }, []);
 
     return (
         <div>

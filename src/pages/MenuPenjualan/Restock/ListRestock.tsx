@@ -1,47 +1,36 @@
-import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
-import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import IconPencil from '../../../components/Icon/IconPencil';
-import { Link } from 'react-router-dom';
-import IconNotes from '../../../components/Icon/IconNotes';
 import axios from 'axios';
+import sortBy from 'lodash/sortBy';
+import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+
 import Pagination from '../../../components/Pagination';
+import { useModal } from '../../../hooks/use-modal';
+import IconNotes from '../../../components/Icon/IconNotes';
+import IconArchive from '../../../components/Icon/IconArchive';
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface DataInitial {
     id: number;
     distribution_report_code: string;
-    suplier_id: number;
+    suplier: {
+        id: number;
+        suplier_name: string;
+    };
     operating_cost: number;
     items_total: number;
     grand_total_price: number;
     status: string;
 }
 
-interface MetaLinkProps {
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-    per_page: number;
-    total: number;
-}
-interface MetaLinksLinkProps {
-    active: boolean;
-    label: string;
-    url: string;
-}
-
-interface LinksLinkProps {
-    first: string;
-    last: string;
-    next: string;
-    prev: string;
-}
-
 const ListRestock = () => {
     const dispatch = useDispatch();
+    const { onOpen } = useModal();
     useEffect(() => {
         dispatch(setPageTitle('List Restock'));
     });
@@ -59,7 +48,7 @@ const ListRestock = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-reports');
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-report-restoks');
 
     // get distribution report
     useEffect(() => {
@@ -102,9 +91,9 @@ const ListRestock = () => {
         setRecordsData(() => {
             return initialRecords.filter((item) => {
                 return (
-                    item.id.toString().includes(search.toLowerCase()) ||
                     item.distribution_report_code.toLowerCase().includes(search.toLowerCase()) ||
-                    item.status.toLowerCase().includes(search.toLowerCase())
+                    item.status.toLowerCase().includes(search.toLowerCase()) ||
+                    item.suplier.suplier_name.toLowerCase().includes(search.toLowerCase())
                 );
             });
         });
@@ -116,6 +105,19 @@ const ListRestock = () => {
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
+
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+            }
+        }
+        return localStorage.removeItem('notification');
+    }, []);
 
     return (
         <div>
@@ -148,38 +150,27 @@ const ListRestock = () => {
                             { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
                             { accessor: 'distribution_report_code', title: 'Kode Dokumen', sortable: true },
                             {
-                                accessor: 'suplier_id',
+                                accessor: 'suplier.suplier_name',
                                 title: 'Supplier',
                                 sortable: true,
                             },
-                            { accessor: 'operating_cost', title: 'Operasional', sortable: true },
-                            { accessor: 'grand_total_price', title: 'Total', sortable: true },
+                            { accessor: 'operating_cost', title: 'Operasional', sortable: true, render: (e) => formatPrice(e.operating_cost) },
+                            {
+                                accessor: 'items_total',
+                                title: 'Distribution Qty',
+                                sortable: true,
+                                textAlignment: 'center',
+                            },
+                            { accessor: 'grand_total_price', title: 'Total', sortable: true, render: (e) => formatPrice(e.grand_total_price) },
                             {
                                 accessor: 'status',
                                 title: 'Status',
                                 sortable: true,
                                 render: (data) => (
-                                    <span
-                                        className={`badge whitespace-nowrap ${
-                                            data.status === 'completed'
-                                                ? 'bg-primary   '
-                                                : data.status === 'Pending'
-                                                ? 'bg-secondary'
-                                                : data.status === 'In Progress'
-                                                ? 'bg-success'
-                                                : data.status === 'Canceled'
-                                                ? 'bg-danger'
-                                                : 'bg-primary'
-                                        }`}
-                                    >
+                                    <span className={`badge whitespace-nowrap ${data.status === 'selesai' ? 'bg-primary' : data.status === 'pending' ? 'bg-secondary' : 'bg-success'}`}>
                                         {data.status}
                                     </span>
                                 ),
-                            },
-                            {
-                                accessor: 'items_total',
-                                title: 'Distribution Qty',
-                                sortable: true,
                             },
                             {
                                 accessor: 'action',
@@ -192,14 +183,11 @@ const ListRestock = () => {
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        <button type="button" style={{ color: 'orange' }}>
-                                            <Link to={`/menupenjualan/restock/editrestock/${e.id}`}>
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
+                                        {e.status !== 'selesai' && (
+                                            <button type="submit" style={{ color: 'blue' }} onClick={() => onOpen('finish-restock', e.id)}>
+                                                <IconArchive className="ltr:mr-2 rtl:ml-2 " />
+                                            </button>
+                                        )}
                                     </div>
                                 ),
                             },

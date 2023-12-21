@@ -6,36 +6,10 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import IconTrash from '../../../components/Icon/IconTrash';
 import IconUpload from '../../../components/Icon/icon-upload';
-import fs from 'fs';
-
-interface FormState {
-    product_category_id: number;
-    supplier_id: number;
-    product_name: string;
-    product_price: number;
-    product_modal: number;
-    product_pos: string;
-    product_ecommers: string;
-    product_responsibility: string;
-    product_image: File | null;
-    product_barcode: string;
-    product_ime: string;
-    product_weight: number;
-}
-
-interface CategoriesProductList {
-    id: number;
-    product_category_name: string;
-}
-
-interface SupliersList {
-    id: number;
-    suplier_name: string;
-}
 
 const InputProduk = () => {
-    const [categoriesProduct, setCategoriesProduct] = useState<CategoriesProductList[]>([]);
-    const [supliers, setSupliers] = useState<SupliersList[]>([]);
+    const [categoriesProduct, setCategoriesProduct] = useState([]);
+    const [supliers, setSupliers] = useState([]);
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -44,9 +18,9 @@ const InputProduk = () => {
 
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') ?? '';
-    const [file, setFile] = useState<File | null>(null);
+    const [file, setFile] = useState(null);
 
-    const [formData, setFormData] = useState<FormState>({
+    const [formData, setFormData] = useState({
         product_category_id: 0,
         supplier_id: 0,
         product_name: '',
@@ -55,27 +29,24 @@ const InputProduk = () => {
         product_pos: '',
         product_ecommers: '',
         product_responsibility: '',
-        product_image: null,
         product_barcode: '',
         product_ime: '',
         product_weight: 0,
     });
 
-    const onChangeImage = (e: any) => {
+    const onChangeImage = (e) => {
         if (e.target.files) {
             console.log(e.target.value, e.target.files);
             setFile(e.target.files[0]);
-            setFormData({ ...formData, product_image: e.target.files[0] });
         }
     };
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value, type } = e.target;
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
         if (type === 'checkbox') {
-            const checkboxValue = (e.target as HTMLInputElement).checked ? 'yes' : '';
             setFormData((prevData) => ({
                 ...prevData,
-                [name]: checkboxValue,
+                [name]: checked,
             }));
         } else {
             setFormData((prevData) => ({
@@ -85,50 +56,49 @@ const InputProduk = () => {
         }
     };
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
+        const data = new FormData();
+        data.append('product_name', formData.product_name);
+        data.append('product_price', formData.product_price);
+        data.append('product_category_id', formData.product_category_id);
+        data.append('product_modal', formData.product_modal);
+        data.append('product_responsibility', formData.product_responsibility);
 
         if (file) {
-            const data = {
-                product_category_id: formData.product_category_id,
-                suplier_id: formData.supplier_id,
-                product_name: formData.product_name,
-                product_price: formData.product_price,
-                product_modal: formData.product_modal,
-                product_pos: formData.product_pos,
-                product_ecommers: formData.product_ecommers,
-                product_responsibility: formData.product_responsibility,
-                product_image: file,
-                product_barcode: formData.product_barcode,
-                product_ime: formData.product_ime,
-                product_weight: formData.product_weight,
-            };
-            console.log('Data to be sent:', data);
-
-            await axios
-                .post('https://erp.digitalindustryagency.com/api/products', data, {
-                    headers: {
-                        Accept: 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                .then((response) => {
-                    console.log('Customer data successfully added:', response.data);
-                    navigate('/menupenjualan/product/produk');
-                    toast.success('Data berhasil ditambahkan', {
-                        position: 'top-right',
-                        autoClose: 3000,
-                    });
-                })
-                .catch((error) => {
-                    if (error.response && error.response.data) {
-                        console.error('Server Response Data:', error.response.data);
-                        // ... your existing error handling code
-                    }
-                    console.error('Error adding customer data:', error);
-                    toast.error('Error adding data');
-                });
+            data.append('product_image', file);
         }
+
+        data.append('product_pos', formData.product_pos ? 'yes' : 'no');
+        data.append('product_ecommers', formData.product_ecommers ? 'yes' : 'no');
+        data.append('product_barcode', formData.product_barcode);
+        data.append('product_ime', formData.product_ime);
+        data.append('product_weight', formData.product_weight);
+        data.append('suplier_id', formData.supplier_id);
+
+        axios
+            .post('https://erp.digitalindustryagency.com/api/products', data, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                console.log('Customer data successfully added:', response.data);
+                navigate('/menupenjualan/product/produk');
+                toast.success('Data berhasil ditambahkan', {
+                    position: 'top-right',
+                    autoClose: 3000,
+                });
+            })
+            .catch((error) => {
+                if (error.response && error.response.data) {
+                    console.error('Server Response Data:', error.response.data);
+                    // ... your existing error handling code
+                }
+                console.error('Error adding customer data:', error);
+                toast.error('Error adding data');
+            });
     };
 
     useEffect(() => {
@@ -137,7 +107,7 @@ const InputProduk = () => {
             .then((response) => {
                 setCategoriesProduct(response.data.data.resource.data);
             })
-            .catch((err: any) => {
+            .catch((err) => {
                 console.log('CATEGORIES PRODUCT', err.message);
             });
         axios
@@ -145,7 +115,7 @@ const InputProduk = () => {
             .then((response) => {
                 setSupliers(response.data.data.resource.data);
             })
-            .catch((err: any) => {
+            .catch((err) => {
                 console.log('SUPLIER', err.message);
             });
     }, []);
@@ -284,19 +254,19 @@ const InputProduk = () => {
                                 </div>
                                 <div>
                                     <label className="flex items-center mt-1 cursor-pointer">
-                                        <input type="checkbox" className="form-checkbox" name="product_pos" checked={formData.product_pos === 'yes'} onChange={handleChange} />
+                                        <input type="checkbox" className="form-checkbox" name="product_pos" checked={formData.product_pos} onChange={handleChange} />
 
                                         <span className="text-white-dark">POS</span>
                                     </label>
                                 </div>
                                 <div>
                                     <label className="flex items-center mt-1 cursor-pointer">
-                                        <input type="checkbox" className="form-checkbox" name="product_ecommers" checked={formData.product_ecommers === 'yes'} onChange={handleChange} />
+                                        <input type="checkbox" className="form-checkbox" name="product_ecommers" checked={formData.product_ecommers} onChange={handleChange} />
                                         <span className="text-white-dark">E-Commerce</span>
                                     </label>
                                 </div>
                                 <div className="relative">
-                                    {formData.product_image ? (
+                                    {file ? (
                                         <div className="group w-60">
                                             <label>Gambar Produk</label>
                                             <div className="h-60 absolute top-[26px] w-60 rounded-md bg-red-100/80 hidden backdrop-blur-sm group-hover:flex justify-center items-center">
@@ -312,7 +282,7 @@ const InputProduk = () => {
                                                 </div>
                                             </div>
                                             <div className="w-60 h-60 top-0 overflow-hidden rounded-md">
-                                                <img className="object-cover" src={URL.createObjectURL(formData.product_image)} />
+                                                <img className="object-cover" src={URL.createObjectURL(file)} />
                                             </div>
                                         </div>
                                     ) : (
