@@ -42,58 +42,63 @@ const InputProduk = () => {
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-
+        const { name, value, type, checked } = e.target;
+        if (type === 'checkbox') {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: checked,
+            }));
+        } else {
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: value,
             }));
+        }
     };
 
     const handleSubmit = (e) => {
-e.preventDefault()
-            const data = new FormData();
-            data.append('product_name', formData.product_name);
-            data.append('product_price', formData.product_price);
-            data.append('product_category_id', formData.product_category_id);
-            data.append('product_modal', formData.product_modal);
-            data.append('product_responsibility', formData.product_responsibility);
+        e.preventDefault();
+        const data = new FormData();
+        data.append('product_name', formData.product_name);
+        data.append('product_price', formData.product_price);
+        data.append('product_category_id', formData.product_category_id);
+        data.append('product_modal', formData.product_modal);
+        data.append('product_responsibility', formData.product_responsibility);
 
-            if (file) {
-              data.append('product_image', file);
-            }
+        if (file) {
+            data.append('product_image', file);
+        }
 
-            data.append('product_pos', formData.product_pos ? "yes" : "no");
-            data.append('product_ecommers', formData.product_ecommers ? "yes" : "no");
-            data.append('product_barcode', formData.product_barcode);
-            data.append('product_ime', formData.product_ime);
-            data.append('product_weight', formData.product_weight);
-            data.append('suplier_id', formData.supplier_id);
-            console.log('Data to be sent:', data);
+        data.append('product_pos', formData.product_pos ? 'yes' : 'no');
+        data.append('product_ecommers', formData.product_ecommers ? 'yes' : 'no');
+        data.append('product_barcode', formData.product_barcode);
+        data.append('product_ime', formData.product_ime);
+        data.append('product_weight', formData.product_weight);
+        data.append('suplier_id', formData.supplier_id);
 
-             axios
-                .post('https://erp.digitalindustryagency.com/api/products', data, {
-                    headers: {
-                        Accept: 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                .then((response) => {
-                    console.log('Customer data successfully added:', response.data);
-                    navigate('/menupenjualan/product/produk');
-                    toast.success('Data berhasil ditambahkan', {
-                        position: 'top-right',
-                        autoClose: 3000,
-                    });
-                })
-                .catch((error) => {
-                    if (error.response && error.response.data) {
-                        console.error('Server Response Data:', error.response.data);
-                        // ... your existing error handling code
-                    }
-                    console.error('Error adding customer data:', error);
-                    toast.error('Error adding data');
+        axios
+            .post('https://erp.digitalindustryagency.com/api/products', data, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                console.log('Customer data successfully added:', response.data);
+                navigate('/menupenjualan/product/produk');
+                toast.success('Data berhasil ditambahkan', {
+                    position: 'top-right',
+                    autoClose: 3000,
                 });
+            })
+            .catch((error) => {
+                if (error.response && error.response.data) {
+                    console.error('Server Response Data:', error.response.data);
+                    // ... your existing error handling code
+                }
+                console.error('Error adding customer data:', error);
+                toast.error('Error adding data');
+            });
     };
 
     useEffect(() => {
@@ -249,14 +254,14 @@ e.preventDefault()
                                 </div>
                                 <div>
                                     <label className="flex items-center mt-1 cursor-pointer">
-                                        <input type="checkbox" className="form-checkbox" name="product_pos" checked={formData.product_pos === 'yes'} onChange={handleChange} />
+                                        <input type="checkbox" className="form-checkbox" name="product_pos" checked={formData.product_pos} onChange={handleChange} />
 
                                         <span className="text-white-dark">POS</span>
                                     </label>
                                 </div>
                                 <div>
                                     <label className="flex items-center mt-1 cursor-pointer">
-                                        <input type="checkbox" className="form-checkbox" name="product_ecommers" checked={formData.product_ecommers === 'yes'} onChange={handleChange} />
+                                        <input type="checkbox" className="form-checkbox" name="product_ecommers" checked={formData.product_ecommers} onChange={handleChange} />
                                         <span className="text-white-dark">E-Commerce</span>
                                     </label>
                                 </div>
@@ -276,7 +281,9 @@ e.preventDefault()
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div className="w-60 h-60 top-0 overflow-hidden rounded-md"><img className="object-cover" src={URL.createObjectURL(file)} /></div>
+                                            <div className="w-60 h-60 top-0 overflow-hidden rounded-md">
+                                                <img className="object-cover" src={URL.createObjectURL(file)} />
+                                            </div>
                                         </div>
                                     ) : (
                                         <>
