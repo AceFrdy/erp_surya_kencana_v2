@@ -17,7 +17,7 @@ import { useModal } from '../../../hooks/use-modal';
 interface ProductList {
     id: number;
     product_image: string;
-    product_pos: string;
+    product_barcode: string;
     product_name: string;
     product_stock: number;
     product_price: number;
@@ -137,8 +137,8 @@ const Produk = () => {
                                 ),
                             },
                             {
-                                accessor: 'product_pos',
-                                title: 'Code',
+                                accessor: 'product_barcode',
+                                title: 'Barcode',
                                 sortable: true,
                             },
                             {

@@ -1,5 +1,5 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 // import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 // import { Dialog, Transition } from '@headlessui/react';
 // import IconPlus from '../../../components/Icon/IconPlus';
 // import IconNotes from '../../../components/Icon/IconNotes';
@@ -21,8 +21,11 @@ import IconHorizontalDots from '../../../components/Icon/IconHorizontalDots';
 import { IRootState } from '../../../store';
 import IconEye from '../../../components/Icon/IconEye';
 import IconCashBanknotes from '../../../components/Icon/IconCashBanknotes';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 // import * as Yup from 'yup';
 // import { Field, Form, Formik } from 'formik';
+import 'react-toastify/dist/ReactToastify.css';
 
 const rowData = [
     {
@@ -583,83 +586,161 @@ const showAlert = async (type: number) => {
         });
     }
 };
+
+interface formDataProps {
+    index_info: string;
+    income: string;
+    outcome: string;
+    submission: string;
+}
+
+interface DataProps {
+    id: number;
+    index_info: string;
+    income: string;
+    outcome: string;
+    submission: string;
+}
+
 const ControlPanel = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Control Panel'));
     });
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [initialRecords, setInitialRecords] = useState<DataProps[]>([]);
+    const token = localStorage.getItem('accessToken') ?? '';
+    const navigate = useNavigate();
 
-    const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
     });
-
-    
-
-    useEffect(() => {
-        setPage(1);
-    }, [pageSize]);
-
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
-
-    useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
-                return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
-                );
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search]);
+    const [formData, setFormData] = useState<formDataProps>({
+        index_info: '',
+        income: '',
+        outcome: '',
+        submission: '',
+    });
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
-    const formatDate = (date: string | number | Date) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value, type, checked } = e.target;
+        if (type === 'checkbox') {
+            setFormData((prev) => ({
+                ...prev,
+                [name]: checked,
+            }));
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
         }
-        return '';
     };
 
-    const [cost, setCost] = useState('');
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
 
-    // const handleCostChange = (e: { target: { value: any } }) => {
-    //     const inputValue = e.target.value;
-    //     let formatValue = '';
+        const data = new FormData();
+        data.append('index_info', formData.index_info);
+        data.append('income', formData.income ? 'yes' : 'no');
+        data.append('outcome', formData.outcome ? 'yes' : 'no');
+        data.append('submission', formData.submission ? 'yes' : 'no');
 
-    //     // Remove non-numeric characters
-    //     const numValue = inputValue.replace(/\D/g, '');
+        axios
+            .post('https://erp.digitalindustryagency.com/api/indexs', data, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const notification = {
+                    type: 'success',
+                    message: 'Index Berhasil Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
+            })
+            .catch((err: any) => {
+                navigate(0);
+                console.log('ERROR', err.message);
+                const notification = {
+                    type: 'error',
+                    message: 'Index Gagal Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+            });
+    };
 
-    //     // Format the number with 'Rp.' prefix
-    //     if (numValue !== '') {
-    //         formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-    //     }
+    const handleUpdate = (e: FormEvent, id: number, index: string, income: string, outcome: string, submission: string) => {
+        e.preventDefault();
 
-    //     setCost(formatValue);
-    // };
-    const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
+        const dataSubmission = {
+            index_info: index,
+            income: income,
+            outcome: outcome,
+            submission: submission,
+        };
+
+        axios
+            .put(`https://erp.digitalindustryagency.com/api/indexs/${id}`, dataSubmission, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const notification = {
+                    type: 'success',
+                    message: 'Index Berhasil Diupdate',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
+            })
+            .catch((err: any) => {
+                navigate(0);
+                console.log('ERROR', err);
+                const notification = {
+                    type: 'error',
+                    message: 'Index Gagal Diupdate',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+            });
+    };
+
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/indexs', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setInitialRecords(response.data.data.resource.data);
+                console.log(response.data.data.resource);
+            });
+    }, []);
+
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+            }
+        }
+        return localStorage.removeItem('notification');
+    }, []);
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -692,7 +773,6 @@ const ControlPanel = () => {
                         </div>
                         <div className="flex items-center mt-5">
                             <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> Rp.2.170.460,- </div>
-                            {/* <div className="badge bg-white/30">+ 2.35% </div> */}
                         </div>
                         <div className="flex items-center font-semibold mt-5">
                             <IconEye className="ltr:mr-2 rtl:ml-2 shrink-0" />
@@ -707,10 +787,7 @@ const ControlPanel = () => {
                             </div>
                         </div>
                         <div className="relative mt-10">
-                            {/* <div className="absolute -bottom-12 ltr:-right-12 rtl:-left-12 w-24 h-24">
-                                <IconCircleCheck className="text-success opacity-20 w-full h-full" />
-                            </div> */}
-                            <div className="grid grid-cols-1 ss:grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 justify-between flex gap-6">
+                            <div className="grid grid-cols-1 ss:grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                                 <div className="panel bg-gray-400">
                                     <div className="text-dark">Saldo Akhir</div>
                                     <div className="mt-2 font-semibold text-2xl border-b border-b-gray-800">Rp.15.000.000,-</div>
@@ -730,57 +807,52 @@ const ControlPanel = () => {
                         </div>
                     </div>
                 </div>
-                <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
-                        <button type="button" className=" px-2 btn btn-outline-info">
-                            <IconPlus className="flex mx-2" fill={true} /> Add
-                        </button>
-                    </Link> */}
-                    <div className="ltr:mr-auto rtl:ml-auto">
-                    </div>
-                </div>
 
-                <div className="grid xl:grid-cols-3 gap-6 grid-cols-1">
-                    <div className="datatables panel xl:col-span-2">
+                <div className="flex flex-col-reverse xl:flex-row w-full gap-8">
+                    <div className="datatables panel w-full xl:w-2/3">
                         <DataTable
                             highlightOnHover
                             className="whitespace-nowrap table-hover "
-                            records={recordsData}
+                            records={initialRecords}
                             columns={[
-                                { accessor: 'id', title: 'No', sortable: true },
-                                { accessor: 'firstName', title: 'Keterangan', sortable: true },
+                                { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
+                                { accessor: 'index_info', title: 'Keterangan', sortable: true },
                                 {
-                                    accessor: 'age',
+                                    accessor: 'income',
                                     title: 'Masuk',
                                     sortable: true,
-                                    render: () => (
+                                    render: (e) => (
                                         <div className="flex">
                                             <label className="inline-flex">
+
                                                 <input type="checkbox" className="form-checkbox outline-info " defaultChecked />
+
                                             </label>
                                         </div>
                                     ),
                                 },
                                 {
-                                    accessor: 'phone',
+                                    accessor: 'outcome',
                                     title: 'Keluar',
                                     sortable: true,
-                                    render: () => (
+                                    render: (e) => (
                                         <div className="flex">
                                             <label className="inline-flex">
                                                 <input type="checkbox" className="form-checkbox outline-info" defaultChecked />
+
                                             </label>
                                         </div>
                                     ),
                                 },
                                 {
-                                    accessor: 'dob',
+                                    accessor: 'submission',
                                     title: 'Pengajuan',
                                     sortable: true,
-                                    render: () => (
+                                    render: (e) => (
                                         <div className="flex ">
                                             <label className="inline-flex">
                                                 <input type="checkbox" className="form-checkbox outline-info " defaultChecked />
+
                                             </label>
                                         </div>
                                     ),
@@ -798,44 +870,37 @@ const ControlPanel = () => {
                                     ),
                                 },
                             ]}
-                            totalRecords={initialRecords.length}
-                            recordsPerPage={pageSize}
-                            page={page}
-                            onPageChange={(p) => setPage(p)}
-                            recordsPerPageOptions={PAGE_SIZES}
-                            onRecordsPerPageChange={setPageSize}
                             sortStatus={sortStatus}
                             onSortStatusChange={setSortStatus}
                             minHeight={200}
-                            paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                         />
                     </div>
-                    <form className="space-y-5 panel xl:col-span-1">
+                    <form className="space-y-5 panel w-full xl:w-1/3" onSubmit={handleSubmit}>
                         <h1 className="font-semibold text-xl dark:text-white-light mb-2 justify-center flex">Tambah Index</h1>
                         <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
                             <div className="">
-                                <label htmlFor="gridTotal" className="text-xl font-medium mr-8">
+                                <label htmlFor="index_info" className="text-xl font-medium mr-8">
                                     Keterangan:
                                 </label>
-                                <input id="gridTotal" type="text" placeholder="Keterangan..." defaultValue="Nasi Goreng" className="form-input text-lg" />
+                                <input id="index_info" type="text" name="index_info" placeholder="Keterangan..." className="form-input text-lg" onChange={handleChange} value={formData.index_info} />
                             </div>
                             <div className="space-y-2">
                                 <div className="text-xl font-medium">Makan :</div>
                                 <div>
                                     <label className="inline-flex">
-                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" />
+                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" name="income" onChange={handleChange} value={formData.income} />
                                         <span className="text-lg">Pemasukan</span>
                                     </label>
                                 </div>
                                 <div>
                                     <label className="inline-flex">
-                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" />
+                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" name="outcome" onChange={handleChange} value={formData.outcome} />
                                         <span className="text-lg ">Pengeluaran</span>
                                     </label>
                                 </div>
                                 <div>
                                     <label className="inline-flex">
-                                        <input type="checkbox" defaultChecked className="form-checkbox outline-info w-6 h-6" />
+                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" name="submission" onChange={handleChange} value={formData.submission} />
                                         <span className="text-lg">Pengajuan</span>
                                     </label>
                                 </div>
