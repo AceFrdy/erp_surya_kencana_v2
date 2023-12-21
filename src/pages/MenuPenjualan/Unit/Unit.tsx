@@ -628,7 +628,7 @@ const Unit = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            // { accessor: 'id', title: 'No', sortable: true },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
                             {
                                 accessor: 'unit_stock_name',
                                 title: 'Nama Unit',

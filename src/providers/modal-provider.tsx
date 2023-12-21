@@ -10,6 +10,7 @@ import EditDistribusiModal from '../components/modals/edit-distribusi-modal';
 import DeleteRestockModal from '../components/modals/delete-restock-modal';
 import DeleteDataRestockModal from '../components/modals/delete-data-restock-modal';
 import DeleteDataPenjualanModal from '../components/modals/delete-data-penjualan-modal';
+import DeleteSaldoModal from '../components/modals/delete-modal-saldo';
 import FinishRestock from '../components/modals/finish-restock';
 import FinishDistribusi from '../components/modals/finish-distribusi';
 import DeleteIndexModal from '../components/modals/delete-index-modal';
@@ -28,6 +29,7 @@ const ModalProvider = () => {
             <DeleteRestockModal />
             <DeleteDataRestockModal />
             <DeleteDataPenjualanModal />
+            <DeleteSaldoModal />
             <DeleteDetailAkunModal />
             <FinishRestock />
             <FinishDistribusi />

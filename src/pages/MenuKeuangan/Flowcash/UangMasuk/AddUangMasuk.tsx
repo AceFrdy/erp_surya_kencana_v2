@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Flatpickr from 'react-flatpickr';
@@ -6,29 +6,44 @@ import 'flatpickr/dist/flatpickr.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../../../store';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
+import axios from 'axios';
+
+interface FormState {
+    id: number;
+    detail_acc_type: string;
+    acc_type: string;
+    acc_code: string;
+}
+
+interface DetailAccountList {
+    id: number;
+    detail_acc_code: string;
+    detail_acc_type: string;
+}
+
+interface AccountList {
+    id: number;
+    acc_type: string;
+    acc_code: string;
+}
+
 const AddUangMasuk = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
         dispatch(setPageTitle('Tambah Uang Masuk'));
     });
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [date1, setDate1] = useState<any>('2022-07-05');
-    const showAlert = async (type: number) => {
-        if (type == 20) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'success',
-                title: 'Data Berhasil Ditambah',
-                padding: '10px 20px',
-            });
-        }
-    };
     const [cost, setCost] = useState('');
+    const [detailAccount, setDetailAccount] = useState<DetailAccountList[]>([]);
+    const [account, setAccount] = useState<AccountList[]>([]);
+    const [formData, setFormData] = useState<FormState>({
+        id: 0,
+        detail_acc_type: '',
+        acc_type: '',
+        acc_code: '',
+    });
 
     const handleCostChange = (e: { target: { value: any } }) => {
         const inputValue = e.target.value;
@@ -44,6 +59,45 @@ const AddUangMasuk = () => {
 
         setCost(formatValue);
     };
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/detail-accounts', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setDetailAccount(response.data.data.resource.data);
+            })
+            .catch((err: any) => {
+                console.log('DETAIL ACCOUNT', err.message);
+            });
+
+        axios
+            .get('https://erp.digitalindustryagency.com/api/accounts', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setAccount(response.data.data.resource.data);
+            })
+            .catch((err: any) => {
+                console.log('ACCOUNT', err.message);
+            });
+    }, []);
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse mb-10">
@@ -74,24 +128,34 @@ const AddUangMasuk = () => {
                     </div>
                     <div>
                         <label htmlFor="gridState">Detail Akun</label>
-                        <select id="gridState" className="form-select text-white-dark">
-                            <option>Choose...</option>
+                        <select id="gridState" className="form-select text-white-dark" name="id" value={formData.id}>
+                            {detailAccount.map((item) => (
+                                <option value={item.id} key={item.id}>
+                                    {item.detail_acc_type}
+                                </option>
+                            ))}
+                            {/* <option>Choose...</option>
                             <option>Asset/Harta</option>
                             <option>Kewajiban/Hutang</option>
                             <option>Modal</option>
                             <option>Pendapatan</option>
-                            <option>Biaya</option>
+                            <option>Biaya</option> */}
                         </select>
                     </div>
                     <div>
                         <label htmlFor="gridState">Index</label>
                         <select id="gridState" className="form-select text-white-dark">
-                            <option>Choose...</option>
+                            {account.map((item) => (
+                                <option value={item.id} key={item.id}>
+                                    {item.acc_type}
+                                </option>
+                            ))}
+                            {/* <option>Choose...</option>
                             <option>Asset/Harta</option>
                             <option>Kewajiban/Hutang</option>
                             <option>Modal</option>
                             <option>Pendapatan</option>
-                            <option>Biaya</option>
+                            <option>Biaya</option> */}
                         </select>
                     </div>
                     <div>
@@ -104,9 +168,9 @@ const AddUangMasuk = () => {
                     </div>
                     <div className="flex">
                         <Link to="/menukeuangan/flowcash/uangmasuk">
-                        <button type="submit" className="btn btn-primary !mt-6 mr-8" onClick={() => showAlert(20)}>
-                            Tambah
-                        </button>
+                            <button type="submit" className="btn btn-primary !mt-6 mr-8">
+                                Tambah
+                            </button>
                         </Link>
                         <Link to="/menukeuangan/flowcash/uangmasuk">
                             <button type="submit" className="btn btn-primary !mt-6">
