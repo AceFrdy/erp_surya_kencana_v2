@@ -519,7 +519,6 @@ const rowData = [
     },
 ];
 
-
 interface BranchDataProps {
     id: number;
     branch_name: string;
@@ -529,7 +528,7 @@ interface BranchDataProps {
 
 const ListCabang = () => {
     const dispatch = useDispatch();
-    const token = localStorage.getItem('accessToken') || '';
+    const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
         dispatch(setPageTitle('List Cabang'));
     });
@@ -582,8 +581,7 @@ const ListCabang = () => {
 
     // get branch
     useEffect(() => {
-        const id = setInterval(() => {
-            axios
+        axios
             .get('https://erp.digitalindustryagency.com/api/branches', {
                 headers: {
                     Accept: 'application/json',
@@ -593,16 +591,13 @@ const ListCabang = () => {
             .then((response) => {
                 const branch = response.data.data.resource.data;
                 setInitialRecords(branch);
-                setBranch(branch); 
+                setBranch(branch);
                 setRecordsData(branch);
-                console.log(branch);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-        }, 2000);
-        return () => clearInterval(id)
-    }, [initialRecords]);
+    }, []);
 
     return (
         <div>
@@ -653,11 +648,11 @@ const ListCabang = () => {
                                 titleClassName: '!text-center',
                                 render: (e) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button" style={{ color: 'blue' }}>
+                                        {/* <button type="button" style={{ color: 'blue' }}>
                                             <Link to="/menupenjualan/cabang/detailcabang">
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
-                                        </button>
+                                        </button> */}
                                         <button type="button" style={{ color: 'orange' }}>
                                             <Link to={`/menupenjualan/cabang/listcabang/editcabang/${e.id}`}>
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />

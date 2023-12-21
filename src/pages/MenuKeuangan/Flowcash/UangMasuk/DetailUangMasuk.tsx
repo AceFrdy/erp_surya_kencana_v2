@@ -6,6 +6,7 @@ import 'flatpickr/dist/flatpickr.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../../../store';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
+
 const DetailUangMasuk = () => {
     const dispatch = useDispatch();
     useEffect(() => {
@@ -14,37 +15,8 @@ const DetailUangMasuk = () => {
     // const dispatch = useDispatch();
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const [date1, setDate1] = useState<any>('2022-07-05');
-    const showAlert = async (type: number) => {
-        if (type == 20) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'success',
-                title: 'Data Berhasil Ditambah',
-                padding: '10px 20px',
-            });
-        }
-    };
-    const [cost, setCost] = useState('');
 
-    const handleCostChange = (e: { target: { value: any } }) => {
-        const inputValue = e.target.value;
-        let formatValue = '';
-
-        // Remove non-numeric characters
-        const numValue = inputValue.replace(/\D/g, '');
-
-        // Format the number with 'Rp.' prefix
-        if (numValue !== '') {
-            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-        }
-
-        setCost(formatValue);
-    };
+   
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse mb-10">

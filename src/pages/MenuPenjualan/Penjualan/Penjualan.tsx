@@ -868,14 +868,12 @@ const Penjualan = () => {
                 },
             })
             .then((response) => {
+                navigate(0);
                 console.log('Data penjualan berhasil ditambahkan:', response.data);
-                navigate('/menupenjualan/penjualan/penjualan');
-                toast.success('Data berhasil ditambahkan', {
-                    position: 'top-right',
-                    autoClose: 3000,
-                });
+                toast.success('Seluruh Data Penjualan Berhasil Ditambahkan');
             })
             .catch((error) => {
+                navigate(0);
                 if (error.response && error.response.data) {
                     const apiErrors = error.response.data;
                     setFormData((prevData) => ({

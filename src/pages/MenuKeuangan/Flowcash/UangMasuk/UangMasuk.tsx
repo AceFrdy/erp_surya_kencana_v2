@@ -15,6 +15,7 @@ import Swal from 'sweetalert2';
 import IconSend from '../../../../components/Icon/IconSend';
 import IconNotes from '../../../../components/Icon/IconNotes';
 import IconPlus from '../../../../components/Icon/IconPlus';
+import axios from 'axios';
 // import * as Yup from 'yup';
 // import { Field, Form, Formik } from 'formik';
 
@@ -577,15 +578,29 @@ const showAlert = async (type: number) => {
         });
     }
 };
+
+interface InflowDataProps {
+    id: number;
+    cash_inflow_date: string;
+    cash_inflow_amount: number;
+    cash_inflow_info: string;
+    detail_account: {
+        detail_acc_code: string;
+        detail_acc_type: string;
+        detail_acc_name: string;
+    };
+}
+
 const UangMasuk = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
         dispatch(setPageTitle('Uang Masuk'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
+    const [initialRecords, setInitialRecords] = useState<InflowDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
 
     const [search, setSearch] = useState('');
@@ -605,14 +620,15 @@ const UangMasuk = () => {
     }, [page, pageSize, initialRecords]);
 
     useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
+        if (!initialRecords) {
+            return;
+        }
+        setRecordsData(() => {
+            return initialRecords.filter((item) => {
                 return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
+                    item.detail_account?.detail_acc_code.toLowerCase().includes(search.toLowerCase()) ||
+                    item.detail_account?.detail_acc_name.toLowerCase().includes(search.toLowerCase()) ||
+                    item.detail_account?.detail_acc_type.toLowerCase().includes(search.toLowerCase())
                 );
             });
         });
@@ -637,20 +653,23 @@ const UangMasuk = () => {
 
     const [cost, setCost] = useState('');
 
-    // const handleCostChange = (e: { target: { value: any } }) => {
-    //     const inputValue = e.target.value;
-    //     let formatValue = '';
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/cash-inflows', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const inflows = response.data.data.resource.data;
+                setInitialRecords(inflows);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    }, []);
 
-    //     // Remove non-numeric characters
-    //     const numValue = inputValue.replace(/\D/g, '');
-
-    //     // Format the number with 'Rp.' prefix
-    //     if (numValue !== '') {
-    //         formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-    //     }
-
-    //     setCost(formatValue);
-    // };
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -686,20 +705,19 @@ const UangMasuk = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
                             {
-                                accessor: 'age',
+                                accessor: 'detail_account.detail_acc_code',
                                 title: 'No Dokumen',
                                 sortable: true,
                             },
-                            { accessor: 'firstName', title: 'Index', sortable: true },
-                            { accessor: 'email', title: 'Keterangan', sortable: true },
-                            { accessor: 'phone', title: 'Cash', sortable: true },
+                            { accessor: 'detail_account.detail_acc_name', title: 'Index', sortable: true },
+                            { accessor: 'cash_inflow_info', title: 'Keterangan', sortable: true },
+                            { accessor: 'cash_inflow_amount', title: 'Cash', sortable: true },
                             {
-                                accessor: 'dob',
+                                accessor: 'cash_inflow_date',
                                 title: 'Tanggal',
                                 sortable: true,
-                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
                             },
 
                             {
