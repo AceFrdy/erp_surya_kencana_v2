@@ -12,6 +12,7 @@ import DeleteDataRestockModal from '../components/modals/delete-data-restock-mod
 import DeleteDataPenjualanModal from '../components/modals/delete-data-penjualan-modal';
 import FinishRestock from '../components/modals/finish-restock';
 import FinishDistribusi from '../components/modals/finish-distribusi';
+import DeleteIndexModal from '../components/modals/delete-index-modal';
 
 const ModalProvider = () => {
     return (
@@ -30,6 +31,7 @@ const ModalProvider = () => {
             <DeleteDetailAkunModal />
             <FinishRestock />
             <FinishDistribusi />
+            <DeleteIndexModal />
         </>
     );
 };
