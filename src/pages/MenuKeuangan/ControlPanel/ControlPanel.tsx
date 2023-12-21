@@ -26,6 +26,9 @@ import { toast } from 'react-toastify';
 // import * as Yup from 'yup';
 // import { Field, Form, Formik } from 'formik';
 import 'react-toastify/dist/ReactToastify.css';
+import { useModal } from '../../../hooks/use-modal';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+import Pagination from '../../../components/Pagination';
 
 const rowData = [
     {
@@ -603,6 +606,7 @@ interface DataProps {
 }
 
 const ControlPanel = () => {
+    const { onOpen } = useModal();
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Control Panel'));
@@ -714,9 +718,15 @@ const ControlPanel = () => {
             });
     };
 
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/indexs');
+
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/indexs', {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -724,9 +734,27 @@ const ControlPanel = () => {
             })
             .then((response) => {
                 setInitialRecords(response.data.data.resource.data);
-                console.log(response.data.data.resource);
+                // page
+                setMetaLink({
+                    current_page: response.data.data.resource.current_page,
+                    last_page: response.data.data.resource.last_page,
+                    from: response.data.data.resource.from,
+                    to: response.data.data.resource.to,
+                    per_page: response.data.data.resource.per_page,
+                    total: response.data.data.resource.total,
+                });
+                setMetaLinksLink(response.data.data.resource.links);
+                setLinksLink({
+                    first: response.data.data.resource.first_page_url,
+                    last: response.data.data.resource.last_page_url,
+                    next: response.data.data.resource.next_page_url,
+                    prev: response.data.data.resource.prev_page_url,
+                });
+            })
+            .catch((err: any) => {
+                console.log('ERROR_INDEX', err.message);
             });
-    }, []);
+    }, [url]);
 
     useEffect(() => {
         const notificationMessage = localStorage.getItem('notification');
@@ -805,8 +833,8 @@ const ControlPanel = () => {
                     </div>
                 </div>
 
-                <div className="flex flex-col-reverse xl:flex-row w-full gap-8">
-                    <div className="datatables panel w-full xl:w-2/3">
+                <div className="flex flex-col-reverse xl:flex-row w-full gap-8 mt-8 h-full">
+                    <div className="datatables panel w-full xl:w-2/3 h-full min-h-[400px]">
                         <DataTable
                             highlightOnHover
                             className="whitespace-nowrap table-hover "
@@ -875,9 +903,9 @@ const ControlPanel = () => {
                                     accessor: 'action',
                                     title: 'Opsi',
                                     titleClassName: '!text-center',
-                                    render: () => (
+                                    render: (e) => (
                                         <div className="flex items-center w-max mx-auto gap-2">
-                                            <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                            <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-index', e.id)}>
                                                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                             </button>
                                         </div>
@@ -888,8 +916,9 @@ const ControlPanel = () => {
                             onSortStatusChange={setSortStatus}
                             minHeight={200}
                         />
+                        {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                     </div>
-                    <form className="space-y-5 panel w-full xl:w-1/3" onSubmit={handleSubmit}>
+                    <form className="space-y-5 panel w-full xl:w-1/3 h-[400px]" onSubmit={handleSubmit}>
                         <h1 className="font-semibold text-xl dark:text-white-light mb-2 justify-center flex">Tambah Index</h1>
                         <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
                             <div className="">
@@ -899,7 +928,7 @@ const ControlPanel = () => {
                                 <input id="index_info" type="text" name="index_info" placeholder="Keterangan..." className="form-input text-lg" onChange={handleChange} value={formData.index_info} />
                             </div>
                             <div className="space-y-2">
-                                <div className="text-xl font-medium">Makan :</div>
+                                <div className="text-xl font-medium">Jenis :</div>
                                 <div>
                                     <label className="inline-flex">
                                         <input type="checkbox" className="form-checkbox outline-info w-6 h-6" name="income" onChange={handleChange} value={formData.income} />
