@@ -152,12 +152,12 @@ const Login = () => {
                                         </span>
                                     </div>
                                 </div>
-                                <div>
+                                {/* <div>
                                     <label className="flex cursor-pointer items-center">
                                         <input type="checkbox" className="form-checkbox bg-white dark:bg-black" />
                                         <span className="text-white-dark">Subscribe to weekly newsletter</span>
                                     </label>
-                                </div>
+                                </div> */}
                                 <button type="submit" className="btn btn-gradient !mt-6 w-full border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
                                     Sign in
                                 </button>
@@ -166,7 +166,7 @@ const Login = () => {
                                 <span className="absolute inset-x-0 top-1/2 h-px w-full -translate-y-1/2 bg-white-light dark:bg-white-dark"></span>
                                 <span className="relative bg-white px-2 font-bold uppercase text-white-dark dark:bg-dark dark:text-white-light">or</span>
                             </div>
-                            <div className="mb-10 md:mb-[60px]">
+                            {/* <div className="mb-10 md:mb-[60px]">
                                 <ul className="flex justify-center gap-3.5 text-white">
                                     <li>
                                         <Link
@@ -205,7 +205,7 @@ const Login = () => {
                                         </Link>
                                     </li>
                                 </ul>
-                            </div>
+                            </div> */}
                             <div className="text-center dark:text-white">
                                 Don't have an account ?&nbsp;
                                 <Link to="/auth/boxed-signup" className="uppercase text-primary underline transition hover:text-black dark:hover:text-white">
