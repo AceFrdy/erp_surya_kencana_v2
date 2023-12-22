@@ -1,25 +1,10 @@
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import { setPageTitle } from '../../../store/themeConfigSlice';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 
-const showAlert = async (type: number) => {
-    if (type == 20) {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-        });
-        toast.fire({
-            icon: 'success',
-            title: 'Data Berhasil Diubah',
-            padding: '10px 20px',
-        });
-    }
-};
+import { setPageTitle } from '../../../store/themeConfigSlice';
+
 interface ProductListProps {
     id: number;
     product_barcode: string;
@@ -28,7 +13,7 @@ interface ProductListProps {
 
 interface FormDataProps {
     product_name: string;
-    product_qty: number;
+    distribution_qty: number;
     product_price: number;
 }
 
@@ -39,12 +24,48 @@ const EditRestock = () => {
     });
     const [formData, setFormData] = useState<FormDataProps>({
         product_name: '',
-        product_qty: 0,
+        distribution_qty: 0,
         product_price: 0,
     });
     const { id } = useParams();
     const token = localStorage.getItem('accessToken') ?? '';
+    const navigate = useNavigate();
 
+    const handleUpdate = (e: FormEvent) => {
+        e.preventDefault();
+
+        const data = {
+            product_name: formData.product_name,
+            distribution_qty: formData.distribution_qty,
+            product_price: formData.product_price,
+        };
+
+        axios
+            .put(`https://erp.digitalindustryagency.com/api/distribution-restok/${id}`, data, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const notification = {
+                    type: 'success',
+                    message: 'Detail Restock Berhasil Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate('/menupenjualan/restock/restock');
+            })
+            .catch((err: any) => {
+                const notification = {
+                    type: 'error',
+                    message: 'Detail Restock Gagal Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
+            });
+    };
+
+    // get data by id
     useEffect(() => {
         axios
             .get(`https://erp.digitalindustryagency.com/api/distribution-restok/${id}`, {
@@ -54,7 +75,8 @@ const EditRestock = () => {
                 },
             })
             .then((response) => {
-                console.log('data show', response.data);
+                setFormData(response.data.data.resource);
+                handleProductClick(response.data.data.resource.product_name);
             })
             .catch((err: any) => {
                 console.log('data show error', err.message);
@@ -116,7 +138,7 @@ const EditRestock = () => {
             </ul>
             <div className="panel mt-6">
                 <h1 className="text-xl font-bold mb-8">Edit Data</h1>
-                <form className="space-y-5">
+                <form className="space-y-5" onSubmit={handleUpdate}>
                     <div className="relative">
                         <label htmlFor="nama">Nama Produk</label>
                         <input id="nama" ref={ProductRef} type="text" className="form-input" placeholder="Nama Produk" onChange={handleProductChange} autoComplete="off" />
@@ -144,16 +166,16 @@ const EditRestock = () => {
                     </div>
                     <div className="flex gap-x-8 w-full">
                         <div className="w-full">
-                            <label htmlFor="product_qty">Qty</label>
+                            <label htmlFor="distribution_qty">Qty</label>
                             <input
-                                id="product_qty"
+                                id="distribution_qty"
                                 type="number"
                                 placeholder=""
                                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
                                     e.preventDefault();
-                                    setFormData((prev) => ({ ...prev, product_qty: parseFloat(e.target.value) }));
+                                    setFormData((prev) => ({ ...prev, distribution_qty: parseFloat(e.target.value) }));
                                 }}
-                                value={formData.product_qty}
+                                value={formData.distribution_qty}
                                 className="form-input"
                             />
                         </div>
@@ -174,13 +196,11 @@ const EditRestock = () => {
                         </div>
                     </div>
                     <div className="flex">
-                        <Link to="/menupenjualan/restock/listrestock">
-                            <button type="submit" className="btn btn-outline-primary !mt-6" onClick={() => showAlert(20)}>
-                                Update
-                            </button>
-                        </Link>
-                        <Link to="/menupenjualan/restock/listrestock">
-                            <button type="submit" className="btn btn-outline-danger !mt-6 ml-6">
+                        <button type="submit" className="btn btn-outline-primary !mt-6">
+                            Update
+                        </button>
+                        <Link to="/menupenjualan/restock/restock">
+                            <button type="button" className="btn btn-outline-danger !mt-6 ml-6">
                                 Kembali
                             </button>
                         </Link>

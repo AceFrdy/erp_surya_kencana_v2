@@ -30,7 +30,6 @@ const Penjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/Penjualan'
 const LaporanPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/LaporanPenjualan'));
 const DetailPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/DetailPenjualan'));
 const Distribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/Distribusi'));
-const EditDistribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/EditDistribusi'));
 const LaporanDistribusi = lazy(() => import('../pages/MenuPenjualan/Distribusi/LaporanDistribusi'));
 const Login = lazy(() => import('../pages/Auth/Login'));
 const SignUp = lazy(() => import('../pages/Auth/SignUp'));
@@ -249,11 +248,6 @@ const routes = [
     {
         path: '/menupenjualan/distribution/detaildistribution/:id',
         element: <DetailDistribusi />,
-        layout: 'default',
-    },
-    {
-        path: '/menupenjualan/distribution/editdistribution',
-        element: <EditDistribusi />,
         layout: 'default',
     },
     //Auth

@@ -8,14 +8,13 @@ import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 
 import { useModal } from '../../../hooks/use-modal';
 import Pagination from '../../../components/Pagination';
-
 import IconPlus from '../../../components/Icon/IconPlus';
 import IconPencil from '../../../components/Icon/IconPencil';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
 
 interface AkunDataProps {
     id: number;
