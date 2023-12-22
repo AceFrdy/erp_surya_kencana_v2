@@ -7,24 +7,6 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-// const submitForm = () => {
-//     const toast = Swal.mixin({
-//         toast: true,
-//         position: 'top',
-//         showConfirmButton: false,
-//         timer: 3000,
-//     });
-//     toast.fire({
-//         icon: 'success',
-//         title: 'Unit Berhasil Ditambah',
-//         padding: '10px 20px',
-//     });
-// };
-
-// const submitForm4 = Yup.object().shape({
-//     namaUnit: Yup.string().required('Nama Tidak Boleh Kosong'),
-//     kapasitasUnit: Yup.string().required('Kapasitas Tidak Boleh Kosong'),
-// });
 
 const AddUnit = () => {
     const dispatch = useDispatch();
@@ -32,7 +14,7 @@ const AddUnit = () => {
         dispatch(setPageTitle('Tambah Unit'));
     });
     const navigate = useNavigate();
-    const token = localStorage.getItem('accessToken') || '';
+    const token = localStorage.getItem('accessToken') ?? '';
 
     const [formData, setFormData] = useState({
         unit_stock_name: '',
@@ -80,7 +62,7 @@ const AddUnit = () => {
                         errors: apiErrors,
                     }));
                 }
-                console.error('Error adding product data:', error);
+                console.error('Error adding unit data:', error);
                 toast.error('Error adding data');
             });
     };

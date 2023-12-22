@@ -18,7 +18,8 @@ export type ModalType =
     | 'delete-seluruh-restock'
     | 'delete-saldo'
     | 'delete-data-penjualan'
-    | 'delete-index';
+    | 'delete-index'
+    | 'delete-inflow-cash';
 
 interface ModalStore {
     type: ModalType | null;

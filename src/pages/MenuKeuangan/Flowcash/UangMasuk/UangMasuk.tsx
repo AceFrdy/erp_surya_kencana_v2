@@ -3,21 +3,12 @@ import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-// import IconBell from '../../../components/Icon/IconBell';
-// import IconXCircle from '../../../components/Icon/IconXCircle';
-import IconPencil from '../../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-// import { Dialog, Transition } from '@headlessui/react';
-// import IconPlus from '../../../components/Icon/IconPlus';
-// import IconNotes from '../../../components/Icon/IconNotes';
-import Swal from 'sweetalert2';
-import IconSend from '../../../../components/Icon/IconSend';
 import IconNotes from '../../../../components/Icon/IconNotes';
 import IconPlus from '../../../../components/Icon/IconPlus';
 import axios from 'axios';
-// import * as Yup from 'yup';
-// import { Field, Form, Formik } from 'formik';
+import { useModal } from '../../../../hooks/use-modal';
 
 const rowData = [
     {
@@ -522,63 +513,6 @@ const rowData = [
     },
 ];
 
-const showAlert = async (type: number) => {
-    if (type === 11) {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
-                popup: 'sweet-alerts',
-            },
-            buttonsStyling: false,
-        });
-        swalWithBootstrapButtons
-            .fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true,
-                padding: '2em',
-            })
-            .then((result) => {
-                if (result.value) {
-                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
-                }
-            });
-    }
-    if (type === 15) {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-        });
-        toast.fire({
-            icon: 'success',
-            title: 'Berhasil Dikirim',
-            padding: '10px 20px',
-        });
-    }
-    if (type == 20) {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-        });
-        toast.fire({
-            icon: 'success',
-            title: 'Data Berhasil Ditambah',
-            padding: '10px 20px',
-        });
-    }
-};
-
 interface InflowDataProps {
     id: number;
     cash_inflow_date: string;
@@ -602,7 +536,7 @@ const UangMasuk = () => {
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [initialRecords, setInitialRecords] = useState<InflowDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
-
+    const { onOpen } = useModal();
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -724,10 +658,10 @@ const UangMasuk = () => {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
-                                render: () => (
+                                render: (e) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menukeuangan/flowcash/detailuangmasuk">
+                                            <Link to={`/menukeuangan/flowcash/detailuangmasuk/${e.id}`}>
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
@@ -736,9 +670,9 @@ const UangMasuk = () => {
                                                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                                 </Link>
                                             </button> */}
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                            </button> */}
+                                        <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-inflow-cash', e.id)}>
+                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                        </button>
                                     </div>
                                 ),
                             },

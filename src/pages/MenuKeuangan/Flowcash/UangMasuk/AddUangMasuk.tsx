@@ -1,102 +1,128 @@
-import { ChangeEvent, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import Flatpickr from 'react-flatpickr';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import 'flatpickr/dist/flatpickr.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { IRootState } from '../../../../store';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 interface FormState {
     id: number;
-    detail_acc_type: string;
-    acc_type: string;
-    acc_code: string;
+    index_id: number;
+    detail_account_id: number;
+    detail_acc_name: string;
+    index_info: string;
+    cash_inflow_amount: number;
+    cash_inflow_info: string;
+    cash_inflow_date: string;
 }
 
 interface DetailAccountList {
     id: number;
     detail_acc_code: string;
-    detail_acc_type: string;
+    detail_acc_name: string;
 }
 
-interface AccountList {
+interface IndexList {
     id: number;
-    acc_type: string;
-    acc_code: string;
+    index_info: string;
 }
 
 const AddUangMasuk = () => {
     const dispatch = useDispatch();
     const token = localStorage.getItem('accessToken') ?? '';
+    const navigate = useNavigate();
     useEffect(() => {
         dispatch(setPageTitle('Tambah Uang Masuk'));
     });
-    const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
-    const [date1, setDate1] = useState<any>('2022-07-05');
-    const [cost, setCost] = useState('');
     const [detailAccount, setDetailAccount] = useState<DetailAccountList[]>([]);
-    const [account, setAccount] = useState<AccountList[]>([]);
+    const [index, setIndex] = useState<IndexList[]>([]);
     const [formData, setFormData] = useState<FormState>({
         id: 0,
-        detail_acc_type: '',
-        acc_type: '',
-        acc_code: '',
+        detail_acc_name: '',
+        index_info: '',
+        index_id: 0,
+        detail_account_id: 0,
+        cash_inflow_amount: 0,
+        cash_inflow_info: '',
+        cash_inflow_date: '',
     });
 
-    const handleCostChange = (e: { target: { value: any } }) => {
-        const inputValue = e.target.value;
-        let formatValue = '';
-
-        // Remove non-numeric characters
-        const numValue = inputValue.replace(/\D/g, '');
-
-        // Format the number with 'Rp.' prefix
-        if (numValue !== '') {
-            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+        if (type === 'checkbox') {
+            const checkboxValue = (e.target as HTMLInputElement).checked ? 'yes' : '';
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: checkboxValue,
+            }));
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
         }
-
-        setCost(formatValue);
-    };
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
     };
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/detail-accounts', {
+            .get('https://erp.digitalindustryagency.com/api/cash-inflow-dropdown', {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {
-                setDetailAccount(response.data.data.resource.data);
+                setIndex(response.data.data.resource.dataIndex);
+                setDetailAccount(response.data.data.resource.dataDetailAcc);
             })
             .catch((err: any) => {
                 console.log('DETAIL ACCOUNT', err.message);
             });
+    }, []);
+
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const data = {
+            index_id: formData.index_id,
+            detail_account_id: formData.detail_account_id,
+            cash_inflow_amount: formData.cash_inflow_amount,
+            cash_inflow_info: formData.cash_inflow_info,
+            cash_inflow_date: formData.cash_inflow_date,
+        };
 
         axios
-            .get('https://erp.digitalindustryagency.com/api/accounts', {
+            .post('https://erp.digitalindustryagency.com/api/cash-inflows', data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {
-                setAccount(response.data.data.resource.data);
+                console.log('Data Uang Masuk berhasil ditambahkan:', response.data);
+                navigate('/menukeuangan/flowcash/uangmasuk');
+                toast.success('Data berhasil ditambahkan', {
+                    position: 'top-right',
+                    autoClose: 3000,
+                });
             })
-            .catch((err: any) => {
-                console.log('ACCOUNT', err.message);
+            .catch((error) => {
+                if (error.response && error.response.data) {
+                    const apiErrors = error.response.data;
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        errors: apiErrors,
+                    }));
+                }
+                console.error('Error adding cash inflow data:', error);
+                toast.error('Error adding data');
             });
-    }, []);
+    };
+
+    const handleCancel = () => {
+        navigate('/menukeuangan/flowcash/uangmasuk');
+    };
 
     return (
         <div>
@@ -115,68 +141,48 @@ const AddUangMasuk = () => {
             </ul>
             <div className="panel">
                 <h1 className="text-xl font-bold mb-6">Add Uang Masuk</h1>
-                <form className="space-y-5">
+                <form className="space-y-5" onSubmit={handleSubmit}>
                     <div>
                         <label htmlFor="Tanggal">Tanggal</label>
-                        <Flatpickr
-                            id="Tanggal"
-                            value={date1}
-                            options={{ dateFormat: 'Y-m-d', position: isRtl ? 'auto right' : 'auto left' }}
-                            className="form-input"
-                            onChange={(date) => setDate1(date)}
-                        />
+                        <input type="date" className="form-input" name="cash_inflow_date" value={formData.cash_inflow_date} onChange={handleChange} />
                     </div>
                     <div>
                         <label htmlFor="gridState">Detail Akun</label>
-                        <select id="gridState" className="form-select text-white-dark" name="id" value={formData.id}>
+                        <select className="form-select text-white-dark" name="detail_account_id" value={formData.detail_account_id} onChange={handleChange}>
+                            <option value="">Choose...</option>
                             {detailAccount.map((item) => (
                                 <option value={item.id} key={item.id}>
-                                    {item.detail_acc_type}
+                                    {item.detail_acc_name}
                                 </option>
                             ))}
-                            {/* <option>Choose...</option>
-                            <option>Asset/Harta</option>
-                            <option>Kewajiban/Hutang</option>
-                            <option>Modal</option>
-                            <option>Pendapatan</option>
-                            <option>Biaya</option> */}
                         </select>
                     </div>
                     <div>
                         <label htmlFor="gridState">Index</label>
-                        <select id="gridState" className="form-select text-white-dark">
-                            {account.map((item) => (
+                        <select id="gridState" className="form-select text-white-dark" name="index_id" value={formData.index_id} onChange={handleChange}>
+                            <option value="">Choose...</option>
+                            {index.map((item) => (
                                 <option value={item.id} key={item.id}>
-                                    {item.acc_type}
+                                    {item.index_info}
                                 </option>
                             ))}
-                            {/* <option>Choose...</option>
-                            <option>Asset/Harta</option>
-                            <option>Kewajiban/Hutang</option>
-                            <option>Modal</option>
-                            <option>Pendapatan</option>
-                            <option>Biaya</option> */}
                         </select>
                     </div>
                     <div>
                         <label htmlFor="Cost">Cash</label>
-                        <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input" />
+                        <input type="text" placeholder="Rp." className="form-input" name="cash_inflow_amount" value={formData.cash_inflow_amount} onChange={handleChange} />
                     </div>
                     <div>
                         <label htmlFor="Cost">Keterangan</label>
-                        <input id="Cost" type="text" placeholder="Keterangan..." className="form-input" />
+                        <input type="text" placeholder="Keterangan..." className="form-input" name="cash_inflow_info" value={formData.cash_inflow_info} onChange={handleChange} />
                     </div>
                     <div className="flex">
-                        <Link to="/menukeuangan/flowcash/uangmasuk">
-                            <button type="submit" className="btn btn-primary !mt-6 mr-8">
-                                Tambah
-                            </button>
-                        </Link>
-                        <Link to="/menukeuangan/flowcash/uangmasuk">
-                            <button type="submit" className="btn btn-primary !mt-6">
-                                Kembali
-                            </button>
-                        </Link>
+                        <button type="submit" className="btn btn-primary !mt-6 mr-8">
+                            Tambah
+                        </button>
+                        <button type="submit" className="btn btn-primary !mt-6" onClick={handleCancel}>
+                            Kembali
+                        </button>
                     </div>
                 </form>
             </div>

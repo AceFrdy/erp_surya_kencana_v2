@@ -600,6 +600,7 @@ interface MetaLinkProps {
     per_page: number;
     total: number;
 }
+
 interface MetaLinksLinkProps {
     active: boolean;
     label: string;
