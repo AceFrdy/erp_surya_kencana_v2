@@ -1,18 +1,20 @@
+import axios from 'axios';
+import sortBy from 'lodash/sortBy';
+import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
-import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import IconPencil from '../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
+
 import { Link, useNavigate } from 'react-router-dom';
-import IconSend from '../../../components/Icon/IconSend';
-import axios from 'axios';
-import Pagination from '../../../components/Pagination';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useModal } from '../../../hooks/use-modal';
+import Pagination from '../../../components/Pagination';
+import IconSend from '../../../components/Icon/IconSend';
+import IconPencil from '../../../components/Icon/IconPencil';
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface DistributionListProps {
     id: number;
@@ -139,6 +141,8 @@ const Distribusi = () => {
             unit_stock_id: formData.unit_stock_id,
         };
 
+        console.log(data);
+
         axios
             .post('https://erp.digitalindustryagency.com/api/distributions', data, {
                 headers: {
@@ -155,7 +159,7 @@ const Distribusi = () => {
                 navigate(0);
             })
             .catch((err: any) => {
-                console.log('error', err.message);
+                console.log('error', err);
                 const notification = {
                     type: 'error',
                     message: 'Distribusi Gagal Ditambahkan',
@@ -214,17 +218,15 @@ const Distribusi = () => {
                 },
             })
             .then((response) => {
-                if (response.data.data.resource.data !== 'Data not available') {
-                    setInitialRecords(response.data.data.resource.data);
+                setInitialRecords(response.data.data.resource.data);
+                if (response.data.data.resource.data.length >= 1) {
                     // page
                     setMetaLink(response.data.data.resource.meta);
                     setMetaLinksLink(response.data.data.resource.meta.links);
                     setLinksLink(response.data.data.resource.links);
-                    if (response.data.data.resource.data.length >= 1) {
-                        setFormData((prev) => ({ ...prev, branch_id: response.data.data.resource.data[0].branch.id }));
-                    }
-                    console.log(response.data.data.resource);
+                    setFormData((prev) => ({ ...prev, branch_id: response.data.data.resource.data[0].branch.id }));
                 }
+                console.log('data', response.data.data.resource);
             })
             .catch((err: any) => {
                 console.log('DISTRIBUTION', err.message);

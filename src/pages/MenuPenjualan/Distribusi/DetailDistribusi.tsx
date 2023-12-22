@@ -48,6 +48,7 @@ const DetailDistribusi = () => {
             })
             .then((response) => {
                 setInitialRecords(response.data.data.resource.distributions);
+                console.log(response.data.data.resource.distributions);
                 setBranchName(response.data.data.resource.branch.branch_name);
                 setStatusKode(response.data.data.resource.status);
                 setDistribusiCode(response.data.data.resource.distributions[0].distribution_code);
@@ -80,7 +81,7 @@ const DetailDistribusi = () => {
             </ul>
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    <Link to="/menupenjualan/restock/listrestock">
+                    <Link to="/menupenjualan/distribution/laporandistribution">
                         <button type="button" className=" px-2 btn btn-outline-info">
                             <IconArrowBackward className="flex mx-2" fill={true} /> Kembali
                         </button>
