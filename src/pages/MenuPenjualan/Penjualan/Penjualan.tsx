@@ -660,8 +660,6 @@ const Penjualan = () => {
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [initialRecords, setInitialRecords] = useState<SaleOrderListProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
-    const [penjualan, setPenjualan] = useState([]);
-    const [customer, setCustomer] = useState<CustomersList[]>([]);
     const [barcodeProduk, setBarcodeProduk] = useState<BarcodeDataProps[]>([]);
     const [unit, setUnit] = useState<UnitDataProps[]>([]);
     const [branch, setBranch] = useState<BranchDataProps[]>([]);
@@ -695,7 +693,6 @@ const Penjualan = () => {
     useEffect(() => {
         const from = (page - 1) * pageSize;
         const to = from + pageSize;
-        // setRecordsData([...initialRecords.slice(from, to)]);
     }, [page, pageSize, initialRecords]);
 
     useEffect(() => {
@@ -712,41 +709,15 @@ const Penjualan = () => {
                 );
             });
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
-    const formatDate = (date: string | number | Date) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
-        }
-        return '';
-    };
 
     const [cost, setCost] = useState('');
-
-    const handleCostChange = (e: { target: { value: any } }) => {
-        const inputValue = e.target.value;
-        let formatValue = '';
-
-        // Remove non-numeric characters
-        const numValue = inputValue.replace(/\D/g, '');
-
-        // Format the number with 'Rp.' prefix
-        if (numValue !== '') {
-            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-        }
-
-        setCost(formatValue);
-    };
 
     useEffect(() => {
         axios

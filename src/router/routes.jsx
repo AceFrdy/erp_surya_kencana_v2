@@ -322,7 +322,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menukeuangan/flowcash/detailuangmasuk',
+        path: '/menukeuangan/flowcash/detailuangmasuk/:id',
         element: <DetailUangMasuk />,
         layout: 'default',
     },

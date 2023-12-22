@@ -1,22 +1,47 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import Flatpickr from 'react-flatpickr';
+import { Link, useParams } from 'react-router-dom';
 import 'flatpickr/dist/flatpickr.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../../../store';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
+import axios from 'axios';
 
 const DetailUangMasuk = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') ?? '';
+    const { id } = useParams();
     useEffect(() => {
         dispatch(setPageTitle('Detail Uang Masuk'));
     });
-    // const dispatch = useDispatch();
-    const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
-    const [date1, setDate1] = useState<any>('2022-07-05');
+    const [cashInflowDate, setCashInflowDate] = useState<string>('');
+    const [cashInflowAmount, setCashInflowAmount] = useState<number>(0);
+    const [cashInflowInfo, setCashInflowInfo] = useState<string>('');
+    const [cashInflowIndexInfo, setCashInflowIndexInfo] = useState<string>('');
+    const [cashInflowDetailAccount, setCashInflowDetailAccount] = useState<string>('');
 
-   
+
+    const [url, setUrl] = useState<string>(`https://erp.digitalindustryagency.com/api/cash-inflows/${id}`);
+
+    useEffect(() => {
+        axios
+            .get(url, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setCashInflowDate(response.data.data.resource.cash_inflow_date);
+                setCashInflowAmount(response.data.data.resource.cash_inflow_amount);
+                setCashInflowInfo(response.data.data.resource.cash_inflow_info);
+                setCashInflowIndexInfo(response.data.data.resource.index.index_info);
+                setCashInflowDetailAccount(response.data.data.resource.detail_account.detail_acc_name);
+            })
+            .catch((err: any) => {
+                console.log('GET SALE REPORT', err.message);
+            });
+    }, []);
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse mb-10">
@@ -37,44 +62,23 @@ const DetailUangMasuk = () => {
                 <form className="space-y-5">
                     <div>
                         <label htmlFor="Tanggal">Tanggal</label>
-                        <Flatpickr
-                            id="Tanggal"
-                            value={date1}
-                            options={{ dateFormat: 'Y-m-d', position: isRtl ? 'auto right' : 'auto left' }}
-                            className="form-input"
-                            disabled
-                            onChange={(date) => setDate1(date)}
-                        />
+                        <input className="form-input" value={cashInflowDate} disabled/>
                     </div>
                     <div>
                         <label htmlFor="gridState">Detail Akun</label>
-                        <select id="gridState" disabled className="form-select text-white-dark">
-                            <option>Asset/Harta</option>
-                            <option>Choose...</option>
-                            <option>Kewajiban/Hutang</option>
-                            <option>Modal</option>
-                            <option>Pendapatan</option>
-                            <option>Biaya</option>
-                        </select>
+                        <input className="form-input" value={cashInflowDetailAccount} disabled/>
                     </div>
                     <div>
                         <label htmlFor="gridState">Index</label>
-                        <select id="gridState" disabled className="form-select text-white-dark">
-                            <option>Modal</option>
-                            <option>Choose...</option>
-                            <option>Asset/Harta</option>
-                            <option>Kewajiban/Hutang</option>
-                            <option>Pendapatan</option>
-                            <option>Biaya</option>
-                        </select>
+                        <input className="form-input" value={cashInflowIndexInfo} disabled/>
                     </div>
                     <div>
                         <label htmlFor="Cost">Cash</label>
-                        <input id="Cost" disabled type="text"  defaultValue={1020234} placeholder="Rp." className="form-input" />
+                        <input className="form-input" value={cashInflowAmount} disabled/>
                     </div>
                     <div>
-                        <label htmlFor="Cost">Keterangan</label>
-                        <input id="Cost" disabled type="text" defaultValue="Keterangan Yang Diisi" placeholder="Keterangan..." className="form-input" />
+                        <label htmlFor="gridState">Keterangan</label>
+                        <input className="form-input" value={cashInflowInfo}disabled/>
                     </div>
                     <div className="flex">
                         <Link to="/menukeuangan/flowcash/uangmasuk">
