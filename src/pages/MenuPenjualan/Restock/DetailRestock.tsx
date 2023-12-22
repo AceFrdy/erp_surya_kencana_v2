@@ -52,7 +52,6 @@ const DetailRestock = () => {
                 console.log('GET DISTRIBRUTION REPORT', err.message);
             });
     }, []);
-    // console.log('initial', initialRecords);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);

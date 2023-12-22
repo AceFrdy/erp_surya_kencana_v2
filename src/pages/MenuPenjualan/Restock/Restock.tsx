@@ -1,19 +1,20 @@
+import axios from 'axios';
+import sortBy from 'lodash/sortBy';
+import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
-import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import IconPencil from '../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link, useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import IconSend from '../../../components/Icon/IconSend';
-import axios from 'axios';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+
 import { useModal } from '../../../hooks/use-modal';
 import Pagination from '../../../components/Pagination';
+import IconSend from '../../../components/Icon/IconSend';
+import IconPencil from '../../../components/Icon/IconPencil';
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import IconTrashLines from '../../../components/Icon/IconTrashLines';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface RestockProps {
     id: number;

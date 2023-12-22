@@ -61,6 +61,7 @@ const ListRestock = () => {
             })
             .then((response) => {
                 setInitialRecords(response.data.data.resource.data);
+                console.log(response.data.data.resource.data);
 
                 // page
                 setMetaLink({
