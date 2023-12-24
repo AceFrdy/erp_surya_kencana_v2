@@ -26,5 +26,5 @@ jobs:
           cd /www/wwwroot/erp-demo.digitalindustryagency.com/erp_surya_kencana_v2/
           git pull origin master
           git status
-          npm install --only=prod
-          npm run build
+          npm ci
+          npm run build --if-present
