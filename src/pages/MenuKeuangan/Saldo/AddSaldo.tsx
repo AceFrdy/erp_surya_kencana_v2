@@ -17,7 +17,6 @@ const AddSaldo = () => {
         detail_account_id: '',
         saldo_amount: '',
         saldo_info: '',
-        // errors: {},
     });
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {

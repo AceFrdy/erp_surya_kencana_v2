@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import 'flatpickr/dist/flatpickr.css';
+// import 'flatpickr/dist/flatpickr.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 import axios from 'axios';
@@ -143,11 +143,11 @@ const AddUangMasuk = () => {
                 <h1 className="text-xl font-bold mb-6">Add Uang Masuk</h1>
                 <form className="space-y-5" onSubmit={handleSubmit}>
                     <div>
-                        <label htmlFor="Tanggal">Tanggal</label>
+                        <label>Tanggal</label>
                         <input type="date" className="form-input" name="cash_inflow_date" value={formData.cash_inflow_date} onChange={handleChange} />
                     </div>
                     <div>
-                        <label htmlFor="gridState">Detail Akun</label>
+                        <label>Detail Akun</label>
                         <select className="form-select text-white-dark" name="detail_account_id" value={formData.detail_account_id} onChange={handleChange}>
                             <option value="">Choose...</option>
                             {detailAccount.map((item) => (
@@ -158,7 +158,7 @@ const AddUangMasuk = () => {
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="gridState">Index</label>
+                        <label>Index</label>
                         <select id="gridState" className="form-select text-white-dark" name="index_id" value={formData.index_id} onChange={handleChange}>
                             <option value="">Choose...</option>
                             {index.map((item) => (
@@ -169,11 +169,11 @@ const AddUangMasuk = () => {
                         </select>
                     </div>
                     <div>
-                        <label htmlFor="Cost">Cash</label>
+                        <label>Cash</label>
                         <input type="text" placeholder="Rp." className="form-input" name="cash_inflow_amount" value={formData.cash_inflow_amount} onChange={handleChange} />
                     </div>
                     <div>
-                        <label htmlFor="Cost">Keterangan</label>
+                        <label>Keterangan</label>
                         <input type="text" placeholder="Keterangan..." className="form-input" name="cash_inflow_info" value={formData.cash_inflow_info} onChange={handleChange} />
                     </div>
                     <div className="flex">

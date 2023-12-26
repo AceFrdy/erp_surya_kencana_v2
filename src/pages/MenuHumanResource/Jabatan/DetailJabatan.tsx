@@ -222,8 +222,6 @@ const DetailJabatan = () => {
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
     const [recordsData, setRecordsData] = useState(initialRecords);
-
-    // const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
@@ -239,27 +237,14 @@ const DetailJabatan = () => {
         setRecordsData([...initialRecords.slice(from, to)]);
     }, [page, pageSize, initialRecords]);
 
-    // useEffect(() => {
-    //     setInitialRecords(() => {
-    //         return rowData.filter((item) => {
-    //             return (
-    //                 item.id.toString().includes(search.toLowerCase()) ||
-    //                 item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-    //                 item.dob.toLowerCase().includes(search.toLowerCase()) ||
-    //                 item.email.toLowerCase().includes(search.toLowerCase()) ||
-    //                 item.phone.toLowerCase().includes(search.toLowerCase())
-    //             );
-    //         });
-    //     });
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [search]);
-
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
+
+    
     return (
         <div>
             <div className="flex flex-wrap w-full justify-start mb-5">

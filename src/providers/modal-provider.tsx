@@ -14,7 +14,6 @@ import DeleteSaldoModal from '../components/modals/delete-modal-saldo';
 import FinishRestock from '../components/modals/finish-restock';
 import FinishDistribusi from '../components/modals/finish-distribusi';
 import DeleteIndexModal from '../components/modals/delete-index-modal';
-import DeleteInflowCashModal from '../components/modals/delete-modal-uang-masuk';
 
 const ModalProvider = () => {
     return (
@@ -35,7 +34,6 @@ const ModalProvider = () => {
             <FinishRestock />
             <FinishDistribusi />
             <DeleteIndexModal />
-            <DeleteInflowCashModal />
         </>
     );
 };

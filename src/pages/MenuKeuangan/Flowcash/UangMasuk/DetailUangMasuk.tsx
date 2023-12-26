@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import 'flatpickr/dist/flatpickr.css';
-import { useDispatch, useSelector } from 'react-redux';
-import { IRootState } from '../../../../store';
+import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 import axios from 'axios';
 

@@ -3,20 +3,14 @@ import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-// import IconBell from '../../../components/Icon/IconBell';
-// import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-// import { Dialog, Transition } from '@headlessui/react';
-// import IconPlus from '../../../components/Icon/IconPlus';
-// import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
-import IconSend from '../../../../components/Icon/IconSend';
 import IconNotes from '../../../../components/Icon/IconNotes';
 import IconPlus from '../../../../components/Icon/IconPlus';
-// import * as Yup from 'yup';
-// import { Field, Form, Formik } from 'formik';
+import axios from 'axios';
+import IconTrashLines from '../../../../components/Icon/IconTrashLines';
+import { formatPrice } from '../../../../utils';
 
 const rowData = [
     {
@@ -587,15 +581,25 @@ const showAlert = async (type: number) => {
         });
     }
 };
+
+interface DebtDataProps {
+    id: number;
+    creditur_name: string;
+    debt_balance: number;
+    debt_date: string;
+    payment_amount: number;
+}
+
 const Hutang = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
         dispatch(setPageTitle('Hutang'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
+    const [initialRecords, setInitialRecords] = useState<DebtDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
 
     const [search, setSearch] = useState('');
@@ -615,18 +619,21 @@ const Hutang = () => {
     }, [page, pageSize, initialRecords]);
 
     useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
+        if (!initialRecords) {
+            return;
+        }
+
+        setRecordsData(() => {
+            return initialRecords.filter((item) => {
                 return (
                     item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
+                    item.debt_balance.toString().includes(search.toLowerCase()) ||
+                    item.payment_amount.toString().includes(search.toLowerCase()) ||
+                    item.creditur_name.toLowerCase().includes(search.toLowerCase()) ||
+                    item.debt_date.toLowerCase().includes(search.toLowerCase())
                 );
             });
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search]);
 
     useEffect(() => {
@@ -645,22 +652,27 @@ const Hutang = () => {
         return '';
     };
 
-    // const [cost, setCost] = useState('');
+    const fetchData = () => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/debts', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const debts = response.data.data.resource.data;
+                setInitialRecords(debts);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    };
 
-    // const handleCostChange = (e: { target: { value: any } }) => {
-    //     const inputValue = e.target.value;
-    //     let formatValue = '';
+    useEffect(() => {
+        fetchData();
+    }, [token]);
 
-    //     // Remove non-numeric characters
-    //     const numValue = inputValue.replace(/\D/g, '');
-
-    //     // Format the number with 'Rp.' prefix
-    //     if (numValue !== '') {
-    //         formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-    //     }
-
-    //     setCost(formatValue);
-    // };
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -696,67 +708,67 @@ const Hutang = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
                             {
-                                accessor: 'firstName',
+                                accessor: 'creditur_name',
                                 title: 'Nama Kreditur',
                                 sortable: true,
                             },
-                            { accessor: 'age', title: 'Nominal', sortable: true },
+                            { accessor: 'debt_balance', title: 'Nominal', sortable: true, render: (e) => formatPrice(e.debt_balance) },
                             {
-                                accessor: 'dob',
+                                accessor: 'debt_date',
                                 title: 'Tanggal',
                                 sortable: true,
-                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
+                                render: ({ debt_date }) => <div>{formatDate(debt_date)}</div>,
                             },
-                            // { accessor: 'phone', title: 'Total', sortable: true },
                             {
-                                accessor: 'progress',
+                                accessor: 'payment_amount',
                                 title: 'Progress',
                                 sortable: true,
-                                render: (rowData) => (
-                                    <div>
-                                        {/* {racordsData.map((data) => { */}
-                                            {/* return ( */}
-                                                <div
-                                                    className={`whitespace-nowrap ${
-                                                        rowData.progress === 'completed'
-                                                            ? 'text-success'
-                                                            : rowData.progress === 'Pending'
-                                                            ? 'text-secondary'
-                                                            : rowData.progress === 'In Progress'
-                                                            ? 'text-info'
-                                                            : rowData.progress === 'Canceled'
-                                                            ? 'text-danger'
-                                                            : 'text-success'
-                                                    }`}
-                                                >
-                                                    {rowData.progress}
-                                                </div>
-                                            {/* ); */}
-                                        {/* })} */}
-                                    </div>
-                                ),
+                                render: (e) => formatPrice(e.payment_amount)
+                                // render: (rowData) => (
+                                //     <div>
+                                //         {/* {racordsData.map((data) => { */}
+                                //             {/* return ( */}
+                                //                 <div
+                                //                     className={`whitespace-nowrap ${
+                                //                         rowData.progress === 'completed'
+                                //                             ? 'text-success'
+                                //                             : rowData.progress === 'Pending'
+                                //                             ? 'text-secondary'
+                                //                             : rowData.progress === 'In Progress'
+                                //                             ? 'text-info'
+                                //                             : rowData.progress === 'Canceled'
+                                //                             ? 'text-danger'
+                                //                             : 'text-success'
+                                //                     }`}
+                                //                 >
+                                //                     {rowData.progress}
+                                //                 </div>
+                                //             {/* ); */}
+                                //         {/* })} */}
+                                //     </div>
+                                // ),
                             },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
-                                render: () => (
+                                render: (e) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menukeuangan/hutang-piutang/detailhutang">
+                                            <Link to={`/menukeuangan/hutang-piutang/detailhutang/${e.id}`}>
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
                                         <button type="button" style={{ color: 'orange' }}>
-                                                <Link to="/menukeuangan/hutang-piutang/edithutang">
-                                                    <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                                </Link>
-                                            </button>
+                                            <Link to={`/menukeuangan/hutang-piutang/edithutang/${e.id}`}>
+                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                            </Link>
+                                        </button>
                                         {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                            </button> */}
+                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                        </button> */}
                                     </div>
                                 ),
                             },
