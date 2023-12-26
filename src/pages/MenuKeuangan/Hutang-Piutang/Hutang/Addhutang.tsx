@@ -1,49 +1,128 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import Flatpickr from 'react-flatpickr';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import 'flatpickr/dist/flatpickr.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../../../store';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
+interface FormState {
+    // id: number;
+    location_acc: number;
+    direction_acc: number;
+    debt_date: string;
+    debt_balance: number;
+    creditur_name: string;
+}
+
+interface DataDetailAccLocationProps {
+    id: number;
+    detail_acc_code: string;
+    detail_acc_name: string;
+}
+
+interface DataDetailAcc {
+    id: number;
+    detail_acc_code: string;
+    detail_acc_name: string;
+}
+
 const AddHutang = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') ?? '';
+    const navigate = useNavigate();
     useEffect(() => {
-        dispatch(setPageTitle('Uang Masuk'));
+        dispatch(setPageTitle('Tambah Hutang'));
     });
-    const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
-    const [date1, setDate1] = useState<any>('2022-07-05');
-    const showAlert = async (type: number) => {
-        if (type == 20) {
-            const toast = Swal.mixin({
-                toast: true,
-                position: 'top',
-                showConfirmButton: false,
-                timer: 3000,
-            });
-            toast.fire({
-                icon: 'success',
-                title: 'Data Berhasil Ditambah',
-                padding: '10px 20px',
-            });
+    const [detailAccLocation, setDetailAccLocation] = useState<DataDetailAccLocationProps[]>([]);
+    const [detailAcc, setDetailAcc] = useState<DataDetailAcc[]>([]);
+    const [formData, setFormData] = useState<FormState>({
+        // id: 0,
+        debt_balance: 0,
+        location_acc: 0,
+        direction_acc: 0,
+        debt_date: '',
+        creditur_name: '',
+    });
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+        if (type === 'checkbox') {
+            const checkboxValue = (e.target as HTMLInputElement).checked ? 'yes' : '';
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: checkboxValue,
+            }));
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
         }
     };
-    const [cost, setCost] = useState('');
 
-    const handleCostChange = (e: { target: { value: any } }) => {
-        const inputValue = e.target.value;
-        let formatValue = '';
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/debt-dropdown', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setDetailAccLocation(response.data.data.resource.dataDetailAccLocation);
+                setDetailAcc(response.data.data.resource.dataDetailAcc);
+            })
+            .catch((err: any) => {
+                console.log('DETAIL ACCOUNT', err.message);
+            });
+    }, []);
 
-        // Remove non-numeric characters
-        const numValue = inputValue.replace(/\D/g, '');
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
 
-        // Format the number with 'Rp.' prefix
-        if (numValue !== '') {
-            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-        }
+        const data = {
+            location_acc: formData.location_acc,
+            direction_acc: formData.direction_acc,
+            debt_date: formData.debt_date,
+            debt_balance: formData.debt_balance,
+            creditur_name: formData.creditur_name,
+        };
 
-        setCost(formatValue);
+        axios
+            .post('https://erp.digitalindustryagency.com/api/debts', data, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                console.log('Data Hutang berhasil ditambahkan:', response.data);
+                navigate('/menukeuangan/hutang-piutang/hutang');
+                toast.success('Data berhasil ditambahkan', {
+                    position: 'top-right',
+                    autoClose: 3000,
+                });
+            })
+            .catch((error) => {
+                if (error.response && error.response.data) {
+                    const apiErrors = error.response.data;
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        errors: apiErrors,
+                    }));
+                }
+                console.error('Error adding debt data:', error);
+                console.log(formData);
+                toast.error('Error adding data');
+            });
     };
+
+    const handleCancel = () => {
+        navigate('/menukeuangan/hutang-piutang/hutang');
+    };
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse mb-10">
@@ -61,44 +140,55 @@ const AddHutang = () => {
             </ul>
             <div className="panel">
                 <h1 className="text-xl font-bold mb-6">Add Hutang</h1>
-                <form className="space-y-5">
+                <form className="space-y-5" onSubmit={handleSubmit}>
                     <div>
-                        <label htmlFor="Cost">Akun Asal</label>
-                        <input id="Cost" type="text" placeholder="Asal..." className="form-input" />
+                        <label>Akun Asal</label>
+                        <select className="form-select text-white-dark" name="location_acc" value={formData.location_acc} onChange={handleChange}>
+                            <option value="">Choose...</option>
+                            {detailAccLocation.map((item) => (
+                                <option value={item.id} key={item.id}>
+                                    {item.detail_acc_name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div>
-                        <label htmlFor="Cost">Akun Tujuan</label>
-                        <input id="Cost" type="text" placeholder="Tujuan..." className="form-input" />
+                        <label>Akun Tujuan</label>
+                        <select className="form-select text-white-dark" name="direction_acc" value={formData.direction_acc} onChange={handleChange}>
+                            <option value="">Choose...</option>
+                            {detailAcc.map((item) => (
+                                <option value={item.id} key={item.id}>
+                                    {item.detail_acc_name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div>
-                        <label htmlFor="Cost">Total Nominal</label>
-                        <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input" />
+                        <label>Total Nominal</label>
+                        <input type="text" placeholder="Rp." className="form-input" name="debt_balance" value={formData.debt_balance} onChange={handleChange} />
                     </div>
                     <div>
-                        <label htmlFor="Cost">Kreditur</label>
-                        <input id="Cost" type="text" placeholder="Nama Kreditur..." className="form-input" />
+                        <label>Kreditur</label>
+                        <input type="text" placeholder="Nama Kreditur..." className="form-input" name="creditur_name" value={formData.creditur_name} onChange={handleChange} />
                     </div>
                     <div>
-                        <label htmlFor="Tanggal">Tanggal</label>
-                        <Flatpickr
+                        <label>Tanggal</label>
+                        <input type="date" placeholder="Tanggal..." className="form-input" name="debt_date" value={formData.debt_date} onChange={handleChange} />
+                        {/* <Flatpickr
                             id="Tanggal"
                             value={date1}
                             options={{ dateFormat: 'Y-m-d', position: isRtl ? 'auto right' : 'auto left' }}
                             className="form-input"
                             onChange={(date) => setDate1(date)}
-                        />
+                        /> */}
                     </div>
                     <div className="flex">
-                        <Link to="/menukeuangan/hutang-piutang/hutang">
-                            <button type="submit" className="btn btn-primary !mt-6 mr-8" onClick={() => showAlert(20)}>
-                                Tambah
-                            </button>
-                        </Link>
-                        <Link to="/menukeuangan/hutang-piutang/hutang">
-                            <button type="submit" className="btn btn-primary !mt-6">
-                                Kembali
-                            </button>
-                        </Link>
+                        <button type="submit" className="btn btn-primary !mt-6 mr-8">
+                            Tambah
+                        </button>
+                        <button type="button" className="btn btn-primary !mt-6" onClick={handleCancel}>
+                            Kembali
+                        </button>
                     </div>
                 </form>
             </div>

@@ -1,13 +1,11 @@
-import React, { SetStateAction, useState, Fragment, useEffect, FormEvent, ChangeEvent } from 'react';
+import React, { useState, Fragment, useEffect, FormEvent, ChangeEvent } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
-import Swal from 'sweetalert2';
 import { Pagination } from '@mantine/core';
 import { Link, useNavigate } from 'react-router-dom';
 import IconPlus from '../../../components/Icon/IconPlus';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import IconPencil from '../../../components/Icon/IconPencil';
-import { FormikState } from 'formik';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../../store/themeConfigSlice';
@@ -111,83 +109,50 @@ const tableData = [
     },
 ];
 
-const showAlert = async (type: number) => {
-    if (type === 11) {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
-                popup: 'sweet-alerts',
-            },
-            buttonsStyling: false,
-        });
-        swalWithBootstrapButtons
-            .fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true,
-                padding: '2em',
-            })
-            .then((result) => {
-                if (result.value) {
-                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
-                }
-            });
-    }
-};
 const KategoriProduk = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Kategori Produk'));
     });
     const navigate = useNavigate();
-    const [currentPage, setCurrentPage] = useState<number>(1); // Menggunakan tipe data number untuk state currentPage
+    const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage = 5;
     const totalPages = Math.ceil(tableData.length / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = tableData.slice(indexOfFirstItem, indexOfLastItem);
     const [addKategori, setAddKategori] = useState(false);
     const [editKategori, setEditKategori] = useState(false);
     const [deleteKategori, setDeleteKategori] = useState(false);
-    const token = localStorage.getItem('accessToken') || '';
+    const token = localStorage.getItem('accessToken') ?? '';
     const [editedCategoryId, setEditedCategoryId] = useState<number | null>(null);
     const [deleteCategoryId, setDeleteCategoryId] = useState<number | null>(null);
 
     const handlePageChange = (page: number) => {
-        setCurrentPage(page); // Memperbarui state currentPage saat halaman berubah
+        setCurrentPage(page);
     };
-    const [data, setData] = useState([]);
     const [categories, setCategories] = useState<{ id: number; product_category_name: string }[]>([]);
-    const [nextIndex, setNextIndex] = useState(1);
-    const [errors, setErrors] = useState({});
+
+    const fetchData = () => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/product-categories', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const categories = response.data.data.resource.data;
+                setCategories(categories);
+                // console.log('CATEGORIES', response.data.data);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    };
 
     useEffect(() => {
-        const id = setInterval(() => {
-            axios
-                .get('https://erp.digitalindustryagency.com/api/product-categories', {
-                    headers: {
-                        Accept: 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                .then((response) => {
-                    const categories = response.data.data.resource.data;
-                    setCategories(categories); 
-                    // console.log('CATEGORIES', response.data.data);
-                })
-                .catch((error) => {
-                    console.error('Error fetching data:', error);
-                });
-        }, 2000);
-        return () => clearInterval(id);
-    }, []);
+        fetchData();
+    }, [token]);
 
     const [formData, setFormData] = useState({
         product_category_name: '',
@@ -222,6 +187,7 @@ const KategoriProduk = () => {
                     product_category_name: '',
                     errors: {},
                 });
+                fetchData();
                 setAddKategori(false);
                 navigate('/menupenjualan/product/kategoriproduk');
                 toast.success('Data berhasil ditambahkan', {
@@ -256,7 +222,7 @@ const KategoriProduk = () => {
 
     const handleEditKategori = () => {
         if (!editedCategoryId) {
-            return; 
+            return;
         }
 
         const editedData = {
@@ -274,7 +240,7 @@ const KategoriProduk = () => {
                 },
             })
             .then((response) => {
-                console.log('API Response:', response.data); 
+                console.log('API Response:', response.data);
                 console.log('kategori data successfully updated:', response.data);
                 navigate('/menupenjualan/product/kategoriproduk');
                 toast.success('Data berhasil diedit', {
@@ -282,7 +248,7 @@ const KategoriProduk = () => {
                     autoClose: 3000,
                 });
                 setEditKategori(false);
-                setEditedCategoryId(null); 
+                setEditedCategoryId(null);
             })
             .catch((error) => {
                 if (error.response && error.response.data) {
@@ -333,6 +299,7 @@ const KategoriProduk = () => {
                     position: 'top-right',
                     autoClose: 3000,
                 });
+                fetchData();
                 setDeleteKategori(false);
             })
             .catch((error) => {

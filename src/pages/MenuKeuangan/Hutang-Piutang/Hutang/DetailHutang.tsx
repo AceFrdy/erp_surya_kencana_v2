@@ -5,13 +5,14 @@ import { setPageTitle } from '../../../../store/themeConfigSlice';
 import { useDispatch, useSelector } from 'react-redux';
 // import IconPencil from '../../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import IconSend from '../../../../components/Icon/IconSend';
 import { IRootState } from '../../../../store';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import IconArrowBackward from '../../../../components/Icon/IconArrowBackward';
+import axios from 'axios';
 
 const rowData = [
     {
@@ -584,6 +585,8 @@ const showAlert = async (type: number) => {
 };
 const DetailHutang = () => {
     const dispatch = useDispatch();
+    const { id } = useParams();
+    const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
         dispatch(setPageTitle('Detail Hutang'));
     });
@@ -592,7 +595,11 @@ const DetailHutang = () => {
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
     const [recordsData, setRecordsData] = useState(initialRecords);
-
+    const [locationAcc, setLocationAcc] = useState<string>('');
+    const [directionAcc, setDirectionAcc] = useState<string>('');
+    const [debtDate, setDebtDate] = useState<string>('');
+    const [debtBalance, setDebtBalance] = useState<number>(0);
+    const [creditureName, setCreditureName] = useState<string>('');
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -675,6 +682,45 @@ const DetailHutang = () => {
 
         setCost(formatValue);
     };
+
+    const fetchData = () => {
+        axios
+        .get(`https://erp.digitalindustryagency.com/api/debts/${id}`, {
+            headers: {
+                Accept: 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        })
+        .then((response) => {
+            setLocationAcc(response.data.data.resource.location_acc.detail_acc_name);
+            setDirectionAcc(response.data.data.resource.direction_acc.detail_acc_name);
+            setDebtBalance(response.data.data.resource.debt_balance);
+            setDebtDate(response.data.data.resource.debt_date);
+            setCreditureName(response.data.data.resource.creditur_name);
+        })
+        .catch((error) => {
+            console.error('Error fetching data:', error);
+        });
+
+        axios
+        .get(`https://erp.digitalindustryagency.com/api/debt-pay`, {
+            headers: {
+                Accept: 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        })
+        .then((response) => {
+            // setDebtPay(response.data.data.resource.id);
+        })
+        .catch((error) => {
+            console.error('Error fetching data:', error);
+        });
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [token]);
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -690,8 +736,6 @@ const DetailHutang = () => {
                     <span> Detail Hutang </span>
                 </li>
             </ul>
-            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
-            </div> */}
             <div className="panel mt-6">
                 <div className="flex mb-4 justify-end">
                     <Link to="/menukeuangan/hutang-piutang/hutang">
@@ -706,30 +750,23 @@ const DetailHutang = () => {
                 <form className="space-y-5">
                     <div>
                         <label htmlFor="Cost">Akun Asal</label>
-                        <input id="Cost" disabled type="text" defaultValue="Iya Cuy" placeholder="Keterangan..." className="form-input" />
+                        <input id="Cost" disabled type="text" value={locationAcc} placeholder="Keterangan..." className="form-input" />
                     </div>
                     <div>
                         <label htmlFor="Cost">Akun Tujuan</label>
-                        <input id="Cost" disabled type="text" defaultValue="Ke Bank" placeholder="Keterangan..." className="form-input" />
+                        <input id="Cost" disabled type="text" value={directionAcc} placeholder="Keterangan..." className="form-input" />
                     </div>
                     <div>
                         <label htmlFor="Cost">Total Nominal</label>
-                        <input id="Cost" disabled type="text" defaultValue={1203944} placeholder="Rp." className="form-input" />
+                        <input id="Cost" disabled type="text" value={debtBalance} placeholder="Rp." className="form-input" />
                     </div>
                     <div>
                         <label htmlFor="Cost">Kreditur</label>
-                        <input id="Cost" disabled type="text" defaultValue="Trickster" placeholder="Keterangan..." className="form-input" />
+                        <input id="Cost" disabled type="text" value={creditureName} placeholder="Keterangan..." className="form-input" />
                     </div>
                     <div>
                         <label htmlFor="Tanggal">Tanggal</label>
-                        <Flatpickr
-                            id="Tanggal"
-                            value={date1}
-                            options={{ dateFormat: 'Y-m-d', position: isRtl ? 'auto right' : 'auto left' }}
-                            className="form-input"
-                            disabled
-                            onChange={(date) => setDate1(date)}
-                        />
+                        <input id="Cost" disabled type="date" value={debtDate} placeholder="Keterangan..." className="form-input" />
                     </div>
                 </form>
             </div>

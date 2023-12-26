@@ -1,14 +1,17 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
 import IconPencil from '../../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import IconSend from '../../../../components/Icon/IconSend';
 import IconArrowBackward from '../../../../components/Icon/IconArrowBackward';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { formatPrice } from '../../../../utils';
 
 const rowData = [
     {
@@ -579,8 +582,19 @@ const showAlert = async (type: number) => {
         });
     }
 };
+
+interface DebtDataProps {
+    id: number;
+    payment_date: string;
+    debt_id: number;
+    payment_total: number;
+}
+
 const EditHutang = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') ?? '';
+    const navigate = useNavigate();
+    const { id } = useParams();
     useEffect(() => {
         dispatch(setPageTitle('Edit Hutang'));
     });
@@ -589,14 +603,21 @@ const EditHutang = () => {
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
     const [recordsData, setRecordsData] = useState(initialRecords);
-
+    const [idDebt, setIdDebt] = useState<number>(0);
+    const [debtBalance, setDebtBalance] = useState<number>(0);
+    const [paymentAmount, setPaymentAmount] = useState<number>(0);
+    const [debtUnpaid, setDebtUnpaid] = useState<number>(0);
+    const [debtPay, setDebtPay] = useState<DebtDataProps[]>([]);
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
     });
-
-    //
+    const [formData, setFormData] = useState({
+        debt_id: '',
+        payment_date: '',
+        payment_total: '',
+    });
 
     useEffect(() => {
         setPage(1);
@@ -608,20 +629,19 @@ const EditHutang = () => {
         setRecordsData([...initialRecords.slice(from, to)]);
     }, [page, pageSize, initialRecords]);
 
-    useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
-                return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
-                );
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search]);
+    // useEffect(() => {
+    //     setInitialRecords(() => {
+    //         return rowData.filter((item) => {
+    //             return (
+    //                 item.id.toString().includes(search.toLowerCase()) ||
+    //                 item.firstName.toLowerCase().includes(search.toLowerCase()) ||
+    //                 item.dob.toLowerCase().includes(search.toLowerCase()) ||
+    //                 item.email.toLowerCase().includes(search.toLowerCase()) ||
+    //                 item.phone.toLowerCase().includes(search.toLowerCase())
+    //             );
+    //         });
+    //     });
+    // }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -639,38 +659,97 @@ const EditHutang = () => {
         return '';
     };
 
-    const [operasionalCost, setOperasionalCost] = useState('');
-    const [cost, setCost] = useState('');
+    useEffect(() => {
+        setFormData((prevData) => ({
+            ...prevData,
+            debt_id: String(idDebt),
+        }));
+    }, [idDebt]);
 
-    const handleOperasioanalCostChange = (e: { target: { value: any } }) => {
-        const inputValue = e.target.value;
-        let formattedValue = '';
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+    
+    const fetchData = () => {
+        axios
+        .get(`https://erp.digitalindustryagency.com/api/debts/${id}`, {
+            headers: {
+                Accept: 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        })
+        .then((response) => {
+            setIdDebt(response.data.data.resource.id);
+            setDebtBalance(response.data.data.resource.debt_balance);
+            setPaymentAmount(response.data.data.resource.payment_amount);
+            setDebtUnpaid(response.data.data.resource.debt_unpaid);
+        })
+        .catch((error) => {
+            console.error('Error fetching data:', error);
+        });
 
-        // Remove non-numeric characters
-        const numericValue = inputValue.replace(/\D/g, '');
-
-        // Format the number with 'Rp.' prefix
-        if (numericValue !== '') {
-            formattedValue = `Rp. ${parseInt(numericValue, 10).toLocaleString('id-ID')}`;
-        }
-
-        setOperasionalCost(formattedValue);
+        axios
+        .get(`https://erp.digitalindustryagency.com/api/debt-pay`, {
+            headers: {
+                Accept: 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        })
+        .then((response) => {
+            setDebtPay(response.data.data.resource.id);
+        })
+        .catch((error) => {
+            console.error('Error fetching data:', error);
+        });
     };
 
-    const handleCostChange = (e: { target: { value: any } }) => {
-        const inputValue = e.target.value;
-        let formatValue = '';
+    useEffect(() => {
+        fetchData();
+    }, [token]);
 
-        // Remove non-numeric characters
-        const numValue = inputValue.replace(/\D/g, '');
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formElement = e.currentTarget;
+        const id = formElement.id;
+        const data = {
+            debt_id: formData.debt_id,
+            payment_date: formData.payment_date,
+            payment_total: formData.payment_total,
+        };
 
-        // Format the number with 'Rp.' prefix
-        if (numValue !== '') {
-            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-        }
-
-        setCost(formatValue);
+        axios
+            .post('https://erp.digitalindustryagency.com/api/debt-pay', data, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                console.log('Data Hutang berhasil ditambahkan:', response.data);
+                fetchData();
+                navigate(`/menukeuangan/hutang-piutang/edithutang/${idDebt}`);
+                toast.success('Data berhasil ditambahkan', {
+                    position: 'top-right',
+                    autoClose: 3000,
+                });
+            })
+            .catch((error) => {
+                if (error.response && error.response.data) {
+                    const apiErrors = error.response.data;
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        errors: apiErrors,
+                    }));
+                }
+                console.error('Error adding debt data:', error);
+                toast.error('Error adding data');
+            });
     };
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -686,41 +765,42 @@ const EditHutang = () => {
                     <span> Edit Data Hutang </span>
                 </li>
             </ul>
-            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
-            </div> */}
             <div className="panel mt-6">
                 <h1 className="text-lg font-bold">Edit Data Hutang</h1>
                 <div className="flex mb-4 justify-end">
-                    {/* <button type="button" className="btn btn-outline-danger mr-4" onClick={() => showAlert(11)}>
-                        <IconTrashLines className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                        Batal
-                    </button> */}
                     <Link to="/menukeuangan/hutang-piutang/hutang">
-                    <button type="button" className="btn btn-outline-primary">
-                        <IconArrowBackward className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                        Kembali
-                    </button>
+                        <button type="button" className="btn btn-outline-primary">
+                            <IconArrowBackward className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                            Kembali
+                        </button>
                     </Link>
                 </div>
-                {/* <h1 className="text-lg font-bold mb-4">Kode:SK0012023</h1> */}
-                <form className="space-y-5">
+                <form className="space-y-5" onSubmit={handleSubmit}>
                     <div>
-                        <label htmlFor="Opcost">Total : </label>
-                        <input id="Opcost" disabled type="text" defaultValue={121212} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
+                        <label>Total : </label>
+                        <input value={formatPrice(debtBalance)} className="form-input text-black border-zinc-300" disabled />
                     </div>
                     <div>
-                        <label htmlFor="Opcost">Terbayar : </label>
-                        <input id="Opcost" disabled type="text" defaultValue={121246} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
+                        <label>Terbayar : </label>
+                        <input value={formatPrice(paymentAmount)} className="form-input text-black border-zinc-300" disabled />
                     </div>
                     <div>
-                        <label htmlFor="Opcost">Sisa</label>
-                        <input id="Opcost" disabled type="text" defaultValue={562} onChange={handleOperasioanalCostChange} placeholder="Rp." className="form-input" />
+                        <label>Sisa</label>
+                        <input value={formatPrice(debtUnpaid)} className="form-input text-black border-zinc-300" disabled />
                     </div>
                     <div>
-                        <label htmlFor="Cost">Bayar</label>
-                        <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input" />
+                        <label>Kode Hutang</label>
+                        <input type="text" placeholder="Jumlah Bayar..." className="form-input" name="debt_id" value={formData.debt_id} onChange={handleChange} disabled />
                     </div>
-                    <button type="submit" className="btn btn-outline-primary !mt-6 w-full" onClick={() => showAlert(20)}>
+                    <div>
+                        <label>Tanggal Pembayaran</label>
+                        <input type="date" placeholder="Tanggal Bayar..." className="form-input" name="payment_date" value={formData.payment_date} onChange={handleChange} />
+                    </div>
+                    <div>
+                        <label>Bayar</label>
+                        <input type="text" placeholder="Jumlah Bayar..." className="form-input" name="payment_total" value={formData.payment_total} onChange={handleChange} />
+                    </div>
+                    <button type="submit" className="btn btn-outline-primary !mt-6 w-full">
                         Tambah
                     </button>
                 </form>
@@ -751,7 +831,6 @@ const EditHutang = () => {
                                 render: ({ dob }) => <div>{formatDate(dob)}</div>,
                             },
                             { accessor: 'age', title: 'Sisa', sortable: true },
-                            
                         ]}
                         totalRecords={initialRecords.length}
                         recordsPerPage={pageSize}

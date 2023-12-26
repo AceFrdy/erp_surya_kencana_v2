@@ -566,26 +566,13 @@ const UangMasuk = () => {
                 );
             });
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
-    const formatDate = (date: string | number | Date) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
-        }
-        return '';
-    };
-
-    const [cost, setCost] = useState('');
 
     useEffect(() => {
         axios
@@ -642,7 +629,7 @@ const UangMasuk = () => {
                             { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
                             {
                                 accessor: 'detail_account.detail_acc_code',
-                                title: 'No Dokumen',
+                                title: 'Kode Detail Akun',
                                 sortable: true,
                             },
                             { accessor: 'detail_account.detail_acc_name', title: 'Index', sortable: true },

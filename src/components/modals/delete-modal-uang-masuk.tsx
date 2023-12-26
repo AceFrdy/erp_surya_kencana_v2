@@ -9,7 +9,6 @@ const DeleteInflowCashModal = () => {
     const { isOpen, type, onClose, data } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
     const navigate = useNavigate();
-
     const isModalOpen = isOpen && type === 'delete-inflow-cash';
 
     const handleDelete = (id: number) => {
