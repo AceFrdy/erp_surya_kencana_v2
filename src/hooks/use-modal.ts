@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from 'react';
 import { StoreApi, UseBoundStore, create } from 'zustand';
 
 export type ModalType =
@@ -16,13 +17,38 @@ export type ModalType =
     | 'finish-distribusi'
     | 'delete-data-detail-penjualan'
     | 'delete-data-penjualan'
-    | 'delete-index';
+    | 'delete-index'
+    | 'search-product'
+    | 'search-cabang'
+    | 'search-unit';
+
+interface DataProps {
+    id?: number;
+    product_barcode?: string;
+    product_name?: string;
+}
+
+interface CabangProps {
+    id?: number;
+    branch_name?: string;
+    branch_address?: string;
+}
+
+interface UnitProps {
+    id?: number;
+    unit_stock_name?: string;
+    number_of_units?: number;
+}
 
 interface ModalStore {
     type: ModalType | null;
     isOpen: boolean;
     data: number;
-    onOpen: (type: ModalType, data: number) => void;
+    product: DataProps[];
+    cabang: CabangProps[];
+    unit: UnitProps[];
+    setGet: Dispatch<SetStateAction<string>>;
+    onOpen: (type: ModalType, data?: number, product?: DataProps[], cabang?: CabangProps[], unit?: UnitProps[], setGet?: Dispatch<SetStateAction<string>>) => void;
     onClose: () => void;
 }
 
@@ -30,6 +56,10 @@ export const useModal: UseBoundStore<StoreApi<ModalStore>> = create<ModalStore>(
     type: null,
     isOpen: false,
     data: 0,
-    onOpen: (type, data) => set({ isOpen: true, type, data }),
+    product: [],
+    cabang: [],
+    unit: [],
+    setGet: () => {},
+    onOpen: (type, data, product, cabang, unit, setGet) => set({ isOpen: true, type, data, product, cabang, unit, setGet }),
     onClose: () => set({ isOpen: false, type: null }),
 }));
