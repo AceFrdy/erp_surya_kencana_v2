@@ -11,7 +11,7 @@ const AddSupplier = () => {
         dispatch(setPageTitle('Tambah Supplier'));
     });
     const navigate = useNavigate();
-    const token = localStorage.getItem('accessToken') || '';
+    const token = localStorage.getItem('accessToken') ?? '';
 
     const [formData, setFormData] = useState({
         suplier_name: '',

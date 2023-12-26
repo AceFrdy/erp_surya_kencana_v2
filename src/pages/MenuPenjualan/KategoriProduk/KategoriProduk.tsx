@@ -187,7 +187,7 @@ const KategoriProduk = () => {
                 });
         }, 2000);
         return () => clearInterval(id);
-    }, [categories]);
+    }, []);
 
     const [formData, setFormData] = useState({
         product_category_name: '',

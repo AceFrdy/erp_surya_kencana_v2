@@ -557,7 +557,7 @@ interface SuplierDataProps {
 
 const Suplier = () => {
     const dispatch = useDispatch();
-    const token = localStorage.getItem('accessToken') || '';
+    const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
         dispatch(setPageTitle('Supplier'));
     });
@@ -572,7 +572,7 @@ const Suplier = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const [suplier, setSuplier] = useState([]);
+    // const [suplier, setSuplier] = useState([]);
 
     useEffect(() => {
         setPage(1);
@@ -619,9 +619,9 @@ const Suplier = () => {
             })
             .then((response) => {
                 const suplier = response.data.data.resource.data;
-                setSuplier(suplier); // Set categories state with fetched data
+                // setSuplier(suplier);
                 setInitialRecords(suplier);
-                setRecordsData(suplier);
+                // setRecordsData(suplier);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
