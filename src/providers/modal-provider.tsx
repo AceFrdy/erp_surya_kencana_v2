@@ -14,6 +14,9 @@ import DeleteSaldoModal from '../components/modals/delete-modal-saldo';
 import FinishRestock from '../components/modals/finish-restock';
 import FinishDistribusi from '../components/modals/finish-distribusi';
 import DeleteIndexModal from '../components/modals/delete-index-modal';
+import SearchProduct from '../components/modals/search-product';
+import SearchCabang from '../components/modals/search-cabang';
+import SearchUnit from '../components/modals/search-unit';
 
 const ModalProvider = () => {
     return (
@@ -34,6 +37,9 @@ const ModalProvider = () => {
             <FinishRestock />
             <FinishDistribusi />
             <DeleteIndexModal />
+            <SearchProduct />
+            <SearchCabang />
+            <SearchUnit />
         </>
     );
 };

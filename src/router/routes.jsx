@@ -338,7 +338,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menukeuangan/flowcash/detailuangkeluar',
+        path: '/menukeuangan/flowcash/detailuangkeluar/:id',
         element: <DetailUangKeluar />,
         layout: 'default',
     },
