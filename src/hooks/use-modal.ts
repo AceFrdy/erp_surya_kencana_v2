@@ -46,11 +46,12 @@ interface ModalStore {
     type: ModalType | null;
     isOpen: boolean;
     data: number;
+    qty: number;
     product: DataProps[];
     cabang: CabangProps[];
     unit: UnitProps[];
     setGet: Dispatch<SetStateAction<string>>;
-    onOpen: (type: ModalType, data?: number, product?: DataProps[], cabang?: CabangProps[], unit?: UnitProps[], setGet?: Dispatch<SetStateAction<string>>) => void;
+    onOpen: (type: ModalType, data?: number, qty?: number, product?: DataProps[], cabang?: CabangProps[], unit?: UnitProps[], setGet?: Dispatch<SetStateAction<string>>) => void;
     onClose: () => void;
 }
 
@@ -58,10 +59,11 @@ export const useModal: UseBoundStore<StoreApi<ModalStore>> = create<ModalStore>(
     type: null,
     isOpen: false,
     data: 0,
+    qty: 0,
     product: [],
     cabang: [],
     unit: [],
     setGet: () => {},
-    onOpen: (type, data, product, cabang, unit, setGet) => set({ isOpen: true, type, data, product, cabang, unit, setGet }),
+    onOpen: (type, data, qty, product, cabang, unit, setGet) => set({ isOpen: true, type, data, qty, product, cabang, unit, setGet }),
     onClose: () => set({ isOpen: false, type: null }),
 }));

@@ -107,7 +107,7 @@ const Distribusi = () => {
                     message: 'Distribusi Gagal Ditambahkan',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
-                navigate(0);
+                // navigate(0);
             });
     };
 
@@ -275,7 +275,7 @@ const Distribusi = () => {
                             className="h-10 border rounded-md w-full justify-between px-4 flex items-center"
                             onClick={(e) => {
                                 e.preventDefault();
-                                onOpen('search-cabang', undefined, [], cabangList, [], setCabang);
+                                onOpen('search-cabang', undefined, undefined, [], cabangList, [], setCabang);
                             }}
                             disabled={cabangDisabled}
                         >
@@ -300,7 +300,7 @@ const Distribusi = () => {
                                 className="h-7 w-7 border rounded-md absolute justify-center flex right-1.5 top-[31px] items-center border-green-500"
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    onOpen('search-product', undefined, productList, [], [], setProductBarcode);
+                                    onOpen('search-product', undefined, undefined, productList, [], [], setProductBarcode);
                                 }}
                             >
                                 <IconSearch className="w-4 h-4" />
@@ -327,7 +327,7 @@ const Distribusi = () => {
                                 className="h-10 border rounded-md w-full justify-between px-4 flex items-center"
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    onOpen('search-unit', undefined, [], [], unitList, setUnit);
+                                    onOpen('search-unit', undefined, undefined, [], [], unitList, setUnit);
                                 }}
                             >
                                 <span>{unit}</span>
@@ -365,13 +365,7 @@ const Distribusi = () => {
                                 titleClassName: '!text-center',
                                 render: (e) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
-                                        <button
-                                            type="button"
-                                            style={{ color: 'orange' }}
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                            }}
-                                        >
+                                        <button type="button" style={{ color: 'orange' }} onClick={() => {}}>
                                             <IconPencil className="ltr:mr-2 rtl:ml-2" />
                                         </button>
                                         <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-data-distribusi', e.id)}>
