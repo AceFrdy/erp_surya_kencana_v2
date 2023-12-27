@@ -104,9 +104,9 @@ const AddUangMasuk = () => {
                     </div>
                     <div className="flex">
                         <Link to="/menukeuangan/flowcash/uangmasuk">
-                        <button type="submit" className="btn btn-primary !mt-6 mr-8" onClick={() => showAlert(20)}>
-                            Tambah
-                        </button>
+                            <button type="submit" className="btn btn-primary !mt-6 mr-8" onClick={() => showAlert(20)}>
+                                Tambah
+                            </button>
                         </Link>
                         <Link to="/menukeuangan/flowcash/uangmasuk">
                             <button type="submit" className="btn btn-primary !mt-6">
