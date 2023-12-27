@@ -1,23 +1,16 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { Fragment, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, Fragment, useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-// import IconBell from '../../../components/Icon/IconBell';
-// import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
-// import { Dialog, Transition } from '@headlessui/react';
-// import IconPlus from '../../../components/Icon/IconPlus';
-// import IconNotes from '../../../components/Icon/IconNotes';
-import Swal from 'sweetalert2';
-import IconSend from '../../../components/Icon/IconSend';
+import { Link, useNavigate } from 'react-router-dom';
 import IconNotes from '../../../components/Icon/IconNotes';
 import IconPlus from '../../../components/Icon/IconPlus';
 import { Dialog, Transition } from '@headlessui/react';
-// import * as Yup from 'yup';
-// import { Field, Form, Formik } from 'formik';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const rowData = [
     {
@@ -222,73 +215,29 @@ const rowData = [
     },
 ];
 
-const showAlert = async (type: number) => {
-    if (type === 11) {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
-                popup: 'sweet-alerts',
-            },
-            buttonsStyling: false,
-        });
-        swalWithBootstrapButtons
-            .fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true,
-                padding: '2em',
-            })
-            .then((result) => {
-                if (result.value) {
-                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
-                }
-            });
-    }
-    if (type === 15) {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-        });
-        toast.fire({
-            icon: 'success',
-            title: 'Berhasil Dikirim',
-            padding: '10px 20px',
-        });
-    }
-    if (type == 20) {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-        });
-        toast.fire({
-            icon: 'success',
-            title: 'Data Berhasil Ditambah',
-            padding: '10px 20px',
-        });
-    }
-};
+interface PrivilagesDataProps {
+    id: number;
+    privilage_name: string;
+}
+
 const Jabatan = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') ?? '';
+    const navigate = useNavigate();
     useEffect(() => {
         dispatch(setPageTitle('Uang Masuk'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
+    const [initialRecords, setInitialRecords] = useState<PrivilagesDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
-
+    const [addPrivilages, setAddPrivilages] = useState(false);
+    const [editPrivilages, setEditPrivilages] = useState(false);
+    const [deletePrivilages, setDeletePrivilages] = useState(false);
+    const [editedPrivilagesId, setEditedPrivilagesId] = useState<number | null>(null);
+    const [deletePrivilagesId, setDeletePrivilagesId] = useState<number | null>(null);
+    // const [privilages, setPrivilages] = useState<PrivilagesDataProps[]>([]);
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -306,59 +255,202 @@ const Jabatan = () => {
     }, [page, pageSize, initialRecords]);
 
     useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
-                return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
-                );
+        if (!initialRecords) {
+            return;
+        }
+        setRecordsData(() => {
+            return initialRecords.filter((item) => {
+                return item.privilage_name.toLowerCase().includes(search.toLowerCase());
             });
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
-    const formatDate = (date: string | number | Date) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
-        }
-        return '';
+
+    const fetchData = () => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/privilages', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const privilages = response.data.data.resource.data;
+                setInitialRecords(privilages);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
     };
 
-    const [AddJabatan, setAddJabatan] = useState(false);
-    const [EditJabatan, setEditJabatan] = useState(false);
+    useEffect(() => {
+        fetchData();
+    }, [token]);
 
-    const [cost, setCost] = useState('');
+    const [formData, setFormData] = useState({
+        privilage_name: '',
+        errors: {},
+    });
 
-    // const handleCostChange = (e: { target: { value: any } }) => {
-    //     const inputValue = e.target.value;
-    //     let formatValue = '';
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
 
-    //     // Remove non-numeric characters
-    //     const numValue = inputValue.replace(/\D/g, '');
+    const handleAdd = (e: FormEvent) => {
+        e.preventDefault();
 
-    //     // Format the number with 'Rp.' prefix
-    //     if (numValue !== '') {
-    //         formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-    //     }
+        const data = {
+            privilage_name: formData.privilage_name,
+        };
 
-    //     setCost(formatValue);
-    // };
+        axios
+            .post('https://erp.digitalindustryagency.com/api/privilages', data, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                console.log('Data privilage berhasil ditambahkan:', response.data);
+                setFormData({
+                    privilage_name: '',
+                    errors: {},
+                });
+                fetchData();
+                setAddPrivilages(false);
+                navigate('/menuhumanresource/jabatan');
+                toast.success('Data berhasil ditambahkan', {
+                    position: 'top-right',
+                    autoClose: 3000,
+                });
+            })
+            .catch((error) => {
+                if (error.response && error.response.data) {
+                    const apiErrors = error.response.data;
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        errors: apiErrors,
+                    }));
+                }
+                console.error('Error adding privilage data:', error);
+                toast.error('Error adding data');
+            });
+    };
+
+    const handleEditButtonClick = (privilagesId: number) => {
+        const editedPrivilages = initialRecords.find((privilage) => privilage.id === privilagesId);
+        if (editedPrivilages) {
+            setFormData({
+                privilage_name: editedPrivilages.privilage_name,
+                errors: {},
+            });
+            setEditedPrivilagesId(privilagesId);
+            setEditPrivilages(true);
+        }
+    };
+
+    const handleEditPrivilages = () => {
+        if (!editedPrivilagesId) {
+            return;
+        }
+
+        const editedData = {
+            id: editedPrivilagesId,
+            privilage_name: formData.privilage_name,
+        };
+
+        console.log('Edited Data:', editedData);
+        axios
+            .put(`https://erp.digitalindustryagency.com/api/privilages/${editedPrivilagesId}`, editedData, {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                console.log('API Response:', response.data);
+                console.log('Privilages data successfully updated:', response.data);
+                navigate('/menuhumanresource/jabatan');
+                toast.success('Data berhasil diedit', {
+                    position: 'top-right',
+                    autoClose: 3000,
+                });
+                setEditPrivilages(false);
+                setEditedPrivilagesId(null);
+                fetchData();
+            })
+            .catch((error) => {
+                if (error.response && error.response.data) {
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        errors: error.response.data,
+                    }));
+                    console.log('Validation Errors:', error.response.data);
+                }
+                console.error('Error updating Privilages data:', error);
+                toast.error('Error updating data');
+            });
+    };
+
+    const handleDeleteButtonClick = (privilagesId: number | null) => {
+        const deletePrivilages = initialRecords.find((privilages) => privilages.id === privilagesId);
+        if (deletePrivilages) {
+            setFormData({
+                privilage_name: deletePrivilages.privilage_name,
+                errors: {},
+            });
+            setDeletePrivilagesId(privilagesId);
+            setDeletePrivilages(true);
+        }
+    };
+
+    const handleDeletePrivilages = () => {
+        if (!deletePrivilagesId) {
+            return;
+        }
+
+        const deleteData = {
+            id: deletePrivilagesId,
+            privilage_name: formData.privilage_name,
+        };
+        console.log('Delete Data:', deleteData);
+        axios
+            .delete(`https://erp.digitalindustryagency.com/api/privilages/${deletePrivilagesId}`, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                console.log('API Response:', response.data);
+                console.log('privilages data successfully deleted:', response.data);
+                toast.success('Data berhasil dihapus', {
+                    position: 'top-right',
+                    autoClose: 3000,
+                });
+                fetchData();
+                setDeletePrivilages(false);
+            })
+            .catch((error) => {
+                console.error('Error deleting privilages data:', error);
+                toast.error('Error deleting data');
+            });
+    };
+
     return (
         <div>
-            <Transition appear show={AddJabatan} as={Fragment}>
-                <Dialog as="div" open={AddJabatan} onClose={() => setAddJabatan(false)}>
+            <Transition appear show={addPrivilages} as={Fragment}>
+                <Dialog as="div" open={addPrivilages} onClose={() => setAddPrivilages(false)}>
                     <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
                         <div className="fixed inset-0" />
                     </Transition.Child>
@@ -376,20 +468,31 @@ const Jabatan = () => {
                                 <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg my-8 text-black dark:text-white-dark">
                                     <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
                                         <h5 className="font-bold text-lg">Tambah Jabatan</h5>
-                                        <button type="button" className="text-white-dark hover:text-dark" onClick={() => setAddJabatan(false)}>
+                                        <button type="button" className="text-white-dark hover:text-dark" onClick={() => setAddPrivilages(false)}>
                                             {/* <svg>...</svg> */}
                                         </button>
                                     </div>
                                     <div className="p-5">
                                         <div>
                                             <label htmlFor="gridName">Nama Jabatan</label>
-                                            <input id="gridName" type="text" placeholder="Enter Nama Jabatan *" className="form-input" />
+                                            <form className="space-y-5" onSubmit={handleAdd}>
+                                                <div>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Masukan Privilages"
+                                                        className="form-input"
+                                                        name="privilage_name"
+                                                        value={formData.privilage_name}
+                                                        onChange={handleChange}
+                                                    />
+                                                </div>
+                                            </form>{' '}
                                         </div>
                                         <div className="flex justify-end items-center mt-8">
-                                            <button type="button" className="btn btn-outline-danger" onClick={() => setAddJabatan(false)}>
+                                            <button type="button" className="btn btn-outline-danger" onClick={() => setAddPrivilages(false)}>
                                                 Batal
                                             </button>
-                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setAddJabatan(false)}>
+                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleAdd}>
                                                 Simpan
                                             </button>
                                         </div>
@@ -400,8 +503,8 @@ const Jabatan = () => {
                     </div>
                 </Dialog>
             </Transition>
-            <Transition appear show={EditJabatan} as={Fragment}>
-                <Dialog as="div" open={EditJabatan} onClose={() => setEditJabatan(false)}>
+            <Transition appear show={editPrivilages} as={Fragment}>
+                <Dialog as="div" open={editPrivilages} onClose={() => setEditPrivilages(false)}>
                     <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
                         <div className="fixed inset-0" />
                     </Transition.Child>
@@ -417,22 +520,33 @@ const Jabatan = () => {
                                 leaveTo="opacity-0 scale-95"
                             >
                                 <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden w-full max-w-lg my-8 text-black dark:text-white-dark">
-                                <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                                    <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
                                         <h5 className="font-bold text-lg dark:text-white">Edit Jabatan</h5>
-                                        <button type="button" className="text-white-dark hover:text-dark" onClick={() => setEditJabatan(false)}>
+                                        <button type="button" className="text-white-dark hover:text-dark" onClick={() => setEditPrivilages(false)}>
                                             {/* <svg>...</svg> */}
                                         </button>
                                     </div>
                                     <div className="p-5">
                                         <div>
                                             <label htmlFor="gridName">Nama Jabatan</label>
-                                            <input id="gridName" type="text" placeholder="Enter Nama Jabatan *" value="Knight" className="form-input" />
+                                            <form className="space-y-5">
+                                                <div>
+                                                    <input
+                                                        type="textfield"
+                                                        placeholder="Masukan Privilages"
+                                                        className="form-input"
+                                                        name="privilage_name"
+                                                        value={formData.privilage_name}
+                                                        onChange={handleChange}
+                                                    />
+                                                </div>
+                                            </form>{' '}
                                         </div>
                                         <div className="flex justify-end items-center mt-8">
-                                            <button type="button" className="btn btn-outline-danger" onClick={() => setEditJabatan(false)}>
+                                            <button type="button" className="btn btn-outline-danger" onClick={() => setEditPrivilages(false)}>
                                                 Batal
                                             </button>
-                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => setEditJabatan(false)}>
+                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleEditPrivilages}>
                                                 Simpan
                                             </button>
                                         </div>
@@ -443,6 +557,57 @@ const Jabatan = () => {
                     </div>
                 </Dialog>
             </Transition>
+            <Transition appear show={deletePrivilages} as={Fragment}>
+                    <Dialog as="div" open={deletePrivilages} onClose={() => setDeletePrivilages(false)}>
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0"
+                            enterTo="opacity-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100"
+                            leaveTo="opacity-0"
+                        >
+                            <div className="fixed inset-0" />
+                        </Transition.Child>
+                        <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
+                            <div className="flex items-start justify-center min-h-screen px-4">
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ease-out duration-300"
+                                    enterFrom="opacity-0 scale-95"
+                                    enterTo="opacity-100 scale-100"
+                                    leave="ease-in duration-200"
+                                    leaveFrom="opacity-100 scale-100"
+                                    leaveTo="opacity-0 scale-95"
+                                >
+                                    <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
+                                        <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                                            <div className="text-lg font-bold">Delete Privilages</div>
+                                        </div>
+                                        <div className="p-5">
+                                            <div>
+                                                <form className="space-y-5">
+                                                    <div>
+                                                        <h1>Apakah Anda yakin ingin menghapus jabatan</h1>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div className="flex justify-end items-center mt-8">
+                                                <button type="button" className="btn btn-outline-danger" onClick={() => setDeletePrivilages(false)}>
+                                                    Kembali
+                                                </button>
+                                                <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={handleDeletePrivilages}>
+                                                    Hapus
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </Dialog.Panel>
+                                </Transition.Child>
+                            </div>
+                        </div>
+                    </Dialog>
+                </Transition>
             <ul className="flex space-x-2 rtl:space-x-reverse">
                 <li>
                     <Link to="/" className="text-primary hover:underline">
@@ -456,13 +621,11 @@ const Jabatan = () => {
                     <span> Jabatan </span>
                 </li>
             </ul>
-            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
-            </div> */}
             <div className="panel mt-6">
                 <h1 className="text-lg font-bold flex justify-center">Jabatan</h1>
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
                     {/* <Link to="/m"> */}
-                    <button onClick={() => setAddJabatan(true)} type="button" className=" px-2 btn btn-outline-info">
+                    <button onClick={() => setAddPrivilages(true)} type="button" className=" px-2 btn btn-outline-info">
                         <IconPlus className="flex mx-2" fill={true} /> Add
                     </button>
                     {/* </Link> */}
@@ -476,38 +639,23 @@ const Jabatan = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            // { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'firstName', title: 'Nama Jabatan', sortable: true },
-                            //   { accessor: 'email', title: 'Email', sortable: true },
-                            //   { accessor: 'phone', title: 'Contact', sortable: true },
-                            //   {
-                            //       accessor: 'dob',
-                            //       title: 'Tanggal',
-                            //       sortable: true,
-                            //       render: ({ dob }) => <div>{formatDate(dob)}</div>,
-                            //   },
-                            //   {
-                            //     accessor: 'address.street',
-                            //     title: 'Address',
-                            //     sortable: true,
-                            // },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'privilage_name', title: 'Nama Jabatan', sortable: true },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
-                                render: () => (
+                                render: (e) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menuhumanresource/jabatan/detailjabatan">
+                                            <Link to={`/menuhumanresource/jabatan/detailjabatan/${e.id}`}>
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        <button onClick={() => setEditJabatan(true)} type="button"  style={{ color: 'orange' }}>
-                                            {/* <Link to="/menuhumanresource/karyawan/editkaryawan"> */}
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                            {/* </Link> */}
+                                        <button type="button" style={{ color: 'orange' }} onClick={() => handleEditButtonClick(e.id)}>
+                                            <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
-                                        <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
+                                        <button type="button" style={{ color: 'red' }} onClick={() => handleDeleteButtonClick(e.id)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
                                     </div>

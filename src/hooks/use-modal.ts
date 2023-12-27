@@ -16,6 +16,8 @@ export type ModalType =
     | 'finish-restock'
     | 'finish-distribusi'
     | 'delete-data-detail-penjualan'
+    | 'delete-seluruh-restock'
+    | 'delete-saldo'
     | 'delete-data-penjualan'
     | 'delete-index'
     | 'search-product'

@@ -3,20 +3,12 @@ import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-// import IconBell from '../../../components/Icon/IconBell';
-// import IconXCircle from '../../../components/Icon/IconXCircle';
-import IconPencil from '../../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-// import { Dialog, Transition } from '@headlessui/react';
-// import IconPlus from '../../../components/Icon/IconPlus';
-// import IconNotes from '../../../components/Icon/IconNotes';
-import Swal from 'sweetalert2';
-import IconSend from '../../../../components/Icon/IconSend';
 import IconNotes from '../../../../components/Icon/IconNotes';
 import IconPlus from '../../../../components/Icon/IconPlus';
-// import * as Yup from 'yup';
-// import { Field, Form, Formik } from 'formik';
+import axios from 'axios';
+import { useModal } from '../../../../hooks/use-modal';
 
 const rowData = [
     {
@@ -521,73 +513,30 @@ const rowData = [
     },
 ];
 
-const showAlert = async (type: number) => {
-    if (type === 11) {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: 'btn btn-secondary',
-                cancelButton: 'btn btn-dark ltr:mr-3 rtl:ml-3',
-                popup: 'sweet-alerts',
-            },
-            buttonsStyling: false,
-        });
-        swalWithBootstrapButtons
-            .fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
-                reverseButtons: true,
-                padding: '2em',
-            })
-            .then((result) => {
-                if (result.value) {
-                    swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
-                }
-            });
-    }
-    if (type === 15) {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-        });
-        toast.fire({
-            icon: 'success',
-            title: 'Berhasil Dikirim',
-            padding: '10px 20px',
-        });
-    }
-    if (type == 20) {
-        const toast = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-        });
-        toast.fire({
-            icon: 'success',
-            title: 'Data Berhasil Ditambah',
-            padding: '10px 20px',
-        });
-    }
-};
+interface InflowDataProps {
+    id: number;
+    cash_inflow_date: string;
+    cash_inflow_amount: number;
+    cash_inflow_info: string;
+    detail_account: {
+        detail_acc_code: string;
+        detail_acc_type: string;
+        detail_acc_name: string;
+    };
+}
+
 const UangMasuk = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
         dispatch(setPageTitle('Uang Masuk'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
+    const [initialRecords, setInitialRecords] = useState<InflowDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
-
+    const { onOpen } = useModal();
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -605,52 +554,43 @@ const UangMasuk = () => {
     }, [page, pageSize, initialRecords]);
 
     useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
+        if (!initialRecords) {
+            return;
+        }
+        setRecordsData(() => {
+            return initialRecords.filter((item) => {
                 return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
+                    item.detail_account?.detail_acc_code.toLowerCase().includes(search.toLowerCase()) ||
+                    item.detail_account?.detail_acc_name.toLowerCase().includes(search.toLowerCase()) ||
+                    item.detail_account?.detail_acc_type.toLowerCase().includes(search.toLowerCase())
                 );
             });
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
-    const formatDate = (date: string | number | Date) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
-        }
-        return '';
-    };
 
-    const [cost, setCost] = useState('');
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/cash-inflows', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const inflows = response.data.data.resource.data;
+                setInitialRecords(inflows);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    }, []);
 
-    // const handleCostChange = (e: { target: { value: any } }) => {
-    //     const inputValue = e.target.value;
-    //     let formatValue = '';
-
-    //     // Remove non-numeric characters
-    //     const numValue = inputValue.replace(/\D/g, '');
-
-    //     // Format the number with 'Rp.' prefix
-    //     if (numValue !== '') {
-    //         formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-    //     }
-
-    //     setCost(formatValue);
-    // };
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -686,30 +626,29 @@ const UangMasuk = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
                             {
-                                accessor: 'age',
-                                title: 'No Dokumen',
+                                accessor: 'detail_account.detail_acc_code',
+                                title: 'Kode Detail Akun',
                                 sortable: true,
                             },
-                            { accessor: 'firstName', title: 'Index', sortable: true },
-                            { accessor: 'email', title: 'Keterangan', sortable: true },
-                            { accessor: 'phone', title: 'Cash', sortable: true },
+                            { accessor: 'detail_account.detail_acc_name', title: 'Index', sortable: true },
+                            { accessor: 'cash_inflow_info', title: 'Keterangan', sortable: true },
+                            { accessor: 'cash_inflow_amount', title: 'Cash', sortable: true },
                             {
-                                accessor: 'dob',
+                                accessor: 'cash_inflow_date',
                                 title: 'Tanggal',
                                 sortable: true,
-                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
                             },
 
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
-                                render: () => (
+                                render: (e) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
                                         <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menukeuangan/flowcash/detailuangmasuk">
+                                            <Link to={`/menukeuangan/flowcash/detailuangmasuk/${e.id}`}>
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
@@ -718,9 +657,9 @@ const UangMasuk = () => {
                                                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                                 </Link>
                                             </button> */}
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                            </button> */}
+                                        <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-inflow-cash', e.id)}>
+                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                        </button>
                                     </div>
                                 ),
                             },

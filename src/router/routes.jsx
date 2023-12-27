@@ -322,7 +322,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menukeuangan/flowcash/detailuangmasuk',
+        path: '/menukeuangan/flowcash/detailuangmasuk/:id',
         element: <DetailUangMasuk />,
         layout: 'default',
     },
@@ -354,12 +354,12 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menukeuangan/hutang-piutang/detailhutang',
+        path: '/menukeuangan/hutang-piutang/detailhutang/:id',
         element: <DetailHutang />,
         layout: 'default',
     },
     {
-        path: '/menukeuangan/hutang-piutang/edithutang',
+        path: '/menukeuangan/hutang-piutang/edithutang/:id',
         element: <EditHutang />,
         layout: 'default',
     },
@@ -418,7 +418,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menuhumanresource/jabatan/detailjabatan',
+        path: '/menuhumanresource/jabatan/detailjabatan/:id',
         element: <DetailJabatan />,
         layout: 'default',
     },

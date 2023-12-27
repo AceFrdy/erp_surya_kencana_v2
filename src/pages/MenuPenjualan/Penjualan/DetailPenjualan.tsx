@@ -3,14 +3,9 @@ import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-// import IconBell from '../../../components/Icon/IconBell';
-// import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link, useParams } from 'react-router-dom';
-// import { Dialog, Transition } from '@headlessui/react';
-// import IconPlus from '../../../components/Icon/IconPlus';
-// import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
 import IconSend from '../../../components/Icon/IconSend';
 import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
@@ -18,8 +13,6 @@ import axios from 'axios';
 import { formatPrice } from '../../../utils';
 import { useModal } from '../../../hooks/use-modal';
 import Pagination from '../../../components/Pagination';
-// import * as Yup from 'yup';
-// import { Field, Form, Formik } from 'formik';
 
 const rowData = [
     {
@@ -600,6 +593,7 @@ interface MetaLinkProps {
     per_page: number;
     total: number;
 }
+
 interface MetaLinksLinkProps {
     active: boolean;
     label: string;

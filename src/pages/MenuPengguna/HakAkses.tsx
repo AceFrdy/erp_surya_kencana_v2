@@ -215,7 +215,6 @@ const HakAkses = () => {
 
             <div className="grid xl:grid-cols-3 gap-6 grid-cols-1">
                 <div className="datatables panel xl:col-span-3">
-                    
                     <div className="table-responsive mb-5">
                         <table>
                             <thead>
@@ -223,8 +222,8 @@ const HakAkses = () => {
                                     {/* <th>
                                     <input type="checkbox" className="form-checkbox" />
                                 </th> */}
-                                    <th className='text-lg font-semibold'>Nama Jabatan</th>
-                                    <th className='text-lg font-semibold'>Hak Akses</th>
+                                    <th className="text-lg font-semibold">Nama Jabatan</th>
+                                    <th className="text-lg font-semibold">Hak Akses</th>
                                     {/* <th>Sale</th> */}
                                     {/* <th className="!text-center">Action</th> */}
                                 </tr>
@@ -240,60 +239,61 @@ const HakAkses = () => {
                                                 <div className="whitespace-nowrap">{data.name}</div>
                                             </td>
                                             <td>
-                                                <div>
-                                                    <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
-                                                    <span> Product </span>
-                                                </div>
-                                                <div>
-                                                    <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
-                                                    <span> Restock </span>
-                                                </div>
-                                                <div>
-                                                    <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
-                                                    <span> Cabang </span>
-                                                </div>
-                                                <div>
-                                                    <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
-                                                    <span> Customer </span>
-                                                </div>
-                                                <div>
-                                                    <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
-                                                    <span> Penjualan </span>
-                                                </div>
-                                                <div>
-                                                    <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
-                                                    <span> Distribusi </span>
-                                                </div>
-                                                <div>
-                                                    <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
-                                                    <span> Supplier </span>
-                                                </div>
-                                                <div>
-                                                    <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
-                                                    <span> Akun </span>
-                                                </div>
-                                                <div>
-                                                    <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
-                                                    <span> Control Panel </span>
-                                                </div>
-                                                <div>
-                                                    <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
-                                                    <span> Saldo </span>
-                                                </div>
-                                                <div>
-                                                    <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
-                                                    <span> Flow Cash </span>
-                                                </div>
-                                                <div>
-                                                    <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
-                                                    <span> Hutang Piutang </span>
-                                                </div>
-                                                <div>
-                                                    <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
-                                                    <span> Laporan </span>
+                                                <div className='flex grid grid-cols-2'>
+                                                    <div>
+                                                        <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
+                                                        <span> Product </span>
+                                                    </div>
+                                                    <div>
+                                                        <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
+                                                        <span> Restock </span>
+                                                    </div>
+                                                    <div>
+                                                        <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
+                                                        <span> Cabang </span>
+                                                    </div>
+                                                    <div>
+                                                        <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
+                                                        <span> Customer </span>
+                                                    </div>
+                                                    <div>
+                                                        <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
+                                                        <span> Penjualan </span>
+                                                    </div>
+                                                    <div>
+                                                        <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
+                                                        <span> Distribusi </span>
+                                                    </div>
+                                                    <div>
+                                                        <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
+                                                        <span> Supplier </span>
+                                                    </div>
+                                                    <div>
+                                                        <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
+                                                        <span> Akun </span>
+                                                    </div>
+                                                    <div>
+                                                        <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
+                                                        <span> Control Panel </span>
+                                                    </div>
+                                                    <div>
+                                                        <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
+                                                        <span> Saldo </span>
+                                                    </div>
+                                                    <div>
+                                                        <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
+                                                        <span> Flow Cash </span>
+                                                    </div>
+                                                    <div>
+                                                        <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
+                                                        <span> Hutang Piutang </span>
+                                                    </div>
+                                                    <div>
+                                                        <input type="checkbox" className="form-checkbox outline-primary my-2" defaultChecked />
+                                                        <span> Laporan </span>
+                                                    </div>
                                                 </div>
                                             </td>
-                                            
                                         </tr>
                                     );
                                 })}

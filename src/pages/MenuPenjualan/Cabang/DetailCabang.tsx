@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Tab } from '@headlessui/react';
 import { Fragment, useEffect, useState } from 'react';
 import CodeHighlight from '../../../components/Highlight';
@@ -295,7 +295,6 @@ interface BranchDataProps {
 }
 
 interface StockDataProps {
-    id: number;
     branch_id: number;
     stock_qty: number;
     stock_qty_unit: number;
@@ -307,7 +306,6 @@ interface PenjualanDataProps {
     sale_report_invoice: string;
     branch: {
         id: number;
-        branch_name: string;
     };
     user: {
         id: number;
@@ -319,6 +317,7 @@ interface PenjualanDataProps {
 }
 
 const DetailCabang = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
@@ -412,6 +411,7 @@ const DetailCabang = () => {
                 const branch = response.data.data.resource.data;
                 setInitialRecords(branch);
                 setBranch(branch);
+                console.log('BRANCH', branch);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -425,8 +425,8 @@ const DetailCabang = () => {
                 },
             })
             .then((response) => {
-                setBranch(response.data.data.resource.data);
                 setPenjualan(response.data.data.resource.data);
+                console.log('SALE', response.data.data.resource.data);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -441,7 +441,7 @@ const DetailCabang = () => {
             })
             .then((response) => {
                 setStock(response.data.data.resource.data);
-                console.log(response.data.data.resource.data);
+                console.log('STOCK', response.data.data.resource.data);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -452,8 +452,12 @@ const DetailCabang = () => {
         setSelectedBranch(selectedBranch);
         const filteredPenjualan: PenjualanDataProps[] = penjualan.filter((data) => data.branch.id === selectedBranch.id);
         setFilteredSales(filteredPenjualan);
+        console.log('FILTER PENJUALAN', filteredPenjualan);
         const filteredStockData: StockDataProps[] = stock.filter((data) => data.branch_id === selectedBranch.id);
         setFilteredStock(filteredStockData);
+        console.log('FILTER STOK', filteredStockData);
+        console.log("DATA STOK", stock);
+        console.log("DATA PENJUALAN", penjualan);
 
         // Update the records data to display filtered sales
         setRecordsData(filteredPenjualan);
@@ -479,40 +483,41 @@ const DetailCabang = () => {
                 <div className="mb-5">
                     <div className="flex flex-wrap w-full gap-7 justify-around">
                         <div className="flex items-center justify-center">
-                            <div className="dropdown">
-                                <Dropdown
-                                    placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                    btnClassName="btn btn-outline-primary dropdown-toggle"
-                                    button={
-                                        <>
-                                            {selectedBranch ? (
-                                                <>
-                                                    {selectedBranch.branch_name}
-                                                    <span>
-                                                        <IconCaretDown className="ltr:ml-1 rtl:mr-1 inline-block" />
-                                                    </span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    Cabang
-                                                    <span>
-                                                        <IconCaretDown className="ltr:ml-1 rtl:mr-1 inline-block" />
-                                                    </span>
-                                                </>
-                                            )}
-                                        </>
-                                    }
-                                >
-                                    <ul className="!min-w-[170px]">
-                                        {branch.map((recordsData) => (
-                                            <li key={recordsData.id}>
-                                                <button type="button" onClick={() => handleBranchSelect(recordsData)}>
-                                                    {recordsData.branch_name}
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    {/* <ul className="!min-w-[170px]">
+                            {branch && (
+                                <div className="dropdown">
+                                    <Dropdown
+                                        placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
+                                        btnClassName="btn btn-outline-primary dropdown-toggle"
+                                        button={
+                                            <>
+                                                {selectedBranch ? (
+                                                    <>
+                                                        {selectedBranch.branch_name}
+                                                        <span>
+                                                            <IconCaretDown className="ltr:ml-1 rtl:mr-1 inline-block" />
+                                                        </span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        Cabang
+                                                        <span>
+                                                            <IconCaretDown className="ltr:ml-1 rtl:mr-1 inline-block" />
+                                                        </span>
+                                                    </>
+                                                )}
+                                            </>
+                                        }
+                                    >
+                                        <ul className="!min-w-[170px]">
+                                            {branch.map((recordsData) => (
+                                                <li key={recordsData.id}>
+                                                    <button type="button" onClick={() => handleBranchSelect(recordsData)}>
+                                                        {recordsData.branch_name}
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        {/* <ul className="!min-w-[170px]">
                                         <li>
                                             <button type="button">Cabang 1</button>
                                         </li>
@@ -526,8 +531,9 @@ const DetailCabang = () => {
                                             <button type="button">Cabang 4</button>
                                         </li>
                                     </ul> */}
-                                </Dropdown>
-                            </div>
+                                    </Dropdown>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -732,7 +738,7 @@ const DetailCabang = () => {
                                         className="whitespace-nowrap table-hover"
                                         records={filteredStock}
                                         columns={[
-                                            { accessor: 'id', title: 'No', sortable: true, render: (e) => filteredStock.indexOf(e) + 1  },
+                                            { accessor: 'id', title: 'No', sortable: true, render: (e) => filteredStock.indexOf(e) + 1 },
                                             {
                                                 accessor: 'product_id',
                                                 title: 'Barcode',

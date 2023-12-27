@@ -3,20 +3,12 @@ import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-// import IconBell from '../../../components/Icon/IconBell';
-// import IconXCircle from '../../../components/Icon/IconXCircle';
 import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link } from 'react-router-dom';
-// import { Dialog, Transition } from '@headlessui/react';
-// import IconPlus from '../../../components/Icon/IconPlus';
-// import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
-import IconSend from '../../../components/Icon/IconSend';
-import IconNotes from '../../../components/Icon/IconNotes';
 import IconPlus from '../../../components/Icon/IconPlus';
-// import * as Yup from 'yup';
-// import { Field, Form, Formik } from 'formik';
+import axios from 'axios';
 
 const rowData = [
     {
@@ -577,15 +569,26 @@ const showAlert = async (type: number) => {
         });
     }
 };
+
+interface UsersDataProps {
+    id: number;
+    name: string;
+    email: string;
+    contact: number;
+    created_at: string;
+    address: string;
+}
+
 const Karyawan = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
         dispatch(setPageTitle('Uang Masuk'));
     });
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'firstName'));
+    const [initialRecords, setInitialRecords] = useState<UsersDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
 
     const [search, setSearch] = useState('');
@@ -605,25 +608,28 @@ const Karyawan = () => {
     }, [page, pageSize, initialRecords]);
 
     useEffect(() => {
-        setInitialRecords(() => {
-            return rowData.filter((item) => {
+        if (!initialRecords) {
+            return;
+        }
+
+        setRecordsData(() => {
+            return initialRecords.filter((item) => {
                 return (
                     item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
+                    item.contact.toString().includes(search.toLowerCase()) ||
+                    item.name.toLowerCase().includes(search.toLowerCase()) ||
+                    item.created_at.toLowerCase().includes(search.toLowerCase()) ||
                     item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
+                    item.address.toLowerCase().includes(search.toLowerCase())
                 );
             });
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
         setPage(1);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
     const formatDate = (date: string | number | Date) => {
         if (date) {
@@ -635,22 +641,27 @@ const Karyawan = () => {
         return '';
     };
 
-    const [cost, setCost] = useState('');
+    const fetchData = () => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/users', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const users = response.data.data.resource.data;
+                setInitialRecords(users);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    };
 
-    // const handleCostChange = (e: { target: { value: any } }) => {
-    //     const inputValue = e.target.value;
-    //     let formatValue = '';
+    useEffect(() => {
+        fetchData();
+    }, [token]);
 
-    //     // Remove non-numeric characters
-    //     const numValue = inputValue.replace(/\D/g, '');
-
-    //     // Format the number with 'Rp.' prefix
-    //     if (numValue !== '') {
-    //         formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-    //     }
-
-    //     setCost(formatValue);
-    // };
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse">
@@ -666,8 +677,6 @@ const Karyawan = () => {
                     <span> Karyawan </span>
                 </li>
             </ul>
-            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
-            </div> */}
             <div className="panel mt-6">
                 <h1 className="text-lg font-bold flex justify-center">Data Karyawan</h1>
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
@@ -686,40 +695,35 @@ const Karyawan = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true },
-                            { accessor: 'firstName', title: 'Name', sortable: true },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'name', title: 'Name', sortable: true },
                             { accessor: 'email', title: 'Email', sortable: true },
-                            { accessor: 'phone', title: 'Contact', sortable: true },
+                            { accessor: 'contact', title: 'Contact', sortable: true },
                             {
-                                accessor: 'dob',
+                                accessor: 'created_at',
                                 title: 'Tanggal',
                                 sortable: true,
-                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
+                                render: ({ created_at }) => <div>{formatDate(created_at)}</div>,
                             },
                             {
-                              accessor: 'address.street',
-                              title: 'Address',
-                              sortable: true,
-                          },
+                                accessor: 'address',
+                                title: 'Address',
+                                sortable: true,
+                            },
                             {
                                 accessor: 'action',
                                 title: 'Opsi',
                                 titleClassName: '!text-center',
                                 render: () => (
                                     <div className="flex items-center w-max mx-auto gap-2">
-                                        {/* <button type="button" style={{ color: 'blue' }}>
-                                            <Link to="/menuhumanresource/karyawan/editkaryawan">
-                                                <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button> */}
                                         <button type="button" style={{ color: 'orange' }}>
-                                                <Link to="/menuhumanresource/karyawan/editkaryawan">
-                                                    <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                                </Link>
-                                            </button>
+                                            <Link to="/menuhumanresource/karyawan/editkaryawan">
+                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                            </Link>
+                                        </button>
                                         <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                            </button>
+                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                        </button>
                                     </div>
                                 ),
                             },
