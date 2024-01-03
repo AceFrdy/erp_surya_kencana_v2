@@ -405,7 +405,7 @@ const Penjualan = () => {
                                 className="h-10 border rounded-md w-full justify-between px-4 flex items-center"
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    onOpen('search-cabang', undefined, undefined, [], cabangList, [], setCabang);
+                                    onOpen('search-cabang', undefined, undefined, undefined, [], cabangList, [], setCabang);
                                     setCabang(cabang);
                                 }}
                                 disabled={cabangDisabled}
@@ -444,7 +444,7 @@ const Penjualan = () => {
                                 className="h-7 w-7 border rounded-md absolute justify-center flex right-1.5 top-[31px] items-center border-green-500"
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    onOpen('search-product-barcode', undefined, productList, [], [], [], setProductBarcode);
+                                    onOpen('search-product-barcode', undefined, productList, undefined, [], [], [], setProductBarcode);
                                 }}
                             >
                                 <IconSearch className="w-4 h-4" />
@@ -460,7 +460,7 @@ const Penjualan = () => {
                                 className="h-10 border rounded-md w-full justify-between px-4 flex items-center"
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    onOpen('search-unit', undefined, undefined, [], [], unitList, setUnit);
+                                    onOpen('search-unit', undefined, undefined, undefined, [], [], unitList, setUnit);
                                 }}
                             >
                                 <span>{unit}</span>

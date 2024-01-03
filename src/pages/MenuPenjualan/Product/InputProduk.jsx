@@ -36,7 +36,6 @@ const InputProduk = () => {
 
     const onChangeImage = (e) => {
         if (e.target.files) {
-            console.log(e.target.value, e.target.files);
             setFile(e.target.files[0]);
         }
     };
