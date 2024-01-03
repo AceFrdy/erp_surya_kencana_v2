@@ -17,6 +17,7 @@ const EditPenjualan = () => {
     const [formData, setFormData] = useState({
         sale_order_qty: 0,
         sale_order_discount: 0,
+        unit_stock_id: 0,
     });
 
     const [errors, setErrors] = useState({});
@@ -36,6 +37,7 @@ const EditPenjualan = () => {
                 setFormData({
                     sale_order_qty: saleData.sale_order_qty,
                     sale_order_discount: saleData.sale_order_discount,
+                    unit_stock_id: saleData.unit_stock_id,
                 });
             })
             .catch((error) => {
@@ -126,6 +128,16 @@ const EditPenjualan = () => {
                                     className="form-input"
                                     value={formData.sale_order_discount}
                                     onChange={(e) => handleInputChange('sale_order_discount', e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="diskonPenjualan"> Unit Stok </label>
+                                <input
+                                    type="text"
+                                    placeholder="Unit stock..."
+                                    className="form-input"
+                                    value={formData.unit_stock_id}
+                                    onChange={(e) => handleInputChange('unit_stock_id', e.target.value)}
                                 />
                             </div>
                             <div className="!mt-2">

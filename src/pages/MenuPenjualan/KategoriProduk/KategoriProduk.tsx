@@ -247,6 +247,7 @@ const KategoriProduk = () => {
                     position: 'top-right',
                     autoClose: 3000,
                 });
+                fetchData();
                 setEditKategori(false);
                 setEditedCategoryId(null);
             })

@@ -20,9 +20,11 @@ export type ModalType =
     | 'delete-saldo'
     | 'delete-data-penjualan'
     | 'delete-index'
+    | 'delete-inflow-cash'
     | 'search-product'
     | 'search-cabang'
-    | 'search-unit';
+    | 'search-unit'
+    | 'search-product-barcode';
 
 interface DataProps {
     id?: number;
@@ -42,16 +44,25 @@ interface UnitProps {
     number_of_units?: number;
 }
 
+interface BranchProductProps {
+    id?: number;
+    product?: {
+        product_barcode?: string;
+        product_name?: string;
+    };
+}
+
 interface ModalStore {
     type: ModalType | null;
     isOpen: boolean;
     data: number;
+    branchproduct: DataProps[];
     qty: number;
     product: DataProps[];
     cabang: CabangProps[];
     unit: UnitProps[];
     setGet: Dispatch<SetStateAction<string>>;
-    onOpen: (type: ModalType, data?: number, qty?: number, product?: DataProps[], cabang?: CabangProps[], unit?: UnitProps[], setGet?: Dispatch<SetStateAction<string>>) => void;
+    onOpen: (type: ModalType, data?: number, branchproduct?: BranchProductProps[], qty?: number, product?: DataProps[], cabang?: CabangProps[], unit?: UnitProps[], setGet?: Dispatch<SetStateAction<string>>) => void;
     onClose: () => void;
 }
 
@@ -63,7 +74,8 @@ export const useModal: UseBoundStore<StoreApi<ModalStore>> = create<ModalStore>(
     product: [],
     cabang: [],
     unit: [],
+    branchproduct:[],
     setGet: () => {},
-    onOpen: (type, data, qty, product, cabang, unit, setGet) => set({ isOpen: true, type, data, qty, product, cabang, unit, setGet }),
+    onOpen: (type, data, branchproduct, qty, product, cabang, unit, setGet) => set({ isOpen: true, type, data, branchproduct, qty, product, cabang, unit, setGet }),
     onClose: () => set({ isOpen: false, type: null }),
 }));
