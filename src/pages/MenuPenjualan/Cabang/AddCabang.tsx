@@ -68,7 +68,6 @@ const AddCabang = () => {
     };
 
     const handleCancel = () => {
-        // Instead of using a Link, directly use the navigate function
         navigate('/menupenjualan/cabang/listcabang');
     };
 
