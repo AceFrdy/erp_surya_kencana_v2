@@ -9,6 +9,8 @@ import IconNotes from '../../../../components/Icon/IconNotes';
 import IconPlus from '../../../../components/Icon/IconPlus';
 import axios from 'axios';
 import { useModal } from '../../../../hooks/use-modal';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../../utils';
+import Pagination from '../../../../components/Pagination';
 
 interface InflowDataProps {
     id: number;
@@ -36,6 +38,12 @@ const UangMasuk = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
+
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-reports');
 
     useEffect(() => {
         if (!initialRecords) {
@@ -68,6 +76,24 @@ const UangMasuk = () => {
             .then((response) => {
                 const inflows = response.data.data.resource.data;
                 setInitialRecords(inflows);
+                setRecordsData(inflows);
+
+                // page
+                setMetaLink({
+                    current_page: response.data.data.resource.current_page,
+                    last_page: response.data.data.resource.last_page,
+                    from: response.data.data.resource.from,
+                    to: response.data.data.resource.to,
+                    per_page: response.data.data.resource.per_page,
+                    total: response.data.data.resource.total,
+                });
+                setMetaLinksLink(response.data.data.resource.links);
+                setLinksLink({
+                    first: response.data.data.resource.first_page_url,
+                    last: response.data.data.resource.last_page_url,
+                    next: response.data.data.resource.next_page_url,
+                    prev: response.data.data.resource.prev_page_url,
+                });
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -151,6 +177,7 @@ const UangMasuk = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                 </div>
             </div>
         </div>

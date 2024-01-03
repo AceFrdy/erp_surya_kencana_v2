@@ -7,8 +7,9 @@ import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link, useNavigate } from 'react-router-dom';
 import IconPlus from '../../../components/Icon/IconPlus';
 import axios from 'axios';
-import { formatPrice } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
 import { useModal } from '../../../hooks/use-modal';
+import Pagination from '../../../components/Pagination';
 
 interface SaldoDataProps {
     id: number;
@@ -24,7 +25,6 @@ const Saldo = () => {
     const dispatch = useDispatch();
     const token = localStorage.getItem('accessToken') ?? '';
     const { onOpen } = useModal();
-    const navigate = useNavigate();
     useEffect(() => {
         dispatch(setPageTitle('Saldo'));
     });
@@ -35,6 +35,13 @@ const Saldo = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
+
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-reports');
+
 
     useEffect(() => {
         if (!initialRecords) {
@@ -66,7 +73,25 @@ const Saldo = () => {
             })
             .then((response) => {
                 const saldo = response.data.data.resource.data;
+                setRecordsData(saldo);
                 setInitialRecords(saldo);
+
+                // page
+                setMetaLink({
+                    current_page: response.data.data.resource.current_page,
+                    last_page: response.data.data.resource.last_page,
+                    from: response.data.data.resource.from,
+                    to: response.data.data.resource.to,
+                    per_page: response.data.data.resource.per_page,
+                    total: response.data.data.resource.total,
+                });
+                setMetaLinksLink(response.data.data.resource.links);
+                setLinksLink({
+                    first: response.data.data.resource.first_page_url,
+                    last: response.data.data.resource.last_page_url,
+                    next: response.data.data.resource.next_page_url,
+                    prev: response.data.data.resource.prev_page_url,
+                });
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -147,6 +172,7 @@ const Saldo = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                 </div>
             </div>
         </div>

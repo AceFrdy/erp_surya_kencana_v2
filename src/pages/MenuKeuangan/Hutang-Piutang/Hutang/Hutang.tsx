@@ -8,8 +8,8 @@ import { Link } from 'react-router-dom';
 import IconNotes from '../../../../components/Icon/IconNotes';
 import IconPlus from '../../../../components/Icon/IconPlus';
 import axios from 'axios';
-import { formatPrice } from '../../../../utils';
-
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../../utils';
+import Pagination from '../../../../components/Pagination';
 
 interface DebtDataProps {
     id: number;
@@ -27,12 +27,17 @@ const Hutang = () => {
     });
     const [initialRecords, setInitialRecords] = useState<DebtDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
-
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
     });
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-reports');
+
 
     useEffect(() => {
         if (!initialRecords) {
@@ -78,6 +83,24 @@ const Hutang = () => {
             .then((response) => {
                 const debts = response.data.data.resource.data;
                 setInitialRecords(debts);
+                setRecordsData(debts);
+
+                // page
+                setMetaLink({
+                    current_page: response.data.data.resource.current_page,
+                    last_page: response.data.data.resource.last_page,
+                    from: response.data.data.resource.from,
+                    to: response.data.data.resource.to,
+                    per_page: response.data.data.resource.per_page,
+                    total: response.data.data.resource.total,
+                });
+                setMetaLinksLink(response.data.data.resource.links);
+                setLinksLink({
+                    first: response.data.data.resource.first_page_url,
+                    last: response.data.data.resource.last_page_url,
+                    next: response.data.data.resource.next_page_url,
+                    prev: response.data.data.resource.prev_page_url,
+                });
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -138,7 +161,7 @@ const Hutang = () => {
                                 accessor: 'payment_amount',
                                 title: 'Progress',
                                 sortable: true,
-                                render: (e) => formatPrice(e.payment_amount)
+                                render: (e) => formatPrice(e.payment_amount),
                             },
                             {
                                 accessor: 'action',
@@ -167,6 +190,7 @@ const Hutang = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                 </div>
             </div>
         </div>
