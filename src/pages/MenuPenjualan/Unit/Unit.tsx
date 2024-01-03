@@ -10,7 +10,8 @@ import IconPlus from '../../../components/Icon/IconPlus';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useModal } from '../../../hooks/use-modal';
-
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+import Pagination from '../../../components/Pagination';
 
 interface UnitsDataProps {
     id: number;
@@ -28,16 +29,19 @@ const Unit = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-
     const token = localStorage.getItem('accessToken') || '';
     const [initialRecords, setInitialRecords] = useState<UnitsDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
-    const navigate = useNavigate();
     const { onOpen } = useModal();
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/unit-stock');
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/unit-stock', {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -45,13 +49,29 @@ const Unit = () => {
             })
             .then((response) => {
                 const unit = response.data.data.resource.data;
+                setRecordsData(unit);
                 setInitialRecords(unit);
-                console.log('UNIT', unit);
+                // page
+                setMetaLink({
+                    current_page: response.data.data.resource.current_page,
+                    last_page: response.data.data.resource.last_page,
+                    from: response.data.data.resource.from,
+                    to: response.data.data.resource.to,
+                    per_page: response.data.data.resource.per_page,
+                    total: response.data.data.resource.total,
+                });
+                setMetaLinksLink(response.data.data.resource.links);
+                setLinksLink({
+                    first: response.data.data.resource.first_page_url,
+                    last: response.data.data.resource.last_page_url,
+                    next: response.data.data.resource.next_page_url,
+                    prev: response.data.data.resource.prev_page_url,
+                });
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, []);
+    }, [url]);
 
     useEffect(() => {
         if (!initialRecords) {
@@ -131,6 +151,7 @@ const Unit = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                 </div>
             </div>
         </div>
