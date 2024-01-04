@@ -82,10 +82,6 @@ const EditCabang = () => {
         navigate('/menupenjualan/cabang/listcabang');
     };
 
-    if (loading) {
-        return <div>Loading...</div>; // You can replace this with a loading spinner or any other UI element.
-    }
-
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse mb-10">

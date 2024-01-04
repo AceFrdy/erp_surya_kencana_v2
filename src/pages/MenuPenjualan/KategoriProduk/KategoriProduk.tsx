@@ -10,126 +10,18 @@ import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 
-const tableData = [
-    {
-        id: 1,
-        nama: 'John Doe',
-        email: 'johndoe@yahoo.com',
-        date: '10/08/2020',
-        sale: 120,
-        status: 'Complete',
-        register: '5 min ago',
-        progress: '40%',
-        position: 'Developer',
-        office: 'London',
-    },
-    {
-        id: 2,
-        nama: 'Shaun Park',
-        email: 'shaunpark@gmail.com',
-        date: '11/08/2020',
-        sale: 400,
-        status: 'Pending',
-        register: '11 min ago',
-        progress: '23%',
-        position: 'Designer',
-        office: 'New York',
-    },
-    {
-        id: 3,
-        nama: 'Alma Clarke',
-        email: 'alma@gmail.com',
-        date: '12/02/2020',
-        sale: 310,
-        status: 'In Progress',
-        register: '1 hour ago',
-        progress: '80%',
-        position: 'Accountant',
-        office: 'Amazon',
-    },
-    {
-        id: 4,
-        nama: 'Vincent Carpenter',
-        email: 'vincent@gmail.com',
-        date: '13/08/2020',
-        sale: 100,
-        status: 'Canceled',
-        register: '1 day ago',
-        progress: '60%',
-        position: 'Data Scientist',
-        office: 'Canada',
-    },
-    {
-        id: 4,
-        nama: 'Vincent Carpenter',
-        email: 'vincent@gmail.com',
-        date: '13/08/2020',
-        sale: 100,
-        status: 'Canceled',
-        register: '1 day ago',
-        progress: '60%',
-        position: 'Data Scientist',
-        office: 'Canada',
-    },
-    {
-        id: 4,
-        nama: 'Vincent Carpenter',
-        email: 'vincent@gmail.com',
-        date: '13/08/2020',
-        sale: 100,
-        status: 'Canceled',
-        register: '1 day ago',
-        progress: '60%',
-        position: 'Data Scientist',
-        office: 'Canada',
-    },
-    {
-        id: 4,
-        nama: 'Vincent Carpenter',
-        email: 'vincent@gmail.com',
-        date: '13/08/2020',
-        sale: 100,
-        status: 'Canceled',
-        register: '1 day ago',
-        progress: '60%',
-        position: 'Data Scientist',
-        office: 'Canada',
-    },
-    {
-        id: 4,
-        nama: 'Vincent Carpenter',
-        email: 'vincent@gmail.com',
-        date: '13/08/2020',
-        sale: 100,
-        status: 'Canceled',
-        register: '1 day ago',
-        progress: '60%',
-        position: 'Data Scientist',
-        office: 'Canada',
-    },
-];
-
 const KategoriProduk = () => {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Kategori Produk'));
     });
     const navigate = useNavigate();
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const itemsPerPage = 5;
-    const totalPages = Math.ceil(tableData.length / itemsPerPage);
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const [addKategori, setAddKategori] = useState(false);
     const [editKategori, setEditKategori] = useState(false);
     const [deleteKategori, setDeleteKategori] = useState(false);
     const token = localStorage.getItem('accessToken') ?? '';
     const [editedCategoryId, setEditedCategoryId] = useState<number | null>(null);
     const [deleteCategoryId, setDeleteCategoryId] = useState<number | null>(null);
-
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
     const [categories, setCategories] = useState<{ id: number; product_category_name: string }[]>([]);
 
     const fetchData = () => {
@@ -143,7 +35,6 @@ const KategoriProduk = () => {
             .then((response) => {
                 const categories = response.data.data.resource.data;
                 setCategories(categories);
-                // console.log('CATEGORIES', response.data.data);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -247,6 +138,7 @@ const KategoriProduk = () => {
                     position: 'top-right',
                     autoClose: 3000,
                 });
+                fetchData();
                 setEditKategori(false);
                 setEditedCategoryId(null);
             })
@@ -537,9 +429,6 @@ const KategoriProduk = () => {
                             </tbody>
                         </table>
                     </div>
-
-                    {/* Integrasikan Pagination di sini */}
-                    <Pagination total={totalPages} page={currentPage} onChange={handlePageChange} size="md" />
                 </div>
             </div>
         </div>

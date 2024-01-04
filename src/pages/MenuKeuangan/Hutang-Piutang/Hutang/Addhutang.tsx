@@ -72,7 +72,7 @@ const AddHutang = () => {
             })
             .then((response) => {
                 setDetailAccLocation(response.data.data.resource.dataDetailAccLocation);
-                setDetailAcc(response.data.data.resource.dataDetailAcc);
+                setDetailAcc(response.data.data.resource.dataDetailAccDirection);
             })
             .catch((err: any) => {
                 console.log('DETAIL ACCOUNT', err.message);
@@ -145,7 +145,7 @@ const AddHutang = () => {
                         <label>Akun Asal</label>
                         <select className="form-select text-white-dark" name="location_acc" value={formData.location_acc} onChange={handleChange}>
                             <option value="">Choose...</option>
-                            {detailAccLocation.map((item) => (
+                            {detailAccLocation && detailAccLocation.map((item) => (
                                 <option value={item.id} key={item.id}>
                                     {item.detail_acc_name}
                                 </option>
@@ -156,7 +156,7 @@ const AddHutang = () => {
                         <label>Akun Tujuan</label>
                         <select className="form-select text-white-dark" name="direction_acc" value={formData.direction_acc} onChange={handleChange}>
                             <option value="">Choose...</option>
-                            {detailAcc.map((item) => (
+                            {detailAcc && detailAcc.map((item) => (
                                 <option value={item.id} key={item.id}>
                                     {item.detail_acc_name}
                                 </option>
@@ -174,13 +174,6 @@ const AddHutang = () => {
                     <div>
                         <label>Tanggal</label>
                         <input type="date" placeholder="Tanggal..." className="form-input" name="debt_date" value={formData.debt_date} onChange={handleChange} />
-                        {/* <Flatpickr
-                            id="Tanggal"
-                            value={date1}
-                            options={{ dateFormat: 'Y-m-d', position: isRtl ? 'auto right' : 'auto left' }}
-                            className="form-input"
-                            onChange={(date) => setDate1(date)}
-                        /> */}
                     </div>
                     <div className="flex">
                         <button type="submit" className="btn btn-primary !mt-6 mr-8">

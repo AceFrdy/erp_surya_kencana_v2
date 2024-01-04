@@ -5,10 +5,17 @@ import { setPageTitle } from '../../../store/themeConfigSlice';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+interface DataDetailAccountProps {
+    id: number;
+    detail_acc_code: string;
+    detail_acc_name: string;
+}
+
 const AddSaldo = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') ?? '';
+    const [detailAccount, setDetailAccount] = useState<DataDetailAccountProps[]>([]);
     useEffect(() => {
         dispatch(setPageTitle('Tambah Saldo'));
     });
@@ -19,13 +26,38 @@ const AddSaldo = () => {
         saldo_info: '',
     });
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+        if (type === 'checkbox') {
+            const checkboxValue = (e.target as HTMLInputElement).checked ? 'yes' : '';
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: checkboxValue,
+            }));
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        }
     };
+
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/detail-accounts', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setDetailAccount(response.data.data.resource.data);
+                console.log("DETAIL ACCOUNT", response.data.data.resource.data)
+            })
+            .catch((err: any) => {
+                console.log('DETAIL ACCOUNT', err.message);
+            });
+    }, []);
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -88,35 +120,20 @@ const AddSaldo = () => {
             <div className="panel">
                 <h1 className="text-xl font-bold mb-6">Add Saldo</h1>
                 <form className="space-y-5" onSubmit={handleSubmit}>
-                    {/* <div>
-                        <label htmlFor="gridState">Jenis Saldo</label>
-                        <select id="gridState" className="form-select text-white-dark">
-                            <option>Choose...</option>
-                            <option>Asset/Harta</option>
-                            <option>Kewajiban/Hutang</option>
-                            <option>Modal</option>
-                            <option>Pendapatan</option>
-                            <option>Biaya</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label htmlFor="Cost">Cash</label>
-                        <input id="Cost" type="text" value={cost} onChange={handleCostChange} placeholder="Rp." className="form-input" />
-                    </div> */}
                     <div>
                         <label htmlFor="date">Tanggal Saldo</label>
                         <input type="date" className="form-input" name="saldo_date" value={formData.saldo_date} onChange={handleChange} />
                     </div>
                     <div>
                         <label htmlFor="detail_account">Detail Akun</label>
-                        <input
-                            type="text"
-                            placeholder="Detail Akun..."
-                            className="form-input"
-                            name="detail_account_id"
-                            value={formData.detail_account_id}
-                            onChange={handleChange}
-                        />
+                        <select className="form-select text-white-dark" name="detail_account_id" value={formData.detail_account_id} onChange={handleChange}>
+                            <option value="">Choose...</option>
+                            {detailAccount && detailAccount.map((item) => (
+                                <option value={item.id} key={item.id}>
+                                    {item.detail_acc_name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <label htmlFor="saldo_amount">Jumlah Saldo</label>

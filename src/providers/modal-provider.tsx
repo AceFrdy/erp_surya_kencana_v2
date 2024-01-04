@@ -20,6 +20,8 @@ import SearchUnit from '../components/modals/search-unit';
 import DeletePayPiutang from '../components/modals/delete-modal-pay-piutang';
 import DeletePiutang from '../components/modals/delete-modal-piutang';
 import DeleteUangKeluar from '../components/modals/delete-modal-uang-keluar';
+import SearchProductBarcode from '../components/modals/search-product barcode';
+import DeleteInflowCashModal from '../components/modals/delete-modal-uang-masuk';
 
 const ModalProvider = () => {
     return (
@@ -46,6 +48,9 @@ const ModalProvider = () => {
             <DeletePayPiutang />
             <DeletePiutang />
             <DeleteUangKeluar />
+            <SearchProductBarcode />
+            <DeleteIndexModal />
+            <DeleteInflowCashModal />
         </>
     );
 };
