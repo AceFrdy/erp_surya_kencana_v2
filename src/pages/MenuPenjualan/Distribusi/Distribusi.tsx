@@ -397,7 +397,7 @@ const Distribusi = () => {
                                 className="h-10 border rounded-md w-full justify-between px-4 flex items-center"
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    onOpen('search-cabang', undefined, undefined, [], cabangList, [], setCabang);
+                                    onOpen('search-cabang', undefined, [], undefined, [], cabangList, [], setCabang);
                                 }}
                                 disabled={cabangDisabled}
                             >
@@ -422,7 +422,7 @@ const Distribusi = () => {
                                     className="h-7 w-7 border rounded-md absolute justify-center flex right-1.5 top-[31px] items-center border-green-500"
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        onOpen('search-product', undefined, undefined, productList, [], [], setProductBarcode);
+                                        onOpen('search-product', undefined, [], undefined, productList, [], [], setProductBarcode);
                                     }}
                                 >
                                     <IconSearch className="w-4 h-4" />
@@ -449,7 +449,7 @@ const Distribusi = () => {
                                     className="h-10 border rounded-md w-full justify-between px-4 flex items-center"
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        onOpen('search-unit', undefined, undefined, [], [], unitList, setUnit);
+                                        onOpen('search-unit', undefined, [], undefined, [], [], unitList, setUnit);
                                     }}
                                 >
                                     <span>{unit}</span>
