@@ -17,6 +17,9 @@ import DeleteIndexModal from '../components/modals/delete-index-modal';
 import SearchProduct from '../components/modals/search-product';
 import SearchCabang from '../components/modals/search-cabang';
 import SearchUnit from '../components/modals/search-unit';
+import DeletePayPiutang from '../components/modals/delete-modal-pay-piutang';
+import DeletePiutang from '../components/modals/delete-modal-piutang';
+import DeleteUangKeluar from '../components/modals/delete-modal-uang-keluar';
 
 const ModalProvider = () => {
     return (
@@ -40,6 +43,9 @@ const ModalProvider = () => {
             <SearchProduct />
             <SearchCabang />
             <SearchUnit />
+            <DeletePayPiutang />
+            <DeletePiutang />
+            <DeleteUangKeluar />
         </>
     );
 };

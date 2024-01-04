@@ -31,7 +31,6 @@ const AddAkun = () => {
             acc_group_name: formData.acc_group_name,
             acc_info: formData.acc_info,
         };
-        console.log(data);
 
         await axios
             .post('https://erp.digitalindustryagency.com/api/accounts', data, {
@@ -49,17 +48,27 @@ const AddAkun = () => {
                 navigate('/menukeuangan/akun/akun');
             })
             .catch((err: any) => {
-                console.error('Error adding account:', err);
+                // set_old_value
+                const oldValueBefore = {
+                    acc_type: formData.acc_type,
+                    acc_group_name: formData.acc_group_name,
+                    acc_info: formData.acc_info,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
                 const notification = {
                     type: 'error',
                     message: 'Akun Gagal Ditambahkan',
+                    log: err.message,
+                    title: 'ERROR_ADDING_ACCOUNT',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
             });
     };
 
-    // Update the state for each input field
+    // Handle_Change
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -67,17 +76,28 @@ const AddAkun = () => {
             [name]: value,
         }));
     };
+
+    // get_notif
     useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+        }
         const notificationMessage = localStorage.getItem('notification');
         if (notificationMessage) {
-            const { type, message } = JSON.parse(notificationMessage);
+            const { title, log, type, message } = JSON.parse(notificationMessage);
             if (type === 'success') {
                 toast.success(message);
             } else if (type === 'error') {
                 toast.error(message);
+                console.log(title, log);
             }
         }
-        return localStorage.removeItem('notification');
+        return () => {
+            localStorage.removeItem('notification');
+            sessionStorage.removeItem('old_value');
+        };
     }, []);
 
     return (
@@ -100,13 +120,7 @@ const AddAkun = () => {
                 <form className="space-y-5" onSubmit={handleSubmit}>
                     <div>
                         <label htmlFor="gridState">Jenis Akun</label>
-                        <select
-                            id="gridState"
-                            className="form-select text-white-dark"
-                            name="acc_type"
-                            value={formData.acc_type}
-                            onChange={handleInputChange} // Modified to use the general handler
-                        >
+                        <select id="gridState" className="form-select" name="acc_type" value={formData.acc_type} onChange={handleInputChange} required>
                             <option>Choose...</option>
                             {typeAccount.map((item) => (
                                 <option value={item} key={item}>
@@ -117,15 +131,7 @@ const AddAkun = () => {
                     </div>
                     <div>
                         <label htmlFor="actionGroup">Group</label>
-                        <input
-                            id="actionGroup"
-                            type="text"
-                            placeholder="Group..."
-                            name="acc_group_name"
-                            className="form-input"
-                            value={formData.acc_group_name}
-                            onChange={handleInputChange} // Modified to use the general handler
-                        />
+                        <input id="actionGroup" type="text" placeholder="Group..." name="acc_group_name" className="form-input" value={formData.acc_group_name} onChange={handleInputChange} required />
                     </div>
                     <div>
                         <label htmlFor="actionWeb">Keterangan</label>
@@ -138,6 +144,7 @@ const AddAkun = () => {
                             value={formData.acc_info}
                             onChange={handleInputChange} // Modified to use the general handler
                             minLength={5}
+                            required
                         />
                     </div>
                     <div className="flex">

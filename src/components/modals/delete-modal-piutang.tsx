@@ -5,16 +5,16 @@ import { Dialog, Transition } from '@headlessui/react';
 
 import { useModal } from '../../hooks/use-modal';
 
-const DeleteDetailAkunModal = () => {
+const DeletePiutang = () => {
     const navigate = useNavigate();
     const { isOpen, type, onClose, data } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
 
-    const isModalOpen = isOpen && type === 'delete-detail-akun';
+    const isModalOpen = isOpen && type === 'delete-piutang';
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/detail-accounts/${id}`, {
+            .delete(`https://erp.digitalindustryagency.com/api/receivables/${id}}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -24,17 +24,18 @@ const DeleteDetailAkunModal = () => {
                 onClose();
                 const notification = {
                     type: 'success',
-                    message: 'Detail Akun Berhasil Dihapus',
+                    message: 'Piutang Berhasil Dihapus',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
             })
             .catch((err) => {
+                onClose();
                 const notification = {
                     type: 'error',
-                    message: 'Detail Akun Gagal Dihapus.',
+                    message: 'Piutang Gagal Dihapus.',
                     log: err.message,
-                    title: 'ERROR_DELETING_DETAIL_ACCOUNT',
+                    title: 'ERROR_DELETING_PIUTANG',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
@@ -60,13 +61,13 @@ const DeleteDetailAkunModal = () => {
                         >
                             <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
                                 <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                    <div className="text-lg font-bold">Hapus Detail Akun</div>
+                                    <div className="text-lg font-bold">Hapus Piutang</div>
                                 </div>
                                 <div className="p-5">
                                     <div>
                                         <form className="space-y-5">
                                             <div>
-                                                <h1>Apakah Anda yakin ingin menghapus Detail Akun?</h1>
+                                                <h1>Apakah Anda yakin ingin menghapus Piutang?</h1>
                                             </div>
                                         </form>
                                     </div>
@@ -94,4 +95,4 @@ const DeleteDetailAkunModal = () => {
     );
 };
 
-export default DeleteDetailAkunModal;
+export default DeletePiutang;

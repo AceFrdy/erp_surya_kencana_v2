@@ -22,7 +22,10 @@ export type ModalType =
     | 'delete-index'
     | 'search-product'
     | 'search-cabang'
-    | 'search-unit';
+    | 'search-unit'
+    | 'delete-pay-piutang'
+    | 'delete-piutang'
+    | 'delete-uang-keluar';
 
 interface DataProps {
     id?: number;

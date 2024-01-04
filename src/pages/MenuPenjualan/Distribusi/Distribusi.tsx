@@ -2,8 +2,9 @@ import axios from 'axios';
 import sortBy from 'lodash/sortBy';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
+import { Dialog, Transition } from '@headlessui/react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, Fragment, useEffect, useRef, useState } from 'react';
 
 import { Link, useNavigate } from 'react-router-dom';
 import { useModal } from '../../../hooks/use-modal';
@@ -24,6 +25,10 @@ interface DistributionListProps {
         product_name: string;
     };
     distribution_qty: number;
+    unit_stock: {
+        id: number;
+        unit_stock_name: string;
+    };
 }
 
 interface ProductListProps {
@@ -56,6 +61,10 @@ const Distribusi = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
+    const [openModal, setOpenModal] = useState<boolean>(false);
+    const [qtyEdit, setQtyEdit] = useState<number>(0);
+    const [idEdit, setIdEdit] = useState<number>(0);
+    const [unitEdit, setUnitEdit] = useState<number>(0);
 
     const [initialRecords, setInitialRecords] = useState<DistributionListProps[]>([]);
 
@@ -144,6 +153,39 @@ const Distribusi = () => {
             });
     };
 
+    const handleUpdate = (e: FormEvent) => {
+        e.preventDefault();
+
+        const data = {
+            distribution_qty: qtyEdit,
+            unit_stock_id: unitEdit,
+        };
+
+        axios
+            .put(`https://erp.digitalindustryagency.com/api/distribution/${idEdit}`, data, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const notification = {
+                    type: 'success',
+                    message: 'Data Distribusi Berhasil Diperbarui',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
+            })
+            .catch((err: any) => {
+                const notification = {
+                    type: 'error',
+                    message: 'Data Distribusi Gagal Diperbarui',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
+            });
+    };
+
     // pagination
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
@@ -160,6 +202,7 @@ const Distribusi = () => {
                 },
             })
             .then((response) => {
+                console.log(response.data.data.resource.data);
                 setInitialRecords(response.data.data.resource.data);
                 if (response.data.data.resource.data.length >= 1) {
                     setCabangDisabled(true);
@@ -240,149 +283,239 @@ const Distribusi = () => {
     }, []);
 
     return (
-        <div>
-            <ul className="flex space-x-2 rtl:space-x-reverse">
-                <li>
-                    <Link to="/" className="text-primary hover:underline">
-                        Home
-                    </Link>
-                </li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>Menu Penjualan</span>
-                </li>
-                <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span> Distribusi </span>
-                </li>
-            </ul>
-            <div className="panel mt-6">
-                <h1 className="text-lg font-bold">Perkembangan Distribusi</h1>
-                <div className="flex mb-4 justify-end">
-                    <button className="btn btn-outline-danger mr-4" onClick={() => onOpen('delete-seluruh-distribusi')}>
-                        <IconTrashLines className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                        Batal
-                    </button>
-                    <form onSubmit={handleSubmitDistribution}>
-                        <button type="submit" className="btn btn-outline-primary">
-                            <IconSend className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
-                            Kirim
-                        </button>
-                    </form>
-                </div>
-                <form className="space-y-5" onSubmit={handleSubmitProduct}>
-                    <div className="relative">
-                        <label htmlFor="cabang">Tujuan Cabang</label>
-                        <button
-                            className="h-10 border rounded-md w-full justify-between px-4 flex items-center"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                onOpen('search-cabang', undefined, undefined, [], cabangList, [], setCabang);
-                            }}
-                            disabled={cabangDisabled}
-                        >
-                            <span>{cabang}</span>
-                            <IconSearch />
-                        </button>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="relative">
-                            <label htmlFor="barcode">Barcode Produk</label>
-                            <input
-                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                    e.preventDefault();
-                                    setProductBarcode(e.target.value);
-                                }}
-                                className="form-input"
-                                placeholder="Barcode..."
-                                value={productBarcode}
-                                autoFocus
-                            />
-                            <button
-                                className="h-7 w-7 border rounded-md absolute justify-center flex right-1.5 top-[31px] items-center border-green-500"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    onOpen('search-product', undefined, undefined, productList, [], [], setProductBarcode);
-                                }}
+        <>
+            <Transition appear show={openModal} as={Fragment}>
+                <Dialog as="div" open={openModal} onClose={() => setOpenModal(false)}>
+                    <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
+                        <div className="fixed inset-0" />
+                    </Transition.Child>
+                    <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
+                        <div className="flex items-start justify-center min-h-screen px-4">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 scale-95"
+                                enterTo="opacity-100 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 scale-100"
+                                leaveTo="opacity-0 scale-95"
                             >
-                                <IconSearch className="w-4 h-4" />
+                                <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
+                                    <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                                        <div className="text-lg font-bold">Edit Distribusi Product</div>
+                                    </div>
+                                    <form className="p-5 space-y-5" onSubmit={handleUpdate}>
+                                        <div className="w-full">
+                                            <label htmlFor="oldValue" className="text-sm">
+                                                Qty
+                                            </label>
+                                            <input
+                                                value={qtyEdit}
+                                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                                    e.preventDefault();
+                                                    setQtyEdit(parseFloat(e.target.value));
+                                                }}
+                                                className="form-input"
+                                                autoFocus
+                                            />
+                                        </div>
+                                        <div className="relative">
+                                            <label htmlFor="unit_stock_id">Satuan</label>
+                                            <select
+                                                id="unit_stock_id"
+                                                name="unit_stock_id"
+                                                className="form-select w-full"
+                                                value={unitEdit}
+                                                onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                                                    e.preventDefault();
+                                                    setUnitEdit(parseFloat(e.target.value));
+                                                }}
+                                            >
+                                                <option>Pilih Unit...</option>
+                                                {unitList.map((item) => (
+                                                    <option key={item.id} value={item.id}>
+                                                        {item.unit_stock_name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="flex justify-end items-center mt-8">
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-danger"
+                                                onClick={() => {
+                                                    setOpenModal(false);
+                                                    setQtyEdit(0);
+                                                    setUnitEdit(0);
+                                                }}
+                                            >
+                                                Kembali
+                                            </button>
+                                            <button type="submit" className="btn btn-primary ltr:ml-4 rtl:mr-4">
+                                                Update
+                                            </button>
+                                        </div>
+                                    </form>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition>
+            <div>
+                <ul className="flex space-x-2 rtl:space-x-reverse">
+                    <li>
+                        <Link to="/" className="text-primary hover:underline">
+                            Home
+                        </Link>
+                    </li>
+                    <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                        <span>Menu Penjualan</span>
+                    </li>
+                    <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
+                        <span> Distribusi </span>
+                    </li>
+                </ul>
+                <div className="panel mt-6">
+                    <h1 className="text-lg font-bold">Perkembangan Distribusi</h1>
+                    <div className="flex mb-4 justify-end">
+                        <button className="btn btn-outline-danger mr-4" onClick={() => onOpen('delete-seluruh-distribusi')}>
+                            <IconTrashLines className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                            Batal
+                        </button>
+                        <form onSubmit={handleSubmitDistribution}>
+                            <button type="submit" className="btn btn-outline-primary">
+                                <IconSend className="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" />
+                                Kirim
                             </button>
-                        </div>
-                        <div>
-                            <label htmlFor="Qty">Qty</label>
-                            <input
-                                id="Qty"
-                                type="number"
-                                placeholder="Qty..."
-                                name={'qty'}
-                                value={distributionQty}
-                                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                    e.preventDefault();
-                                    setDistributionQty(parseFloat(e.target.value));
-                                }}
-                                className="form-input"
-                            />
-                        </div>
+                        </form>
+                    </div>
+                    <form className="space-y-5" onSubmit={handleSubmitProduct}>
                         <div className="relative">
-                            <label htmlFor="satuan">Satuan</label>
+                            <label htmlFor="cabang">Tujuan Cabang</label>
                             <button
                                 className="h-10 border rounded-md w-full justify-between px-4 flex items-center"
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    onOpen('search-unit', undefined, undefined, [], [], unitList, setUnit);
+                                    onOpen('search-cabang', undefined, undefined, [], cabangList, [], setCabang);
                                 }}
+                                disabled={cabangDisabled}
                             >
-                                <span>{unit}</span>
+                                <span>{cabang}</span>
                                 <IconSearch />
                             </button>
                         </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div className="relative">
+                                <label htmlFor="barcode">Barcode Produk</label>
+                                <input
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                        e.preventDefault();
+                                        setProductBarcode(e.target.value);
+                                    }}
+                                    className="form-input"
+                                    placeholder="Barcode..."
+                                    value={productBarcode}
+                                    autoFocus
+                                />
+                                <button
+                                    className="h-7 w-7 border rounded-md absolute justify-center flex right-1.5 top-[31px] items-center border-green-500"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        onOpen('search-product', undefined, undefined, productList, [], [], setProductBarcode);
+                                    }}
+                                >
+                                    <IconSearch className="w-4 h-4" />
+                                </button>
+                            </div>
+                            <div>
+                                <label htmlFor="Qty">Qty</label>
+                                <input
+                                    id="Qty"
+                                    type="number"
+                                    placeholder="Qty..."
+                                    name={'qty'}
+                                    value={distributionQty}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                        e.preventDefault();
+                                        setDistributionQty(parseFloat(e.target.value));
+                                    }}
+                                    className="form-input"
+                                />
+                            </div>
+                            <div className="relative">
+                                <label htmlFor="satuan">Satuan</label>
+                                <button
+                                    className="h-10 border rounded-md w-full justify-between px-4 flex items-center"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        onOpen('search-unit', undefined, undefined, [], [], unitList, setUnit);
+                                    }}
+                                >
+                                    <span>{unit}</span>
+                                    <IconSearch />
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" className="btn btn-outline-primary !mt-6 w-full mb-6">
+                            Tambah
+                        </button>
+                    </form>
+                    <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5"></div>
+                    <h5 className="font-semibold text-lg dark:text-white-light mb-4 mt-4 flex justify-center">Data Distribusi</h5>
+                    <div className="datatables">
+                        <DataTable
+                            highlightOnHover
+                            className="whitespace-nowrap table-hover"
+                            records={initialRecords}
+                            columns={[
+                                { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
+                                {
+                                    accessor: 'product.product_barcode',
+                                    title: 'Barcode',
+                                    sortable: true,
+                                },
+                                {
+                                    accessor: 'product.product_name',
+                                    title: 'Nama',
+                                    sortable: true,
+                                },
+                                { accessor: 'distribution_qty', title: 'Qty', sortable: true },
+                                { accessor: 'unit_stock.unit_stock_name', title: 'Unit', sortable: true },
+                                {
+                                    accessor: 'action',
+                                    title: 'Opsi',
+                                    titleClassName: '!text-center',
+                                    render: (e) => (
+                                        <div className="flex items-center w-max mx-auto gap-2">
+                                            <button
+                                                type="button"
+                                                style={{ color: 'orange' }}
+                                                onClick={() => {
+                                                    setOpenModal(true);
+                                                    setQtyEdit(e.distribution_qty);
+                                                    setIdEdit(e.id);
+                                                    setUnitEdit(e.unit_stock.id);
+                                                }}
+                                            >
+                                                <IconPencil className="ltr:mr-2 rtl:ml-2" />
+                                            </button>
+                                            <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-data-distribusi', e.id)}>
+                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                            </button>
+                                        </div>
+                                    ),
+                                },
+                            ]}
+                            sortStatus={sortStatus}
+                            onSortStatusChange={setSortStatus}
+                            minHeight={200}
+                        />
+                        {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                     </div>
-                    <button type="submit" className="btn btn-outline-primary !mt-6 w-full mb-6">
-                        Tambah
-                    </button>
-                </form>
-                <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5"></div>
-                <h5 className="font-semibold text-lg dark:text-white-light mb-4 mt-4 flex justify-center">Data Distribusi</h5>
-                <div className="datatables">
-                    <DataTable
-                        highlightOnHover
-                        className="whitespace-nowrap table-hover"
-                        records={initialRecords}
-                        columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
-                            {
-                                accessor: 'product.product_barcode',
-                                title: 'Barcode',
-                                sortable: true,
-                            },
-                            {
-                                accessor: 'product.product_name',
-                                title: 'Nama',
-                                sortable: true,
-                            },
-                            { accessor: 'distribution_qty', title: 'Qty', sortable: true },
-                            {
-                                accessor: 'action',
-                                title: 'Opsi',
-                                titleClassName: '!text-center',
-                                render: (e) => (
-                                    <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button" style={{ color: 'orange' }} onClick={() => {}}>
-                                            <IconPencil className="ltr:mr-2 rtl:ml-2" />
-                                        </button>
-                                        <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-data-distribusi', e.id)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button>
-                                    </div>
-                                ),
-                            },
-                        ]}
-                        sortStatus={sortStatus}
-                        onSortStatusChange={setSortStatus}
-                        minHeight={200}
-                    />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

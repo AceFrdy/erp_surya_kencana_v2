@@ -3,7 +3,9 @@ import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
+import { formatPrice } from '../../../../utils';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
+import IconNoImage from '../../../../components/Icon/icon-no-image';
 
 interface DataProps {
     id: number;
@@ -42,6 +44,7 @@ const DetailUangKeluar = () => {
         cash_outflow_name: '',
     });
 
+    // get_data
     useEffect(() => {
         axios
             .get(`https://erp.digitalindustryagency.com/api/cash-outflows/${id}`, {
@@ -52,7 +55,9 @@ const DetailUangKeluar = () => {
             })
             .then((response) => {
                 setData(response.data.data.resource);
-                console.log(response.data.data.resource);
+            })
+            .catch((err: any) => {
+                console.log('ERROR_GETTING_DETAIL:', err.message);
             });
     }, []);
 
@@ -74,41 +79,61 @@ const DetailUangKeluar = () => {
                     <div className="panel" id="single_file">
                         <h1 className="text-lg font-bold mb-12">Detail Uang Keluar</h1>
                         <div className=" mb-5">
-                            <div className="space-y-5">
-                                <div>
-                                    <label htmlFor="gridState">Name</label>
-                                    <input id="gridState" type="text" value={data.cash_outflow_name} disabled placeholder="Index..." className="form-input mb-4" />
+                            <div className="flex w-full sm:flex-row flex-col space-y-5 sm:space-y-0 sm:space-x-5">
+                                <div className="flex flex-col space-y-5 w-full">
+                                    <div>
+                                        <label htmlFor="cash_outflow_name">Nama</label>
+                                        <input id="cash_outflow_name" name="cash_outflow_name" disabled type="text" placeholder="Nama..." className="form-input" value={data.cash_outflow_name} />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="detail_account">Pilih Akun</label>
+                                        <input id="detail_account" name="detail_account" className="form-input" disabled type="text" value={data.detail_account.detail_acc_name} />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="cash_outflow_date">Tanggal</label>
+                                        <input id="cash_outflow_date" name="cash_outflow_date" className="form-input" disabled type="date" value={data.cash_outflow_date} />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label htmlFor="gridState">Akun</label>
-                                    <input id="Cost" type="text" value={data.detail_account.detail_acc_name} disabled placeholder="Index..." className="form-input mb-4" />
+                                <div className="flex flex-col w-full space-y-5">
+                                    <div className="relative">
+                                        <label htmlFor="cash_outflow_total">Cash</label>
+                                        <input
+                                            id="cash_outflow_total"
+                                            name="cash_outflow_total"
+                                            disabled
+                                            type="text"
+                                            placeholder="Cash..."
+                                            className="form-input"
+                                            value={formatPrice(data.cash_outflow_total)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="index_info">Pilih Index</label>
+                                        <input id="index_info" name="index_info" className="form-input" disabled type="text" value={data.index.index_info} />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="cash_outflow_info">Keterangan</label>
+                                        <input id="cash_outflow_info" name="cash_outflow_info" disabled type="text" placeholder="Keterangan..." value={data.cash_outflow_info} className="form-input" />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label htmlFor="Cost">Index</label>
-                                    <input id="Cost" type="text" value={data.index.index_info} disabled placeholder="Index..." className="form-input mb-4" />
+                            </div>
+                            <div className="relative mt-8">
+                                {data.photo_struk && (
+                                    <div className="absolute sm:h-60 h-40 w-full sm:w-60 top-0 overflow-hidden rounded-md">
+                                        <img className="object-cover bg-white" src={data.photo_struk} alt="" />
+                                    </div>
+                                )}
+                                <div className="sm:h-60 h-40 w-full flex items-center bg-zinc-50 justify-center flex-col space-y-2 sm:w-60 top-0 overflow-hidden rounded-md">
+                                    <IconNoImage className="sm:w-16 sm:h-16 w-10 h-10" />
+                                    <p className="font-semibold sm:text-lg text-sm">Image not found.</p>
                                 </div>
-                                <div>
-                                    <label htmlFor="Cost">Cash</label>
-                                    <input id="Cost" type="text" value={data.cash_outflow_total} disabled placeholder="Rp." className="form-input mb-4" />
-                                </div>
-                                <div>
-                                    <label htmlFor="Cost">Keterangan</label>
-                                    <input id="Cost" type="text" value={data.cash_outflow_info} disabled placeholder="Keterangan..." className="form-input mb-4" />
-                                </div>
-                                <div>
-                                    <label htmlFor="tanggal">Tanggal</label>
-                                    <input id="tanggal" type="text" value={data.cash_outflow_date} disabled placeholder="Keterangan..." className="form-input mb-4" />
-                                </div>
-                                <div className="relative">
-                                    <img src={data.photo_struk} alt="" />
-                                </div>
-                                <div className="flex">
-                                    <Link to="/menukeuangan/flowcash/uangkeluar">
-                                        <button type="button" className="btn btn-primary !mt-6">
-                                            Kembali
-                                        </button>
-                                    </Link>
-                                </div>
+                            </div>
+                            <div className="flex">
+                                <Link to="/menukeuangan/flowcash/uangkeluar">
+                                    <button type="button" className="btn btn-primary !mt-6">
+                                        Kembali
+                                    </button>
+                                </Link>
                             </div>
                         </div>
                     </div>

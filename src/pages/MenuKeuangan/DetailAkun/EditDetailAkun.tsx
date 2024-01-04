@@ -1,7 +1,12 @@
-import React, { ChangeEvent, FormEvent, useState, useEffect } from 'react';
-import { useNavigate, Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { useNavigate, Link, useParams } from 'react-router-dom';
+import { ChangeEvent, FormEvent, useState, useEffect } from 'react';
+
+import { setPageTitle } from '../../../store/themeConfigSlice';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface DetailAkunDataProps {
     detail_acc_type: string;
@@ -19,6 +24,7 @@ const typeAccount = ['Asset/Harta', 'Kewajiban/Hutang', 'Modal', 'Pendapatan', '
 
 const EditDetailAkun = () => {
     const { id } = useParams();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') ?? '';
     const [akun, setAkun] = useState<string>('');
@@ -32,6 +38,7 @@ const EditDetailAkun = () => {
         account_id: 0,
     });
 
+    // get account type
     useEffect(() => {
         axios
             .get(`https://erp.digitalindustryagency.com/api/accounts?acc_type=${akun}`, {
@@ -41,15 +48,14 @@ const EditDetailAkun = () => {
                 },
             })
             .then((response) => {
-                // setAccountTypes(response.data.data.resource.data);
                 setAccountTypes(response.data.data.resource.data);
-                console.log(response.data.data.resource);
             })
             .catch((error) => {
-                console.error('Error fetching account types:', error);
+                console.error('ERROR_GETTING_ACCOUNT_TYPE:', error);
             });
     }, [akun]);
 
+    // get_data
     useEffect(() => {
         // Fetch account details from the API
         axios
@@ -63,53 +69,63 @@ const EditDetailAkun = () => {
                 // Assuming response.data is the object with the details
                 const details = response.data.data.resource;
                 setFormData(details);
+                setAkun(details.detail_acc_type);
             })
 
             .catch((error) => {
                 console.error('Error fetching account details:', error);
             });
-    }, [id, token]);
+    }, [id]);
 
-    const handleSubmit = async (event: FormEvent) => {
+    // handle_submit
+    const handleSubmit = (event: FormEvent) => {
         event.preventDefault();
 
-        // Konversi `account_id` ke tipe data number
         const data = {
             detail_acc_type: formData.detail_acc_type,
             detail_acc_name: formData.detail_acc_name,
             detail_acc_info: formData.detail_acc_info,
-            account_id: formData.account_id, // Convert to number if necessary
+            account_id: formData.account_id,
         };
 
-        try {
-            // Sebelum melakukan PUT request di handleSubmit:
-            console.log('Data yang akan dikirim:', data);
-            const response = await axios.put(`https://erp.digitalindustryagency.com/api/detail-accounts/${id}`, data, {
+        axios
+            .put(`https://erp.digitalindustryagency.com/api/detail-accounts/${id}`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
                 },
-            });
+            })
+            .then((response) => {
+                const notification = {
+                    type: 'success',
+                    message: 'Detail Akun Berhasil Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate('/menukeuangan/akun/detailakun');
+            })
+            .catch((err: any) => {
+                // set_old_value
+                const oldValueBefore = {
+                    detail_acc_type: formData.detail_acc_type,
+                    detail_acc_name: formData.detail_acc_name,
+                    detail_acc_info: formData.detail_acc_info,
+                    account_id: formData.account_id,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
 
-            toast.success('Data Berhasil Diedit');
-            navigate('/menukeuangan/akun/detailakun');
-        } catch (error: any) {
-            console.error('Error updating account:', error);
-            toast.error('Gagal Mengedit Data');
-            // Tampilkan pesan error dari response jika ada
-            if (error.response && error.response.data) {
-                const errors = error.response.data.errors;
-                for (const key in errors) {
-                    errors[key].forEach((message: any) => {
-                        toast.error(message);
-                    });
-                }
-            }
-        }
+                // set_notif
+                const notification = {
+                    type: 'error',
+                    message: 'Detail Akun Gagal Ditambahkan',
+                    log: err.message,
+                    title: 'ERROR_EDITING_DETAIL_ACCOUNT',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
+            });
     };
 
-    // Update the state for each input field
+    // handle_change
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -117,6 +133,34 @@ const EditDetailAkun = () => {
             [name]: value,
         }));
     };
+
+    // handle_title
+    useEffect(() => {
+        dispatch(setPageTitle('Tambah Detail Akun'));
+    }, []);
+
+    // get_notif
+    useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+        }
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+            }
+        }
+        return () => {
+            localStorage.removeItem('notification');
+            sessionStorage.removeItem('old_value');
+        };
+    }, []);
 
     return (
         <div>
@@ -140,7 +184,7 @@ const EditDetailAkun = () => {
                         <label htmlFor="gridState">Akun</label>
                         <select
                             id="gridState"
-                            className="form-select text-white-dark"
+                            className="form-select"
                             name="detail_acc_type"
                             value={formData.detail_acc_type}
                             onChange={(e) => {
@@ -158,7 +202,7 @@ const EditDetailAkun = () => {
                     </div>
                     <div>
                         <label htmlFor="gridState">Group:</label>
-                        <select id="gridState" name="account_id" className="form-select text-white-dark" value={formData.account_id} onChange={handleInputChange}>
+                        <select id="gridState" name="account_id" className="form-select" value={formData.account_id} disabled={!akun} required onChange={handleInputChange}>
                             <option value=""> silahkan pilih</option>
                             {accountTypes.map((account) => (
                                 <option key={account.id} value={account.id}>

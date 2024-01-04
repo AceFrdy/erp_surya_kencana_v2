@@ -78,10 +78,11 @@ const Akun = () => {
                 });
             })
             .catch((error: any) => {
-                console.error('Error fetching data:', error);
+                console.error('ERROR_GETTING_ACCOUNT:', error);
             });
     }, [url]);
 
+    // search
     useEffect(() => {
         if (!initialRecords) {
             return;
@@ -98,20 +99,23 @@ const Akun = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search, initialRecords]);
 
+    // sort
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
 
+    // get_notif
     useEffect(() => {
         const notificationMessage = localStorage.getItem('notification');
         if (notificationMessage) {
-            const { type, message } = JSON.parse(notificationMessage);
+            const { title, log, type, message } = JSON.parse(notificationMessage);
             if (type === 'success') {
                 toast.success(message);
             } else if (type === 'error') {
                 toast.error(message);
+                console.log(title, log);
             }
         }
         return localStorage.removeItem('notification');

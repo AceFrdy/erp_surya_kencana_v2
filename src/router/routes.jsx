@@ -375,12 +375,12 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menukeuangan/hutang-piutang/detailpiutang',
+        path: '/menukeuangan/hutang-piutang/detailpiutang/:id',
         element: <DetailPiutang />,
         layout: 'default',
     },
     {
-        path: '/menukeuangan/hutang-piutang/editpiutang',
+        path: '/menukeuangan/hutang-piutang/editpiutang/:id',
         element: <EditPiutang />,
         layout: 'default',
     },
@@ -407,7 +407,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/menuhumanresource/karyawan/editkaryawan',
+        path: '/menuhumanresource/karyawan/editkaryawan/:id',
         element: <EditKaryawan />,
         layout: 'default',
     },
