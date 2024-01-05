@@ -24,6 +24,9 @@ export type ModalType =
     | 'search-product'
     | 'search-cabang'
     | 'search-unit'
+    | 'delete-pay-piutang'
+    | 'delete-piutang'
+    | 'delete-uang-keluar'
     | 'search-product-barcode';
 
 interface DataProps {
@@ -62,7 +65,16 @@ interface ModalStore {
     cabang: CabangProps[];
     unit: UnitProps[];
     setGet: Dispatch<SetStateAction<string>>;
-    onOpen: (type: ModalType, data?: number, branchproduct?: BranchProductProps[], qty?: number, product?: DataProps[], cabang?: CabangProps[], unit?: UnitProps[], setGet?: Dispatch<SetStateAction<string>>) => void;
+    onOpen: (
+        type: ModalType,
+        data?: number,
+        branchproduct?: BranchProductProps[],
+        qty?: number,
+        product?: DataProps[],
+        cabang?: CabangProps[],
+        unit?: UnitProps[],
+        setGet?: Dispatch<SetStateAction<string>>
+    ) => void;
     onClose: () => void;
 }
 
@@ -74,7 +86,7 @@ export const useModal: UseBoundStore<StoreApi<ModalStore>> = create<ModalStore>(
     product: [],
     cabang: [],
     unit: [],
-    branchproduct:[],
+    branchproduct: [],
     setGet: () => {},
     onOpen: (type, data, branchproduct, qty, product, cabang, unit, setGet) => set({ isOpen: true, type, data, branchproduct, qty, product, cabang, unit, setGet }),
     onClose: () => set({ isOpen: false, type: null }),

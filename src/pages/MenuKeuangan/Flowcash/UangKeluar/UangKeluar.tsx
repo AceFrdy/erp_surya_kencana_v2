@@ -1,15 +1,20 @@
 import axios from 'axios';
 import sortBy from 'lodash/sortBy';
+import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 
+import { useModal } from '../../../../hooks/use-modal';
 import Pagination from '../../../../components/Pagination';
 import IconPlus from '../../../../components/Icon/IconPlus';
 import IconNotes from '../../../../components/Icon/IconNotes';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../../utils';
+import IconTrashLines from '../../../../components/Icon/IconTrashLines';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../../utils';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface DataProps {
     id: number;
@@ -20,13 +25,13 @@ interface DataProps {
         index_info: string;
     };
     cash_outflow_date: string;
+    cash_outflow_total: number;
+    cash_outflow_name: string;
 }
 
 const UangKeluar = () => {
+    const { onOpen } = useModal();
     const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(setPageTitle('Uang Keluar'));
-    });
     const [initialRecords, setInitialRecords] = useState<DataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
 
@@ -42,6 +47,7 @@ const UangKeluar = () => {
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
     const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/cash-outflows');
 
+    // get_data
     useEffect(() => {
         axios
             .get(url, {
@@ -52,7 +58,6 @@ const UangKeluar = () => {
             })
             .then((response) => {
                 setInitialRecords(response.data.data.resource.data);
-                console.log(response.data.data.resource.data);
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
@@ -72,6 +77,7 @@ const UangKeluar = () => {
             });
     }, [url]);
 
+    // handle_search
     useEffect(() => {
         if (!initialRecords) {
             return;
@@ -84,11 +90,32 @@ const UangKeluar = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search, initialRecords]);
 
+    // handle_sort
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
+
+    // handle_page_title
+    useEffect(() => {
+        dispatch(setPageTitle('Uang Keluar'));
+    }, []);
+
+    // handle_notif
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+            }
+        }
+        return localStorage.removeItem('notification');
+    }, []);
 
     return (
         <div>
@@ -130,6 +157,13 @@ const UangKeluar = () => {
                                 sortable: true,
                             },
                             { accessor: 'index.index_info', title: 'Index', sortable: true },
+                            { accessor: 'cash_outflow_name', title: 'Name', sortable: true },
+                            {
+                                accessor: 'cash_outflow_total',
+                                title: 'Nominal',
+                                sortable: true,
+                                render: ({ cash_outflow_total }) => formatPrice(cash_outflow_total),
+                            },
                             {
                                 accessor: 'cash_outflow_date',
                                 title: 'Tanggal',
@@ -145,6 +179,9 @@ const UangKeluar = () => {
                                             <Link to={`/menukeuangan/flowcash/detailuangkeluar/${e.id}`}>
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
+                                        </button>
+                                        <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-uang-keluar', e.id)}>
+                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
                                     </div>
                                 ),

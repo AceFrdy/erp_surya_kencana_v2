@@ -1,17 +1,14 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import ImageUploading, { ImageListType } from 'react-images-uploading';
-import { setPageTitle } from '../../../../store/themeConfigSlice';
-// import 'file-upload-with-preview/dist/file-upload-with-preview.min.css';
-import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { IRootState } from '../../../../store';
-import Swal from 'sweetalert2';
-import 'flatpickr/dist/flatpickr.css';
-import Flatpickr from 'react-flatpickr';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+
 import IconTrash from '../../../../components/Icon/IconTrash';
 import IconUpload from '../../../../components/Icon/icon-upload';
+import { setPageTitle } from '../../../../store/themeConfigSlice';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface DataFormProps {
     cash_outflow_date: string;
@@ -57,8 +54,7 @@ const AddUangKeluar = () => {
         cash_outflow_info: '',
     });
 
-    console.log('formData', formData);
-
+    // handle_change
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         e.preventDefault();
         const { value, name, type } = e.target;
@@ -69,11 +65,13 @@ const AddUangKeluar = () => {
         }
     };
 
+    // handle_cancel
     const handleCancel = () => {
         // Instead of using a Link, directly use the navigate function
-        navigate('/menupenjualan/product/produk');
+        navigate('/menukeuangan/flowcash/uangkeluar');
     };
 
+    // handle_submit
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
@@ -95,13 +93,38 @@ const AddUangKeluar = () => {
                 },
             })
             .then((response) => {
-                console.log('SUCCESS_SUBMIT_FORM', response);
+                const notification = {
+                    type: 'success',
+                    message: 'Uang Keluar Berhasil Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate('/menukeuangan/flowcash/uangkeluar');
             })
             .catch((err: any) => {
-                console.log('ERROR_SUBMIT_FORM', err.message);
+                // set_old_value
+                const oldValueBefore = {
+                    cash_outflow_date: formData.cash_outflow_date,
+                    index_id: formData.index_id,
+                    detail_account_id: formData.detail_account_id,
+                    cash_outflow_name: formData.cash_outflow_name,
+                    cash_outflow_total: formData.cash_outflow_total,
+                    cash_outflow_info: formData.cash_outflow_info,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
+                const notification = {
+                    type: 'error',
+                    message: 'Uang Keluar Gagal Ditambahkan',
+                    log: err.message,
+                    title: 'ERROR_ADDING_UANG_KELUAR',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
+    // get_option
     useEffect(() => {
         axios
             .get('https://erp.digitalindustryagency.com/api/cash-outflow-dropdown', {
@@ -117,6 +140,27 @@ const AddUangKeluar = () => {
             .catch((err: any) => {
                 console.log('DETAIL_ACCOUNT_ERROR', err.message);
             });
+    }, []);
+
+    // get_notif
+    useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+
+            return sessionStorage.removeItem('old_value');
+        }
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+
+                return localStorage.removeItem('notification');
+            }
+        }
     }, []);
 
     return (
@@ -138,7 +182,7 @@ const AddUangKeluar = () => {
                         <h1 className="text-lg font-bold mb-12">Add Uang Keluar</h1>
                         <div className=" mb-5">
                             <form className="space-y-5 flex flex-col w-full" onSubmit={handleSubmit}>
-                                <div className="flex w-full space-x-5">
+                                <div className="flex w-full sm:flex-row flex-col space-y-5 sm:space-y-0 sm:space-x-5">
                                     <div className="flex flex-col space-y-5 w-full">
                                         <div>
                                             <label htmlFor="cash_outflow_name">Nama</label>
@@ -169,17 +213,18 @@ const AddUangKeluar = () => {
                                         </div>
                                     </div>
                                     <div className="flex flex-col w-full space-y-5">
-                                        <div>
+                                        <div className="relative">
                                             <label htmlFor="cash_outflow_total">Cash</label>
                                             <input
                                                 id="cash_outflow_total"
                                                 name="cash_outflow_total"
                                                 type="number"
                                                 placeholder="Cash..."
-                                                className="form-input"
+                                                className="form-input pl-10"
                                                 onChange={handleChange}
                                                 value={formData.cash_outflow_total}
                                             />
+                                            <p className="absolute top-9 left-3">Rp.</p>
                                         </div>
                                         <div>
                                             <label htmlFor="index_id">Pilih Index</label>
@@ -210,42 +255,45 @@ const AddUangKeluar = () => {
                                     {file ? (
                                         <div className="group w-60">
                                             <label htmlFor="input-gambar">Gambar Struk</label>
-                                            <div className="h-60 absolute top-[26px] w-60 rounded-md bg-red-100/80 hidden backdrop-blur-sm group-hover:flex justify-center items-center">
-                                                <div className="w-40 h-40  rounded-md flex justify-center items-center border-red-700 border border-dashed">
+                                            <div className="sm:h-60 h-40 absolute top-[26px] w-full sm:w-60 rounded-md bg-red-100/80 hidden backdrop-blur-sm group-hover:flex justify-center items-center">
+                                                <div className="w-20 sm:w-40 h-20 sm:h-40 rounded-md flex justify-center items-center border-red-700 border border-dashed">
                                                     <button
-                                                        className="w-12 h-12 rounded-full bg-red-700 flex justify-center items-center cursor-default hover:bg-red-700/80"
+                                                        className="w-8 sm:w-12 h-8 sm:h-12 rounded-full bg-red-700 flex justify-center items-center cursor-default hover:bg-red-700/80"
                                                         onClick={() => {
                                                             setFile(null);
                                                         }}
                                                     >
-                                                        <IconTrash className="w-6 h-6 text-red-100" />
+                                                        <IconTrash className="w-4 sm:w-6 sm:h-6 h-4 text-red-100" />
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div className="w-60 h-60 top-0 overflow-hidden rounded-md">
+                                            <div className="sm:h-60 h-40 w-full sm:w-60 top-0 overflow-hidden rounded-md">
                                                 <img className="object-cover" src={URL.createObjectURL(file)} alt="" />
                                             </div>
                                         </div>
                                     ) : (
                                         <>
                                             <label htmlFor="input-gambar">Gambar Produk</label>
-                                            <label htmlFor="input-gambar" className="h-60 absolute top-[26px] w-60 rounded-md border flex items-center justify-center hover:bg-blue-50">
-                                                <span className="w-40 h-40 flex justify-center items-center rounded-md border border-dashed border-black">
-                                                    <div className="w-12 h-12 rounded-full bg-black hover:bg-black/80 flex justify-center items-center">
-                                                        <IconUpload className="text-white w-6 h-6" />
+                                            <label
+                                                htmlFor="input-gambar"
+                                                className="sm:h-60 h-40 absolute top-[26px] w-full sm:w-60 rounded-md border flex items-center justify-center hover:bg-blue-50"
+                                            >
+                                                <span className="w-20 sm:w-40 h-20 sm:h-40 flex justify-center items-center rounded-md border border-dashed border-black">
+                                                    <div className="w-8 sm:w-12 h-8 sm:h-12 rounded-full bg-black hover:bg-black/80 flex justify-center items-center">
+                                                        <IconUpload className="text-white w-4 sm:w-6 sm:h-6 h-4" />
                                                     </div>
                                                 </span>
                                             </label>
-                                            <div className="w-60 h-60" />
+                                            <div className="sm:h-60 h-40 w-full sm:w-60" />
                                             <input className="hidden" onChange={onChangeImage} id="input-gambar" type="file" accept="image/*" />
                                         </>
                                     )}
                                 </div>
-                                <div className="mb-5 flex">
+                                <div className="mb-5 flex flex-col sm:flex-row sm:space-x-5 space-y-5 sm:space-y-0">
                                     <button type="submit" className="btn btn-primary !mt-6">
                                         Submit
                                     </button>
-                                    <button className="btn btn-primary !mt-6 ml-6" onClick={handleCancel}>
+                                    <button className="btn btn-primary !mt-6" onClick={handleCancel}>
                                         Cancel
                                     </button>
                                 </div>

@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface AkunDataProps {
     acc_type: string;
@@ -20,30 +22,7 @@ const EditAkun = () => {
         acc_info: '',
     });
 
-    useEffect(() => {
-        axios
-            .get(`https://erp.digitalindustryagency.com/api/accounts/${id}`, {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                const accountData = response.data.data.resource;
-                setFormData((prev) => ({
-                    ...prev,
-                    acc_type: accountData.acc_type,
-                    acc_group_name: accountData.acc_group_name,
-                    acc_info: accountData.acc_info,
-                    // Set data lainnya sesuai dengan respons
-                }));
-            })
-            .catch((error) => {
-                console.error('Error fetching account data:', error);
-            });
-    }, []);
-
-    // Update the state for each input field
+    // handle_change
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -52,6 +31,7 @@ const EditAkun = () => {
         }));
     };
 
+    // handle_submit
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
@@ -77,27 +57,65 @@ const EditAkun = () => {
                 navigate('/menukeuangan/akun/akun');
             })
             .catch((err: any) => {
-                console.error('ERROR_UPDATING_ACCOUNT:', err); // Log error yang terjadi
+                // set_old_value
+                const oldValueBefore = {
+                    acc_type: formData.acc_type,
+                    acc_group_name: formData.acc_group_name,
+                    acc_info: formData.acc_info,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
                 const notification = {
                     type: 'error',
                     message: 'Akun Gagal Diperbarui',
+                    log: err.message,
+                    title: 'ERROR_EDITING_ACCOUNT',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
-                // navigate(0);
+                navigate(0);
             });
     };
 
+    // get_data
     useEffect(() => {
+        axios
+            .get(`https://erp.digitalindustryagency.com/api/accounts/${id}`, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const accountData = response.data.data.resource;
+                setFormData(accountData);
+            })
+            .catch((err: any) => {
+                console.log('ERROR_GETTING_DETAIL:', err.message);
+            });
+    }, []);
+
+    // get_notif
+    useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+        }
         const notificationMessage = localStorage.getItem('notification');
         if (notificationMessage) {
-            const { type, message } = JSON.parse(notificationMessage);
+            const { title, log, type, message } = JSON.parse(notificationMessage);
             if (type === 'success') {
                 toast.success(message);
             } else if (type === 'error') {
                 toast.error(message);
+                console.log(title, log);
             }
         }
-        return localStorage.removeItem('notification');
+        return () => {
+            localStorage.removeItem('notification');
+            sessionStorage.removeItem('old_value');
+        };
     }, []);
 
     return (
@@ -120,7 +138,7 @@ const EditAkun = () => {
                 <form className="space-y-5" onSubmit={handleSubmit}>
                     <div>
                         <label htmlFor="gridState">Jenis Akun</label>
-                        <select id="gridState" name="acc_type" value={formData.acc_type} onChange={handleInputChange} className="form-select text-white-dark">
+                        <select id="gridState" name="acc_type" value={formData.acc_type} onChange={handleInputChange} className="form-select">
                             <option>Modal</option>
                             <option>Choose...</option>
                             <option>Asset/Harta</option>

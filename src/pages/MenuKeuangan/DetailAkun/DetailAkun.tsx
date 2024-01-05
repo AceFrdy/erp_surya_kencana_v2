@@ -1,18 +1,20 @@
 import axios from 'axios';
-import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import IconPencil from '../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
+import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import IconPlus from '../../../components/Icon/IconPlus';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+
 import { useModal } from '../../../hooks/use-modal';
 import Pagination from '../../../components/Pagination';
-import 'react-toastify/dist/ReactToastify.css';
-import { toast } from 'react-toastify';
+import IconPlus from '../../../components/Icon/IconPlus';
+import IconPencil from '../../../components/Icon/IconPencil';
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface DetailAkunProps {
     id: number;
@@ -27,19 +29,15 @@ const DetailAkun = () => {
     const dispatch = useDispatch();
     const token = localStorage.getItem('accessToken') ?? '';
     const { onOpen } = useModal();
-
-    useEffect(() => {
-        dispatch(setPageTitle('Detail Akun'));
-    });
-
-    const [initialRecords, setInitialRecords] = useState<DetailAkunProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
-
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
     });
+
+    // handle_data
+    const [initialRecords, setInitialRecords] = useState<DetailAkunProps[]>([]);
+    const [recordsData, setRecordsData] = useState(initialRecords);
 
     // pagination
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
@@ -47,6 +45,7 @@ const DetailAkun = () => {
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
     const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/detail-accounts');
 
+    // get_data
     useEffect(() => {
         axios
             .get(url, {
@@ -76,10 +75,11 @@ const DetailAkun = () => {
                 });
             })
             .catch((error: any) => {
-                console.error('Error fetching data:', error);
+                console.error('ERROR_GETTING_DATA:', error);
             });
     }, [url]);
 
+    // handle_search
     useEffect(() => {
         if (!initialRecords) {
             return;
@@ -92,20 +92,28 @@ const DetailAkun = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search, initialRecords]);
 
+    // handle_sort
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
 
+    // handle_title
+    useEffect(() => {
+        dispatch(setPageTitle('Detail Akun'));
+    });
+
+    // get_notif
     useEffect(() => {
         const notificationMessage = localStorage.getItem('notification');
         if (notificationMessage) {
-            const { type, message } = JSON.parse(notificationMessage);
+            const { title, log, type, message } = JSON.parse(notificationMessage);
             if (type === 'success') {
                 toast.success(message);
             } else if (type === 'error') {
                 toast.error(message);
+                console.log(title, log);
             }
         }
         return localStorage.removeItem('notification');
@@ -145,9 +153,9 @@ const DetailAkun = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'No', render: (e) => recordsData.indexOf(e) + 1 },
-                            { accessor: 'detail_acc_code', title: 'Detail Kode Akun', sortable: true },
-                            { accessor: 'detail_acc_type', title: 'Detail Type Akun', sortable: true },
-                            { accessor: 'detail_acc_name', title: 'Detail Nama Akun', sortable: true },
+                            { accessor: 'detail_acc_code', title: 'Kode', sortable: true },
+                            { accessor: 'detail_acc_type', title: 'Tipe', sortable: true },
+                            { accessor: 'detail_acc_name', title: 'Nama', sortable: true },
 
                             {
                                 accessor: 'action',

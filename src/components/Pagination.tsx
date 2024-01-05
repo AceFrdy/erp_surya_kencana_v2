@@ -55,7 +55,7 @@ const Pagination = ({ links, metaLink, linksMeta, setUrl }: { metaLink: MetaLink
                 {/* ------------------------------ */}
                 {/* page 1/2 */}
                 {linksMeta.length <= 5 ? (
-                    <div>
+                    <div className="flex gap-x-2">
                         {linksMeta.slice(1, metaLink.last_page + 1).map((item) => (
                             <button
                                 onClick={() => setUrl(item.url)}

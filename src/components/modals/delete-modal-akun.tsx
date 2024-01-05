@@ -1,14 +1,14 @@
-import React, { Fragment } from 'react';
-import { useModal } from '../../hooks/use-modal';
-import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import React, { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Dialog, Transition } from '@headlessui/react';
+
+import { useModal } from '../../hooks/use-modal';
 
 const DeleteAkunModal = () => {
+    const navigate = useNavigate();
     const { isOpen, type, onClose, data } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
-    const navigate = useNavigate();
 
     const isModalOpen = isOpen && type === 'delete-akun';
 
@@ -30,10 +30,12 @@ const DeleteAkunModal = () => {
                 navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE Akun', err);
+                onClose();
                 const notification = {
                     type: 'error',
-                    message: 'Error Gagal Dihapus',
+                    message: 'Akun Gagal Dihapus.',
+                    log: err.message,
+                    title: 'ERROR_DELETING_ACCOUNT',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
