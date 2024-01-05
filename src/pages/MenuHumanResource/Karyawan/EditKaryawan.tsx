@@ -213,7 +213,7 @@ const EditKaryawan = () => {
                                         className="h-10 border rounded-md w-full justify-between px-4 flex items-center"
                                         onClick={(e) => {
                                             e.preventDefault();
-                                            onOpen('search-cabang', undefined, undefined, [], branches, [], setCabang);
+                                            onOpen('search-cabang', undefined, [], undefined, [], branches, [], setCabang);
                                         }}
                                     >
                                         <span>{cabang}</span>
