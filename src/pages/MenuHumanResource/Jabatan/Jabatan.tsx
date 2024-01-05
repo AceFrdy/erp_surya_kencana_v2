@@ -26,9 +26,6 @@ const Jabatan = () => {
     useEffect(() => {
         dispatch(setPageTitle('Uang Masuk'));
     });
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [initialRecords, setInitialRecords] = useState<PrivilagesDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
     const [addPrivilages, setAddPrivilages] = useState(false);
@@ -49,16 +46,6 @@ const Jabatan = () => {
     const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/privilages');
 
     useEffect(() => {
-        setPage(1);
-    }, [pageSize]);
-
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
-
-    useEffect(() => {
         if (!initialRecords) {
             return;
         }
@@ -72,7 +59,6 @@ const Jabatan = () => {
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
     }, [sortStatus]);
 
     const fetchData = () => {
@@ -86,7 +72,7 @@ const Jabatan = () => {
             .then((response) => {
                 const privilages = response.data.data.resource.data;
                 setInitialRecords(privilages);
-
+                setRecordsData(privilages);
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
@@ -111,10 +97,10 @@ const Jabatan = () => {
 
     useEffect(() => {
         fetchData();
-    }, [token]);
+    }, [url, token]);
 
     const [formData, setFormData] = useState({
-        privilage_name: '',
+        privilage_name: '', 
         errors: {},
     });
 
@@ -437,11 +423,9 @@ const Jabatan = () => {
             <div className="panel mt-6">
                 <h1 className="text-lg font-bold flex justify-center">Jabatan</h1>
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    {/* <Link to="/m"> */}
                     <button onClick={() => setAddPrivilages(true)} type="button" className=" px-2 btn btn-outline-info">
                         <IconPlus className="flex mx-2" fill={true} /> Add
                     </button>
-                    {/* </Link> */}
                     <div className="ltr:ml-auto rtl:mr-auto">
                         <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>

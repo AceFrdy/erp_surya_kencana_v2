@@ -4,14 +4,11 @@ import { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import IconPencil from '../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import Dropdown from '../../../components/Dropdown';
 import { IRootState } from '../../../store';
 import IconCaretDown from '../../../components/Icon/IconCaretDown';
 import axios from 'axios';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
-import Pagination from '../../../components/Pagination';
+import { formatPrice } from '../../../utils';
 
 interface BranchDataProps {
     id: number;
@@ -61,11 +58,6 @@ const DetailCabang = () => {
     const [penjualan, setPenjualan] = useState<PenjualanDataProps[]>([]);
     const [stock, setStock] = useState<StockDataProps[]>([]);
     
-    // pagination
-    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
-    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
-    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-
     useEffect(() => {
         axios
             .get('https://erp.digitalindustryagency.com/api/branches', {
@@ -116,10 +108,6 @@ const DetailCabang = () => {
             })
             .then((response) => {
                 setPenjualan(response.data.data.resource);
-                setPenjualan(response.data.data.resource);
-                setMetaLink(response.data.data.meta.link);
-                setMetaLinksLink(response.data.data.meta.links);
-                setLinksLink(response.data.data.links);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -276,7 +264,6 @@ const DetailCabang = () => {
                                     minHeight={200}
                                 />
                             </div>
-                            {/* {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />} */}
                         </Tab.Panel>
                         <Tab.Panel>
                             <div className="grid xl:grid-cols-1 gap-6 grid-cols-1">
@@ -299,27 +286,11 @@ const DetailCabang = () => {
                                             },
                                             { accessor: 'stock_category', title: 'Kategori', sortable: true },
                                             { accessor: 'stock_qty', title: 'Qty', sortable: true },
-                                            // {
-                                            //     accessor: 'action',
-                                            //     title: 'Opsi',
-                                            //     titleClassName: '!text-center',
-                                            //     render: () => (
-                                            //         <div className="flex items-center w-max mx-auto gap-2">
-                                            //             <button type="button" style={{ color: 'orange' }}>
-                                            //                 <IconPencil className="ltr:mr-2 rtl:ml-2" />
-                                            //             </button>
-                                            //             <button type="button" style={{ color: 'red' }}>
-                                            //                 <IconTrashLines className="ltr:mr-2 rtl:ml-2" />
-                                            //             </button>
-                                            //         </div>
-                                            //     ),
-                                            // },
                                         ]}
                                         sortStatus={sortStatus}
                                         onSortStatusChange={setSortStatus}
                                         minHeight={200}
                                     />
-                                    {/* {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />} */}
                                 </div>
                             </div>
                         </Tab.Panel>

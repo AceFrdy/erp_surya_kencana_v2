@@ -36,8 +36,7 @@ const Hutang = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-reports');
-
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/debts');
 
     useEffect(() => {
         if (!initialRecords) {
@@ -74,7 +73,7 @@ const Hutang = () => {
 
     const fetchData = () => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/debts', {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -84,7 +83,6 @@ const Hutang = () => {
                 const debts = response.data.data.resource.data;
                 setInitialRecords(debts);
                 setRecordsData(debts);
-
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
@@ -179,9 +177,6 @@ const Hutang = () => {
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
                                     </div>
                                 ),
                             },
