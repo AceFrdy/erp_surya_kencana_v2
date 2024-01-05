@@ -16,7 +16,7 @@ interface DebtDataProps {
     creditur_name: string;
     debt_balance: number;
     debt_date: string;
-    payment_amount: number;
+    debt_status: string;
 }
 
 const Hutang = () => {
@@ -48,7 +48,7 @@ const Hutang = () => {
                 return (
                     item.id.toString().includes(search.toLowerCase()) ||
                     item.debt_balance.toString().includes(search.toLowerCase()) ||
-                    item.payment_amount.toString().includes(search.toLowerCase()) ||
+                    item.debt_status.toLowerCase().includes(search.toLowerCase()) ||
                     item.creditur_name.toLowerCase().includes(search.toLowerCase()) ||
                     item.debt_date.toLowerCase().includes(search.toLowerCase())
                 );
@@ -156,10 +156,12 @@ const Hutang = () => {
                                 render: ({ debt_date }) => <div>{formatDate(debt_date)}</div>,
                             },
                             {
-                                accessor: 'payment_amount',
-                                title: 'Progress',
+                                accessor: 'debt_status',
+                                title: 'Status',
                                 sortable: true,
-                                render: (e) => formatPrice(e.payment_amount),
+                                render: (rowData) => (
+                                    <span className={`badge whitespace-nowrap ${rowData.debt_status === 'Belum Lunas' ? 'bg-red-500' : 'bg-green-500'}`}>{rowData.debt_status}</span>
+                                ),
                             },
                             {
                                 accessor: 'action',
