@@ -1,7 +1,6 @@
 import React, { useState, Fragment, useEffect, FormEvent, ChangeEvent } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
-import { Pagination } from '@mantine/core';
 import { Link, useNavigate } from 'react-router-dom';
 import IconPlus from '../../../components/Icon/IconPlus';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
@@ -9,6 +8,8 @@ import IconPencil from '../../../components/Icon/IconPencil';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../../store/themeConfigSlice';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+import Pagination from '../../../components/Pagination';
 
 const KategoriProduk = () => {
     const dispatch = useDispatch();
@@ -23,10 +24,15 @@ const KategoriProduk = () => {
     const [editedCategoryId, setEditedCategoryId] = useState<number | null>(null);
     const [deleteCategoryId, setDeleteCategoryId] = useState<number | null>(null);
     const [categories, setCategories] = useState<{ id: number; product_category_name: string }[]>([]);
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/product-categories');
 
     const fetchData = () => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/product-categories', {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -35,6 +41,22 @@ const KategoriProduk = () => {
             .then((response) => {
                 const categories = response.data.data.resource.data;
                 setCategories(categories);
+                // page
+                setMetaLink({
+                    current_page: response.data.data.resource.current_page,
+                    last_page: response.data.data.resource.last_page,
+                    from: response.data.data.resource.from,
+                    to: response.data.data.resource.to,
+                    per_page: response.data.data.resource.per_page,
+                    total: response.data.data.resource.total,
+                });
+                setMetaLinksLink(response.data.data.resource.links);
+                setLinksLink({
+                    first: response.data.data.resource.first_page_url,
+                    last: response.data.data.resource.last_page_url,
+                    next: response.data.data.resource.next_page_url,
+                    prev: response.data.data.resource.prev_page_url,
+                });
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -43,7 +65,7 @@ const KategoriProduk = () => {
 
     useEffect(() => {
         fetchData();
-    }, [token]);
+    }, [url, token]);
 
     const [formData, setFormData] = useState({
         product_category_name: '',
@@ -428,6 +450,7 @@ const KategoriProduk = () => {
                                 })}
                             </tbody>
                         </table>
+                        {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                     </div>
                 </div>
             </div>

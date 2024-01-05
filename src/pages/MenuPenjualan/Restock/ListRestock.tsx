@@ -36,7 +36,6 @@ const ListRestock = () => {
     });
     const [initialRecords, setInitialRecords] = useState<DataInitial[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
-
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',

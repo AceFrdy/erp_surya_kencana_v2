@@ -40,8 +40,7 @@ const Saldo = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-reports');
-
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/saldos');
 
     useEffect(() => {
         if (!initialRecords) {
@@ -65,7 +64,7 @@ const Saldo = () => {
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/saldos', {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -75,7 +74,6 @@ const Saldo = () => {
                 const saldo = response.data.data.resource.data;
                 setRecordsData(saldo);
                 setInitialRecords(saldo);
-
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
@@ -96,7 +94,7 @@ const Saldo = () => {
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, []);
+    }, [url]);
 
     return (
         <div>
@@ -153,14 +151,6 @@ const Saldo = () => {
                                 titleClassName: '!text-center',
                                 render: (e) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
-                                        {/* <button type="button" style={{ color: 'blue' }}>
-                                            <IconNotes className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
-                                        {/* <button type="button" style={{ color: 'orange' }}>
-                                            <Link to="/menukeuangan/akun/editakun">
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button> */}
                                         <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-saldo', e.id)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button>

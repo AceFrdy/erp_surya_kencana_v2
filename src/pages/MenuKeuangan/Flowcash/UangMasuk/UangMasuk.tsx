@@ -43,7 +43,7 @@ const UangMasuk = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-reports');
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/cash-inflows');
 
     useEffect(() => {
         if (!initialRecords) {
@@ -67,7 +67,7 @@ const UangMasuk = () => {
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/cash-inflows', {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -77,7 +77,6 @@ const UangMasuk = () => {
                 const inflows = response.data.data.resource.data;
                 setInitialRecords(inflows);
                 setRecordsData(inflows);
-
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
@@ -98,7 +97,7 @@ const UangMasuk = () => {
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, []);
+    }, [url]);
 
     return (
         <div>
@@ -115,8 +114,6 @@ const UangMasuk = () => {
                     <span> Flow Cash </span>
                 </li>
             </ul>
-            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
-            </div> */}
             <div className="panel mt-6">
                 <h1 className="text-lg font-bold flex justify-center">Data Uang Masuk</h1>
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">

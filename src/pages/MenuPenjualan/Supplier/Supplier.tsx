@@ -35,7 +35,7 @@ const Suplier = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-reports');
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/supliers');
 
     useEffect(() => {
         if (!initialRecords) {
@@ -60,7 +60,7 @@ const Suplier = () => {
     // get supplier
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/supliers', {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -70,7 +70,6 @@ const Suplier = () => {
                 const suplier = response.data.data.resource.data;
                 setInitialRecords(suplier);
                 setRecordsData(suplier);
-
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
@@ -91,7 +90,7 @@ const Suplier = () => {
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, []);
+    }, [url, token]);
 
     return (
         <div>
@@ -134,20 +133,20 @@ const Suplier = () => {
                                 title: 'Address',
                                 sortable: true,
                             },
-                            {
-                                accessor: 'action',
-                                title: 'Opsi',
-                                titleClassName: '!text-center',
-                                render: (row) => (
-                                    <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button" style={{ color: 'orange' }}>
-                                            <Link to={`/menupenjualan/supplier/editsupplier/${row.id}`}>
-                                                <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                            </Link>
-                                        </button>
-                                    </div>
-                                ),
-                            },
+                            // {
+                            //     accessor: 'action',
+                            //     title: 'Opsi',
+                            //     titleClassName: '!text-center',
+                            //     render: (row) => (
+                            //         <div className="flex items-center w-max mx-auto gap-2">
+                            //             <button type="button" style={{ color: 'orange' }}>
+                            //                 <Link to={`/menupenjualan/supplier/editsupplier/${row.id}`}>
+                            //                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                            //                 </Link>
+                            //             </button>
+                            //         </div>
+                            //     ),
+                            // },
                         ]}
                         sortStatus={sortStatus}
                         onSortStatusChange={setSortStatus}
