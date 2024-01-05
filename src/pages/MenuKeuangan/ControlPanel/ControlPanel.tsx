@@ -34,6 +34,8 @@ interface DataProps {
 interface SaldoProps {
     saldo_akhir: number;
     saldo_awal: number;
+    inflow_total: number;
+    outflow_total: number;
 }
 
 const ControlPanel = () => {
@@ -59,6 +61,8 @@ const ControlPanel = () => {
     const [saldo, setSaldo] = useState<SaldoProps>({
         saldo_akhir: 0,
         saldo_awal: 0,
+        inflow_total: 0,
+        outflow_total: 0,
     });
 
     useEffect(() => {
@@ -203,6 +207,9 @@ const ControlPanel = () => {
             })
             .then((response) => {
                 setSaldo(response.data.data.resource);
+            })
+            .catch((err: any) => {
+                console.log('ERROR_GETTING_SALDO:', err.message);
             });
     }, []);
 
@@ -270,12 +277,12 @@ const ControlPanel = () => {
                                 </div>
                                 <div className="panel bg-gray-400">
                                     <div className="text-dark">Pemasukan</div>
-                                    <div className="mt-2 font-semibold text-2xl border-b border-b-gray-800">Rp.6.009.435,-</div>
+                                    <div className="mt-2 font-semibold text-2xl border-b border-b-gray-800">{formatPrice(saldo.inflow_total)}-</div>
                                     <div className="mt-2 font-medium text-lg">Total Saldo Sampai Hari ini</div>
                                 </div>
                                 <div className="panel bg-gray-400 ">
                                     <div className="text-dark">Pengeluaran</div>
-                                    <div className="mt-2 font-semibold text-2xl border-b border-b-gray-800">Rp.4.000,245,-</div>
+                                    <div className="mt-2 font-semibold text-2xl border-b border-b-gray-800">{formatPrice(saldo.outflow_total)}-</div>
                                     <div className="mt-2 font-medium text-lg">Total Saldo Sampai Hari ini</div>
                                 </div>
                             </div>
