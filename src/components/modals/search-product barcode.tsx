@@ -81,7 +81,7 @@ const SearchProductBarcode = () => {
                                                             className="text-zinc-400 hover:text-green-500"
                                                             onClick={(event) => {
                                                                 event.preventDefault();
-                                                                setGet(e.product.product_barcode ?? '');
+                                                                setGet(e.product_barcode ?? '');
                                                                 onClose();
                                                                 setSearch('');
                                                             }}
