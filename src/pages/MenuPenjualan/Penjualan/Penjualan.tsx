@@ -459,7 +459,9 @@ const Penjualan = () => {
                                 className="h-7 w-7 border rounded-md absolute justify-center flex right-1.5 top-[31px] items-center border-green-500"
                                 onClick={(e) => {
                                     e.preventDefault();
+                                    // onOpen('search-product-barcode', undefined, productList, undefined, [], [], [], setProductBarcode);
                                     onOpen('search-product-barcode', undefined, productList, undefined, [], [], [], setProductBarcode);
+
                                 }}
                             >
                                 <IconSearch className="w-4 h-4" />

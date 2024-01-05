@@ -42,7 +42,7 @@ const SearchProductBarcode = () => {
                                         records={
                                             search.length > 0
                                                 ? branchproduct.filter(
-                                                      (item) => item.product_barcode?.toLowerCase().includes(search.toLowerCase()) ?? item.product_name?.toLowerCase().includes(search.toLowerCase())
+                                                      (item) => item.product?.product_barcode?.toLowerCase().includes(search.toLowerCase()) ?? item.product?.product_name?.toLowerCase().includes(search.toLowerCase())
                                                   )
                                                 : branchproduct
                                         }
@@ -56,8 +56,8 @@ const SearchProductBarcode = () => {
                                                         ? branchproduct
                                                               .filter(
                                                                   (item) =>
-                                                                      item.product_barcode?.toLowerCase().includes(search.toLowerCase()) ??
-                                                                      item.product_name?.toLowerCase().includes(search.toLowerCase())
+                                                                      item.product?.product_barcode?.toLowerCase().includes(search.toLowerCase()) ??
+                                                                      item.product?.product_name?.toLowerCase().includes(search.toLowerCase())
                                                               )
                                                               .indexOf(e) + 1
                                                         : branchproduct.indexOf(e) + 1,
@@ -81,7 +81,7 @@ const SearchProductBarcode = () => {
                                                             className="text-zinc-400 hover:text-green-500"
                                                             onClick={(event) => {
                                                                 event.preventDefault();
-                                                                setGet(e.product_barcode ?? '');
+                                                                setGet(e.product?.product_barcode ?? '');
                                                                 onClose();
                                                                 setSearch('');
                                                             }}
