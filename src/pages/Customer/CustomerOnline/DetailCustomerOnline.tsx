@@ -1,61 +1,38 @@
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 
 const DetailCustomerOnline = () => {
     const dispatch = useDispatch();
+    const token = localStorage.getItem('accessToken') ?? '';
+    const { id } = useParams();
     useEffect(() => {
         dispatch(setPageTitle('Detail Customer Online'));
     });
-    const navigate = useNavigate();
-    const token = localStorage.getItem('accessToken') || '';
+    const [name, setName] = useState<string>('');
+    const [contact, setContact] = useState<number>(0);
+    const [address, setAddress] = useState<string>('');
 
-    const [formData, setFormData] = useState({
-        name: '',
-        contact: '',
-        address: '',
-        errors: {},
-    });
-
-    const handleAddData = () => {
-        const data = {
-            name: formData.name,
-            contact: formData.contact,
-            address: formData.address,
-        };
-
+    useEffect(() => {
         axios
-            .post('https://erp.digitalindustryagency.com/api/customers', data, {
+            .get(`https://erp.digitalindustryagency.com/api/users/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {
-                console.log('Customer data successfully added:', response.data);
-                navigate('/customer/online');
-                toast.success('Data berhasil ditambahkan', {
-                    position: 'top-right',
-                    autoClose: 3000,
-                });
+                setName(response.data.data.resource.name);
+                setContact(response.data.data.resource.contact);
+                setAddress(response.data.data.resource.address);
             })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    console.error('Server Response Data:', error.response.data);
-                    // ... your existing error handling code
-                }
-                console.error('Error adding customer data:', error);
-                toast.error('Error adding data');
+            .catch((err: any) => {
+                console.log('GET SALE REPORT', err.message);
             });
-    };
-
-    const handleCancel = () => {
-        navigate('/customer/online');
-    };
+    }, []);
 
     return (
         <div>
@@ -73,21 +50,16 @@ const DetailCustomerOnline = () => {
                 <form className="space-y-5">
                     <h1 className="text-lg font-bold mb-12">Detail Customer</h1>
                     <div>
-                        <input type="text" defaultValue="Trickster" placeholder="Nama Customer" className="form-input" />
+                        <label htmlFor="gridState">Nama</label>
+                        <input className="form-input" value={name} disabled />
                     </div>
                     <div>
-                        <input type="text" defaultValue={+628913834124} placeholder="No. Hp" className="form-input" />
+                        <label htmlFor="gridState">Contact</label>
+                        <input className="form-input" value={contact} disabled />
                     </div>
                     <div>
-                        <input type="text" defaultValue="jalan baru d" placeholder="Alamat" className="form-input" />
-                    </div>
-                    <div className="flex justify-center">
-                        <button type="submit" onClick={handleAddData} className="btn btn-primary !mt-6 mr-8">
-                            <Link to="/customer/online">Back</Link>
-                        </button>
-                        {/* <button type="submit" onClick={handleCancel} className="btn btn-primary !mt-6">
-                            <Link to="/customer/online">Add</Link>
-                        </button> */}
+                        <label htmlFor="gridState">Address</label>
+                        <input className="form-input" value={address} disabled />
                     </div>
                 </form>
             </div>
