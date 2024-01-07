@@ -151,7 +151,7 @@ const routes = [
         layout: 'default',
     },
     {
-        path: '/customer/online/detailcustomeronline',
+        path: '/customer/online/detailcustomeronline/:id',
         element: <DetailCustomerOnline />,
         layout: 'default',
     },
