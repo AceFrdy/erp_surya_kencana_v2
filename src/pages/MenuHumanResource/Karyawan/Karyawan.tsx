@@ -14,6 +14,7 @@ import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { useModal } from '../../../hooks/use-modal';
 
 interface UsersDataProps {
     id: number;
@@ -25,6 +26,7 @@ interface UsersDataProps {
 }
 
 const Karyawan = () => {
+    const { onOpen } = useModal();
     const dispatch = useDispatch();
     const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
@@ -89,7 +91,6 @@ const Karyawan = () => {
             .then((response) => {
                 const users = response.data.data.resource.data;
                 setInitialRecords(users);
-                console.log(response.data.data.resource);
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
@@ -184,7 +185,7 @@ const Karyawan = () => {
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        <button type="button" style={{ color: 'red' }} onClick={() => {}}>
+                                        <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-karyawan', e.id)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                         </button>
                                     </div>

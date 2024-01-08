@@ -27,7 +27,8 @@ export type ModalType =
     | 'delete-pay-piutang'
     | 'delete-piutang'
     | 'delete-uang-keluar'
-    | 'search-product-barcode';
+    | 'search-product-barcode'
+    | 'delete-karyawan';
 
 interface DataProps {
     id?: number;

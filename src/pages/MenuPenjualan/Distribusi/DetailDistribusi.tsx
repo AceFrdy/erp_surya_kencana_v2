@@ -48,7 +48,6 @@ const DetailDistribusi = () => {
             })
             .then((response) => {
                 setInitialRecords(response.data.data.resource.distributions);
-                console.log(response.data.data.resource.distributions);
                 setBranchName(response.data.data.resource.branch.branch_name);
                 setStatusKode(response.data.data.resource.status);
                 setDistribusiCode(response.data.data.resource.distributions[0].distribution_code);

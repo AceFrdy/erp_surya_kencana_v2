@@ -127,7 +127,7 @@ const AddKaryawan = () => {
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/dropDownAddKaryawan', {
+            .get('https://erp.digitalindustryagency.com/api/dropdown-karyawan', {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -168,10 +168,10 @@ const AddKaryawan = () => {
             } else if (type === 'error') {
                 toast.error(message);
                 console.log(title, log);
+                return localStorage.removeItem('notification');
             }
         }
         return () => {
-            localStorage.removeItem('notification');
             sessionStorage.removeItem('old_value');
         };
     }, []);

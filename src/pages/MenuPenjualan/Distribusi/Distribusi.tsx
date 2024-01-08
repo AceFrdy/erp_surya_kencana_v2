@@ -110,7 +110,6 @@ const Distribusi = () => {
                 navigate(0);
             })
             .catch((err: any) => {
-                console.log('error', err);
                 const notification = {
                     type: 'error',
                     message: 'Distribusi Gagal Ditambahkan',
@@ -143,7 +142,6 @@ const Distribusi = () => {
                 navigate(0);
             })
             .catch((err: any) => {
-                console.log('ERROR DISTRIBUSI', err.message);
                 const notification = {
                     type: 'error',
                     message: 'Data Distribusi Gagal Ditambahkan',
@@ -202,7 +200,6 @@ const Distribusi = () => {
                 },
             })
             .then((response) => {
-                console.log(response.data.data.resource.data);
                 setInitialRecords(response.data.data.resource.data);
                 if (response.data.data.resource.data.length >= 1) {
                     setCabangDisabled(true);

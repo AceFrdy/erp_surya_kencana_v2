@@ -1,12 +1,12 @@
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+
 import IconTrash from '../../../components/Icon/IconTrash';
 import IconUpload from '../../../components/Icon/icon-upload';
-import fs from 'fs';
+import { setPageTitle } from '../../../store/themeConfigSlice';
 
 interface FormState {
     product_category_id: number;
@@ -17,7 +17,6 @@ interface FormState {
     product_pos: string;
     product_ecommers: string;
     product_responsibility: string;
-    product_image: File | null;
     product_barcode: string;
     product_ime: string;
     product_weight: number;
@@ -38,13 +37,11 @@ const InputProduk = () => {
     const [supliers, setSupliers] = useState<SupliersList[]>([]);
 
     const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(setPageTitle('Edit Produk'));
-    });
 
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') ?? '';
     const [urlImage, setUrlImage] = useState<string>('');
+    const [fileGambar, setFileGambar] = useState<File | null>(null);
     const { id } = useParams();
 
     const [formData, setFormData] = useState<FormState>({
@@ -56,7 +53,6 @@ const InputProduk = () => {
         product_pos: '',
         product_ecommers: '',
         product_responsibility: '',
-        product_image: null,
         product_barcode: '',
         product_ime: '',
         product_weight: 0,
@@ -64,8 +60,6 @@ const InputProduk = () => {
 
     const onChangeImage = (e: any) => {
         if (e.target.files) {
-            console.log(e.target.value, e.target.files);
-            setFormData({ ...formData, product_image: e.target.files[0] });
         }
     };
 
@@ -79,20 +73,7 @@ const InputProduk = () => {
             })
             .then((response) => {
                 const data = response.data.data.resource;
-                setFormData((prev) => ({
-                    ...prev,
-                    product_category_id: data.product_category_id,
-                    supplier_id: data.suplier_id,
-                    product_name: data.product_name,
-                    product_price: data.product_price,
-                    product_modal: data.product_modal,
-                    product_pos: data.product_pos,
-                    product_ecommers: data.product_ecommers,
-                    product_responsibility: data.product_responsibility,
-                    product_barcode: data.product_barcode,
-                    product_ime: data.product_ime,
-                    product_weight: data.product_weight,
-                }));
+                setFormData(data);
                 setUrlImage(data.product_image);
                 console.log(response.data.data.resource);
             });
@@ -117,86 +98,48 @@ const InputProduk = () => {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-        if (formData.product_image !== null) {
-            const data = {
-                product_category_id: formData.product_category_id,
-                suplier_id: formData.supplier_id,
-                product_name: formData.product_name,
-                product_price: formData.product_price,
-                product_modal: formData.product_modal,
-                product_pos: formData.product_pos,
-                product_ecommers: formData.product_ecommers,
-                product_responsibility: formData.product_responsibility,
-                product_image: formData.product_image,
-                product_barcode: formData.product_barcode,
-                product_ime: formData.product_ime,
-                product_weight: formData.product_weight,
-            };
-            console.log('Data to be sent:', data);
+        const data = {
+            product_category_id: formData.product_category_id,
+            suplier_id: formData.supplier_id,
+            product_name: formData.product_name,
+            product_price: formData.product_price,
+            product_modal: formData.product_modal,
+            product_pos: formData.product_pos,
+            product_ecommers: formData.product_ecommers,
+            product_responsibility: formData.product_responsibility,
+            product_barcode: formData.product_barcode,
+            product_ime: formData.product_ime,
+            product_weight: formData.product_weight,
+        };
+        console.log('Data to be sent:', data);
 
-            await axios
-                .put(`https://erp.digitalindustryagency.com/api/products/${id}`, data, {
-                    headers: {
-                        Accept: 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                .then((response) => {
-                    console.log('Customer data successfully added:', response.data);
-                    navigate('/menupenjualan/product/produk');
-                    toast.success('Data berhasil ditambahkan', {
-                        position: 'top-right',
-                        autoClose: 3000,
-                    });
-                })
-                .catch((error) => {
-                    if (error.response && error.response.data) {
-                        console.error('Server Response Data:', error.response.data);
-                        // ... your existing error handling code
-                    }
-                    console.error('Error adding customer data:', error);
-                    toast.error('Error adding data');
+        await axios
+            .put(`https://erp.digitalindustryagency.com/api/products/${id}`, data, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                console.log('Customer data successfully added:', response.data);
+                navigate('/menupenjualan/product/produk');
+                toast.success('Data berhasil ditambahkan', {
+                    position: 'top-right',
+                    autoClose: 3000,
                 });
-        } else {
-            const data = {
-                product_category_id: formData.product_category_id,
-                suplier_id: formData.supplier_id,
-                product_name: formData.product_name,
-                product_price: formData.product_price,
-                product_modal: formData.product_modal,
-                product_pos: formData.product_pos,
-                product_ecommers: formData.product_ecommers,
-                product_responsibility: formData.product_responsibility,
-                product_barcode: formData.product_barcode,
-                product_ime: formData.product_ime,
-                product_weight: formData.product_weight,
-            };
-            console.log('Data to be sent:', data);
+            })
+            .catch((error) => {
+                if (error.response && error.response.data) {
+                    console.error('Server Response Data:', error.response.data);
+                    // ... your existing error handling code
+                }
+                console.error('Error adding customer data:', error);
+                toast.error('Error adding data');
+            });
+    };
 
-            await axios
-                .put(`https://erp.digitalindustryagency.com/api/products/${id}`, data, {
-                    headers: {
-                        Accept: 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                .then((response) => {
-                    console.log('Customer data successfully added:', response.data);
-                    navigate('/menupenjualan/product/produk');
-                    toast.success('Data berhasil ditambahkan', {
-                        position: 'top-right',
-                        autoClose: 3000,
-                    });
-                })
-                .catch((error) => {
-                    if (error.response && error.response.data) {
-                        console.error('Server Response Data:', error.response.data);
-                        // ... your existing error handling code
-                    }
-                    console.error('Error adding customer data:', error);
-                    toast.error('Error adding data');
-                });
-        }
+    const handleCancel = () => {
+        navigate('/menupenjualan/product/produk');
     };
 
     useEffect(() => {
@@ -218,9 +161,9 @@ const InputProduk = () => {
             });
     }, []);
 
-    const handleCancel = () => {
-        navigate('/menupenjualan/product/produk');
-    };
+    useEffect(() => {
+        dispatch(setPageTitle('Edit Produk'));
+    }, []);
 
     return (
         <div>
@@ -364,7 +307,7 @@ const InputProduk = () => {
                                 <div className="relative">
                                     {urlImage ? (
                                         <>
-                                            {formData.product_image ? (
+                                            {fileGambar ? (
                                                 <div className="group w-60">
                                                     <label>Gambar Produk</label>
                                                     <div className="h-60 absolute top-[26px] w-60 rounded-md bg-red-100/80 hidden backdrop-blur-sm group-hover:flex justify-center items-center">
@@ -372,7 +315,7 @@ const InputProduk = () => {
                                                             <button
                                                                 className="w-12 h-12 rounded-full bg-red-700 flex justify-center items-center cursor-default hover:bg-red-700/80"
                                                                 onClick={() => {
-                                                                    setFormData({ ...formData, product_image: null });
+                                                                    setFileGambar(null);
                                                                 }}
                                                             >
                                                                 <IconTrash className="w-6 h-6 text-red-100" />
@@ -380,7 +323,7 @@ const InputProduk = () => {
                                                         </div>
                                                     </div>
                                                     <div className="w-60 h-60 top-0 overflow-hidden rounded-md">
-                                                        <img className="object-cover" src={formData.product_image ? URL.createObjectURL(formData.product_image) : urlImage} />
+                                                        <img className="object-cover" src={fileGambar ? URL.createObjectURL(fileGambar) : urlImage} />
                                                     </div>
                                                 </div>
                                             ) : (
@@ -398,7 +341,7 @@ const InputProduk = () => {
                                                     </label>
                                                     <input className="hidden" onChange={onChangeImage} id="input-gambar" type="file" accept="image/*" />
                                                     <div className="w-60 h-60 top-0 overflow-hidden rounded-md">
-                                                        <img className="object-cover" src={formData.product_image ? URL.createObjectURL(formData.product_image) : urlImage} />
+                                                        <img className="object-cover" src={fileGambar ? URL.createObjectURL(fileGambar) : urlImage} />
                                                     </div>
                                                 </div>
                                             )}
