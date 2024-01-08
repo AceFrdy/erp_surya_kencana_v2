@@ -8,7 +8,8 @@ import { Link, useParams } from 'react-router-dom';
 import 'flatpickr/dist/flatpickr.css';
 import IconArrowBackward from '../../../../components/Icon/IconArrowBackward';
 import axios from 'axios';
-import { formatPrice } from '../../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../../utils';
+import Pagination from '../../../../components/Pagination';
 
 interface DebtPayDataProps {
     id: number;
@@ -25,9 +26,6 @@ const DetailHutang = () => {
     useEffect(() => {
         dispatch(setPageTitle('Detail Hutang'));
     });
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [initialRecords, setInitialRecords] = useState<DebtPayDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
     const [locationAcc, setLocationAcc] = useState<string>('');
@@ -40,16 +38,11 @@ const DetailHutang = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-
-    useEffect(() => {
-        setPage(1);
-    }, [pageSize]);
-
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>(`https://erp.digitalindustryagency.com/api/debt-pays/${id}`);
 
     useEffect(() => {
         if (!initialRecords) {
@@ -71,17 +64,7 @@ const DetailHutang = () => {
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
     }, [sortStatus]);
-    const formatDate = (date: string | number | Date) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
-        }
-        return '';
-    };
 
     const fetchData = () => {
         axios
@@ -103,7 +86,7 @@ const DetailHutang = () => {
             });
 
         axios
-            .get(`https://erp.digitalindustryagency.com/api/debt-pays/${id}`, {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -111,6 +94,22 @@ const DetailHutang = () => {
             })
             .then((response) => {
                 setInitialRecords(response.data.data.resource.data);
+                // page
+                setMetaLink({
+                    current_page: response.data.data.resource.current_page,
+                    last_page: response.data.data.resource.last_page,
+                    from: response.data.data.resource.from,
+                    to: response.data.data.resource.to,
+                    per_page: response.data.data.resource.per_page,
+                    total: response.data.data.resource.total,
+                });
+                setMetaLinksLink(response.data.data.resource.links);
+                setLinksLink({
+                    first: response.data.data.resource.first_page_url,
+                    last: response.data.data.resource.last_page_url,
+                    next: response.data.data.resource.next_page_url,
+                    prev: response.data.data.resource.prev_page_url,
+                });
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -119,7 +118,7 @@ const DetailHutang = () => {
 
     useEffect(() => {
         fetchData();
-    }, [token]);
+    }, [url, token]);
 
     return (
         <div>
@@ -183,7 +182,7 @@ const DetailHutang = () => {
                         className="whitespace-nowrap table-hover"
                         records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
                             { accessor: 'payment_total', title: 'Bayar', sortable: true, render: (e) => formatPrice(e.payment_total) },
                             {
                                 accessor: 'payment_date',
@@ -192,17 +191,11 @@ const DetailHutang = () => {
                             },
                             { accessor: 'debt_unpaid', title: 'Sisa', sortable: true, render: (e) => formatPrice(e.debt_unpaid) },
                         ]}
-                        totalRecords={initialRecords.length}
-                        recordsPerPage={pageSize}
-                        page={page}
-                        onPageChange={(p) => setPage(p)}
-                        recordsPerPageOptions={PAGE_SIZES}
-                        onRecordsPerPageChange={setPageSize}
                         sortStatus={sortStatus}
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
-                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                     />
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                 </div>
             </div>
         </div>

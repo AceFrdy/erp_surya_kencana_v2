@@ -8,18 +8,20 @@ import { Link } from 'react-router-dom';
 import IconNotes from '../../../components/Icon/IconNotes';
 import Swal from 'sweetalert2';
 import axios from 'axios';
-import { formatPrice } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
+import Pagination from '../../../components/Pagination';
 
 interface PenjualanDataProps {
     id: number;
-    sale_order_invoice: string;
+    sale_report_invoice: string;
+    sale_report_customer: string;
     user: {
         id: number;
         name: string;
     };
     branch: {
         id: number;
-        name: string;
+        branch_name: string;
     };
     sale_report_status: string;
     sale_report_money: number;
@@ -32,9 +34,6 @@ const LaporanPenjualan = () => {
     useEffect(() => {
         dispatch(setPageTitle('Laporan Penjualan'));
     });
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [initialRecords, setInitialRecords] = useState<PenjualanDataProps[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
     const [search, setSearch] = useState('');
@@ -42,16 +41,11 @@ const LaporanPenjualan = () => {
         columnAccessor: 'id',
         direction: 'asc',
     });
-
-    useEffect(() => {
-        setPage(1);
-    }, [pageSize]);
-
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/sale-reports');
 
     useEffect(() => {
         if (!initialRecords) {
@@ -60,24 +54,18 @@ const LaporanPenjualan = () => {
         setRecordsData(() => {
             return initialRecords.filter((item) => {
                 return (
-                    // item.sale_order_invoice.toLowerCase().includes(search.toLowerCase()) ||
-                    item.user.name.toLowerCase().includes(search.toLowerCase())
-                    // item.branch.name.toLowerCase().includes(search.toLowerCase())
+                    item.sale_report_invoice.toLowerCase().includes(search.toLowerCase()) ||
+                    item.sale_report_customer.toLowerCase().includes(search.toLowerCase()) ||
+                    item.sale_report_status.toLowerCase().includes(search.toLowerCase()) ||
+                    item.branch.branch_name.toLowerCase().includes(search.toLowerCase())
                 );
             });
         });
     }, [search, recordsData]);
 
     useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sortStatus]);
-
-    useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/sale-reports', {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -86,11 +74,27 @@ const LaporanPenjualan = () => {
             .then((response) => {
                 const penjualan = response.data.data.resource.data;
                 setInitialRecords(penjualan);
+                // page
+                setMetaLink({
+                    current_page: response.data.data.resource.meta.current_page,
+                    last_page: response.data.data.resource.meta.last_page,
+                    from: response.data.data.resource.meta.from,
+                    to: response.data.data.resource.meta.to,
+                    per_page: response.data.data.resource.meta.per_page,
+                    total: response.data.data.resource.meta.total,
+                });
+                setMetaLinksLink(response.data.data.resource.meta.links);
+                setLinksLink({
+                    first: response.data.data.resource.links.first,
+                    last: response.data.data.resource.links.last,
+                    next: response.data.data.resource.links.next,
+                    prev: response.data.data.resource.links.prev,
+                });
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, []);
+    }, [url, token]);
 
     return (
         <div>
@@ -142,7 +146,9 @@ const LaporanPenjualan = () => {
                                 title: 'Status',
                                 sortable: true,
                                 render: (data) => (
-                                    <span className={`badge whitespace-nowrap ${data.sale_report_status === 'lunas' ? 'bg-primary' : data.sale_report_status === 'hutang' ? 'bg-danger' : 'bg-success'}`}>
+                                    <span
+                                        className={`badge whitespace-nowrap ${data.sale_report_status === 'lunas' ? 'bg-primary' : data.sale_report_status === 'hutang' ? 'bg-danger' : 'bg-success'}`}
+                                    >
                                         {data.sale_report_status}
                                     </span>
                                 ),
@@ -165,17 +171,11 @@ const LaporanPenjualan = () => {
                                 ),
                             },
                         ]}
-                        totalRecords={initialRecords.length}
-                        recordsPerPage={pageSize}
-                        page={page}
-                        onPageChange={(p) => setPage(p)}
-                        recordsPerPageOptions={PAGE_SIZES}
-                        onRecordsPerPageChange={setPageSize}
                         sortStatus={sortStatus}
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
-                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                     />
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                 </div>
             </div>
         </div>

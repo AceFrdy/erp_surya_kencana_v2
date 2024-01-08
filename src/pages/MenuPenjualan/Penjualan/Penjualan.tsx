@@ -113,11 +113,6 @@ const Penjualan = () => {
     const [saleReportId, setSaleReportId] = useState<SaleOrderListProps[]>([]);
     const [changeAmount, setChangeAmount] = useState<number>(0);
 
-    // pagination
-    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
-    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
-    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-
     // unit
     const [unitList, setUnitList] = useState<UnitListProps[]>([]);
     const [unit, setUnit] = useState<string>('-');
@@ -133,6 +128,12 @@ const Penjualan = () => {
 
     // customer
     const [customerList, setCustomerList] = useState<CustomerListProps[]>([]);
+
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/sale-orders');
 
     const [formData, setFormData] = useState<FormState>({
         product_category_id: 0,
@@ -166,7 +167,7 @@ const Penjualan = () => {
 
     const handleGetSaleOrder = () => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/sale-orders', {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -180,6 +181,22 @@ const Penjualan = () => {
                 }
                 setInitialRecords(response.data.data.resource.data_order.data);
                 setGrandTotal(response.data.data.resource.grand_total);
+                // page
+                setMetaLink({
+                    current_page: response.data.data.resource.data_order.meta.current_page,
+                    last_page: response.data.data.resource.data_order.meta.last_page,
+                    from: response.data.data.resource.data_order.meta.from,
+                    to: response.data.data.resource.data_order.meta.to,
+                    per_page: response.data.data.resource.data_order.meta.per_page,
+                    total: response.data.data.resource.data_order.meta.total,
+                });
+                setMetaLinksLink(response.data.data.resource.data_order.meta.links);
+                setLinksLink({
+                    first: response.data.data.resource.data_order.links.first_page_url,
+                    last: response.data.data.resource.data_order.links.last_page_url,
+                    next: response.data.data.resource.data_order.links.next_page_url,
+                    prev: response.data.data.resource.data_order.links.prev_page_url,
+                });
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -227,7 +244,7 @@ const Penjualan = () => {
             .catch((err: any) => {
                 console.log('BRANCH_ERROR', err.message);
             });
-    }, [setCabang, setCabangList, token]);
+    }, [url, setCabang, setCabangList, token]);
 
     const handleGetBarcodeProduct = () => {
         if (!cabang) {
@@ -255,9 +272,7 @@ const Penjualan = () => {
     useEffect(() => {
         handleGetSaleOrder();
         handleGetBarcodeProduct();
-    }, [cabang, token]);
-
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/sale-orders');
+    }, [url, cabang, token]);
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -444,7 +459,9 @@ const Penjualan = () => {
                                 className="h-7 w-7 border rounded-md absolute justify-center flex right-1.5 top-[31px] items-center border-green-500"
                                 onClick={(e) => {
                                     e.preventDefault();
+                                    // onOpen('search-product-barcode', undefined, productList, undefined, [], [], [], setProductBarcode);
                                     onOpen('search-product-barcode', undefined, productList, undefined, [], [], [], setProductBarcode);
+
                                 }}
                             >
                                 <IconSearch className="w-4 h-4" />
@@ -477,60 +494,61 @@ const Penjualan = () => {
 
                 <div className="grid xl:grid-cols-3 gap-6 grid-cols-1 mt-8">
                     <div className="datatables panel xl:col-span-2">
-                        <DataTable
-                            highlightOnHover
-                            className="whitespace-nowrap table-hover"
-                            records={initialRecords}
-                            columns={[
-                                { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
-                                {
-                                    accessor: 'sale_order_invoice',
-                                    title: 'Barcode',
-                                    sortable: true,
-                                },
-                                { accessor: 'product.product_name', title: 'Nama', sortable: true },
-                                { accessor: 'sale_order_qty', title: 'Qty', sortable: true },
-                                {
-                                    accessor: 'sale_order_total',
-                                    title: 'Harga',
-                                    sortable: true,
-                                    render: (e) => formatPrice(e.sale_order_total),
-                                },
-                                {
-                                    accessor: 'sale_order_sub_total',
-                                    title: 'Sub Total',
-                                    sortable: true,
-                                    render: (e) => formatPrice(e.sale_order_sub_total),
-                                },
-                                {
-                                    accessor: 'action',
-                                    title: 'Opsi',
-                                    titleClassName: '!text-center',
-                                    render: (e) => (
-                                        <div className="flex items-center w-max mx-auto gap-2">
-                                            <button type="button" style={{ color: 'orange' }}>
-                                                <Link to={`/menupenjualan/penjualan/editpenjualan/${e.id}`}>
-                                                    <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                                </Link>
-                                            </button>
-                                            <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-data-penjualan', e.id)}>
-                                                <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                            </button>
-                                        </div>
-                                    ),
-                                },
-                            ]}
-                            sortStatus={sortStatus}
-                            onSortStatusChange={setSortStatus}
-                            minHeight={200}
-                        />
-                        <div className="flex w-full mt-8">
-                            <div className="w-full flex">
-                                <p>
-                                    Showing <span>1</span> to <span>10</span> of <span>10</span> entries
-                                </p>
+                        <div>
+                            <DataTable
+                                highlightOnHover
+                                className="whitespace-nowrap table-hover"
+                                records={initialRecords}
+                                columns={[
+                                    { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
+                                    {
+                                        accessor: 'sale_order_invoice',
+                                        title: 'Barcode',
+                                        sortable: true,
+                                    },
+                                    { accessor: 'product.product_name', title: 'Nama', sortable: true },
+                                    { accessor: 'sale_order_qty', title: 'Qty', sortable: true },
+                                    {
+                                        accessor: 'sale_order_total',
+                                        title: 'Harga',
+                                        sortable: true,
+                                        render: (e) => formatPrice(e.sale_order_total),
+                                    },
+                                    {
+                                        accessor: 'sale_order_sub_total',
+                                        title: 'Sub Total',
+                                        sortable: true,
+                                        render: (e) => formatPrice(e.sale_order_sub_total),
+                                    },
+                                    {
+                                        accessor: 'action',
+                                        title: 'Opsi',
+                                        titleClassName: '!text-center',
+                                        render: (e) => (
+                                            <div className="flex items-center w-max mx-auto gap-2">
+                                                <button type="button" style={{ color: 'orange' }}>
+                                                    <Link to={`/menupenjualan/penjualan/editpenjualan/${e.id}`}>
+                                                        <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                                    </Link>
+                                                </button>
+                                                <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-data-penjualan', e.id)}>
+                                                    <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                                </button>
+                                            </div>
+                                        ),
+                                    },
+                                ]}
+                                sortStatus={sortStatus}
+                                onSortStatusChange={setSortStatus}
+                                minHeight={200}
+                            />
+                            <div className="flex w-full mt-8">
+                                <div className="w-full flex">
+                                    <p className="w-full flex">
+                                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                                    </p>
+                                </div>
                             </div>
-                            {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                         </div>
                     </div>
                     <form className="space-y-5 panel xl:col-span-1" onSubmit={handleSubmitPayment}>

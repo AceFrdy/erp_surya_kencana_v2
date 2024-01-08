@@ -60,7 +60,7 @@ interface ModalStore {
     type: ModalType | null;
     isOpen: boolean;
     data: number;
-    branchproduct: DataProps[];
+    branchproduct: BranchProductProps[];
     qty: number;
     product: DataProps[];
     cabang: CabangProps[];

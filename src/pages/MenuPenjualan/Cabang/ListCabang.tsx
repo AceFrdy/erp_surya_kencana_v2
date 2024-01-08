@@ -33,7 +33,6 @@ const ListCabang = () => {
         direction: 'asc',
     });
     const [branch, setBranch] = useState([]);
-    const [branchDisabled, setBranchDisabled] = useState<boolean>(false);
     const { onOpen } = useModal();
 
     // pagination
@@ -71,19 +70,27 @@ const ListCabang = () => {
                 setInitialRecords(response.data.data.resource.data);
                 setBranch(branch);
                 setRecordsData(branch);
-                if (response.data.data.resource.data.length >= 1) {
-                    setBranchDisabled(true);
-                    // page
-                    setMetaLink(response.data.data.resource);
-                    setMetaLinksLink(response.data.data.resource.links);
-                    setLinksLink(response.data.data.resource.links);
-                    setBranch(response.data.data.resource.data[0].branch_name);
-                }
+                // page
+                setMetaLink({
+                    current_page: response.data.data.resource.current_page,
+                    last_page: response.data.data.resource.last_page,
+                    from: response.data.data.resource.from,
+                    to: response.data.data.resource.to,
+                    per_page: response.data.data.resource.per_page,
+                    total: response.data.data.resource.total,
+                });
+                setMetaLinksLink(response.data.data.resource.links);
+                setLinksLink({
+                    first: response.data.data.resource.first_page_url,
+                    last: response.data.data.resource.last_page_url,
+                    next: response.data.data.resource.next_page_url,
+                    prev: response.data.data.resource.prev_page_url,
+                });
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, []);
+    }, [url]);
 
     return (
         <div>

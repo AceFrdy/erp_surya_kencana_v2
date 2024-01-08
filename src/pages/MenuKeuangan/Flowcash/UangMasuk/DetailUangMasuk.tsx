@@ -17,8 +17,6 @@ const DetailUangMasuk = () => {
     const [cashInflowInfo, setCashInflowInfo] = useState<string>('');
     const [cashInflowIndexInfo, setCashInflowIndexInfo] = useState<string>('');
     const [cashInflowDetailAccount, setCashInflowDetailAccount] = useState<string>('');
-
-
     const [url, setUrl] = useState<string>(`https://erp.digitalindustryagency.com/api/cash-inflows/${id}`);
 
     useEffect(() => {
@@ -39,7 +37,7 @@ const DetailUangMasuk = () => {
             .catch((err: any) => {
                 console.log('GET SALE REPORT', err.message);
             });
-    }, []);
+    }, [url]);
 
     return (
         <div>

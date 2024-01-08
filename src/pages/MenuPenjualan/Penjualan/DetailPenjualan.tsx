@@ -3,46 +3,22 @@ import { useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
-import IconPencil from '../../../components/Icon/IconPencil';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link, useParams } from 'react-router-dom';
 import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
 import axios from 'axios';
 import { formatPrice } from '../../../utils';
 import { useModal } from '../../../hooks/use-modal';
-import Pagination from '../../../components/Pagination';
 
 interface DetailPenjualan {
     id: number;
-    sale_report_invoice: string;
+    sale_order_invoice: string;
     sale_order_qty: number;
     product: {
         product_name: string;
     };
     sale_order_total: number;
     sale_order_sub_total: number;
-}
-
-interface MetaLinkProps {
-    current_page: number;
-    last_page: number;
-    from: number;
-    to: number;
-    per_page: number;
-    total: number;
-}
-
-interface MetaLinksLinkProps {
-    active: boolean;
-    label: string;
-    url: string;
-}
-
-interface LinksLinkProps {
-    first: string;
-    last: string;
-    next: string;
-    prev: string;
 }
 
 const DetailPenjualan = () => {
@@ -52,9 +28,6 @@ const DetailPenjualan = () => {
     useEffect(() => {
         dispatch(setPageTitle('Detail Penjualan'));
     });
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [initialRecords, setInitialRecords] = useState<DetailPenjualan[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
     const [customer, setCustomer] = useState<string>('');
@@ -68,89 +41,43 @@ const DetailPenjualan = () => {
         direction: 'asc',
     });
     const { id } = useParams();
-    // pagination
-    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
-    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
-    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>(`https://erp.digitalindustryagency.com/api/sale-reports/${id}`);
 
     useEffect(() => {
-        setPage(1);
-    }, [pageSize]);
+        if (!initialRecords) {
+            return;
+        }
 
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
-
-    useEffect(() => {
-        setInitialRecords(() => {
+        setRecordsData(() => {
             return initialRecords.filter((item) => {
                 return (
-                    // item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    // item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    // item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.product.product_name.toLowerCase().includes(search.toLowerCase())
+                    item.sale_order_invoice.toLowerCase().includes(search.toLowerCase()) ||
+                    item.product?.product_name.toLowerCase().includes(search.toLowerCase())
                 );
             });
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search]);
+    }, [search, initialRecords]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
-    const formatDate = (date: string | number | Date) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
-        }
-        return '';
-    };
-
-    const [cost, setCost] = useState('');
-
-    const handleCostChange = (e: { target: { value: any } }) => {
-        const inputValue = e.target.value;
-        let formatValue = '';
-
-        // Remove non-numeric characters
-        const numValue = inputValue.replace(/\D/g, '');
-
-        // Format the number with 'Rp.' prefix
-        if (numValue !== '') {
-            formatValue = `Rp. ${parseInt(numValue, 10).toLocaleString('id-ID')}`;
-        }
-
-        setCost(formatValue);
-    };
 
     useEffect(() => {
         axios
-            .get(url, {
+            .get(`https://erp.digitalindustryagency.com/api/sale-reports/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {
+                setRecordsData(response.data.data.resource.sale_order);
                 setInitialRecords(response.data.data.resource.sale_order);
                 setCustomer(response.data.data.resource.sale_report_customer);
                 setBranch(response.data.data.resource.branch.branch_name);
                 setGrandTotal(response.data.data.resource.sale_report_grand_total);
                 setCash(response.data.data.resource.sale_report_money);
                 setDebt(response.data.data.resource.sale_report_change_money);
-
-                // page
-                setMetaLink(response.data.data.resource.meta);
-                setMetaLinksLink(response.data.data.resource.meta.links);
-                setLinksLink(response.data.data.resource.links);
             })
             .catch((err: any) => {
                 console.log('GET SALE REPORT', err.message);
@@ -238,18 +165,10 @@ const DetailPenjualan = () => {
                                     ),
                                 },
                             ]}
-                            totalRecords={initialRecords.length}
-                            recordsPerPage={pageSize}
-                            page={page}
-                            onPageChange={(p) => setPage(p)}
-                            recordsPerPageOptions={PAGE_SIZES}
-                            onRecordsPerPageChange={setPageSize}
                             sortStatus={sortStatus}
                             onSortStatusChange={setSortStatus}
                             minHeight={200}
-                            paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                         />
-                        {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                     </div>
                     <form className="space-y-5 panel xl:col-span-1">
                         <h1 className="font-semibold text-xl dark:text-white-light mb-2 justify-center flex">Penjualan</h1>

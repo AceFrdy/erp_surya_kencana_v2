@@ -16,7 +16,7 @@ interface DebtDataProps {
     creditur_name: string;
     debt_balance: number;
     debt_date: string;
-    payment_amount: number;
+    debt_status: string;
 }
 
 const Hutang = () => {
@@ -36,8 +36,7 @@ const Hutang = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-reports');
-
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/debts');
 
     useEffect(() => {
         if (!initialRecords) {
@@ -49,7 +48,7 @@ const Hutang = () => {
                 return (
                     item.id.toString().includes(search.toLowerCase()) ||
                     item.debt_balance.toString().includes(search.toLowerCase()) ||
-                    item.payment_amount.toString().includes(search.toLowerCase()) ||
+                    item.debt_status.toLowerCase().includes(search.toLowerCase()) ||
                     item.creditur_name.toLowerCase().includes(search.toLowerCase()) ||
                     item.debt_date.toLowerCase().includes(search.toLowerCase())
                 );
@@ -74,7 +73,7 @@ const Hutang = () => {
 
     const fetchData = () => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/debts', {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -84,7 +83,6 @@ const Hutang = () => {
                 const debts = response.data.data.resource.data;
                 setInitialRecords(debts);
                 setRecordsData(debts);
-
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
@@ -158,10 +156,12 @@ const Hutang = () => {
                                 render: ({ debt_date }) => <div>{formatDate(debt_date)}</div>,
                             },
                             {
-                                accessor: 'payment_amount',
-                                title: 'Progress',
+                                accessor: 'debt_status',
+                                title: 'Status',
                                 sortable: true,
-                                render: (e) => formatPrice(e.payment_amount),
+                                render: (rowData) => (
+                                    <span className={`badge whitespace-nowrap ${rowData.debt_status === 'Belum Lunas' ? 'bg-red-500' : 'bg-green-500'}`}>{rowData.debt_status}</span>
+                                ),
                             },
                             {
                                 accessor: 'action',
@@ -179,9 +179,6 @@ const Hutang = () => {
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
                                     </div>
                                 ),
                             },
