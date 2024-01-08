@@ -1,6 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 const plugin = require('tailwindcss/plugin');
-const rotateX = plugin(function ({ addUtilities }) {
+const rotateX = plugin(function ({
+    addUtilities
+}) {
     addUtilities({
         '.rotate-y-180': {
             transform: 'rotateY(180deg)',
@@ -8,7 +10,7 @@ const rotateX = plugin(function ({ addUtilities }) {
     });
 });
 module.exports = {
-    content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+    content: ['./index.html', './src/**/*.{js,ts,tsx}'],
     darkMode: 'class',
     theme: {
         container: {
@@ -71,20 +73,52 @@ module.exports = {
             boxShadow: {
                 '3xl': '0 2px 2px rgb(224 230 237 / 46%), 1px 6px 7px rgb(224 230 237 / 46%)',
             },
-            typography: ({ theme }) => ({
+            typography: ({
+                theme
+            }) => ({
                 DEFAULT: {
                     css: {
                         '--tw-prose-invert-headings': theme('colors.white.dark'),
                         '--tw-prose-invert-links': theme('colors.white.dark'),
-                        h1: { fontSize: '40px', marginBottom: '0.5rem', marginTop: 0 },
-                        h2: { fontSize: '32px', marginBottom: '0.5rem', marginTop: 0 },
-                        h3: { fontSize: '28px', marginBottom: '0.5rem', marginTop: 0 },
-                        h4: { fontSize: '24px', marginBottom: '0.5rem', marginTop: 0 },
-                        h5: { fontSize: '20px', marginBottom: '0.5rem', marginTop: 0 },
-                        h6: { fontSize: '16px', marginBottom: '0.5rem', marginTop: 0 },
-                        p: { marginBottom: '0.5rem' },
-                        li: { margin: 0 },
-                        img: { margin: 0 },
+                        h1: {
+                            fontSize: '40px',
+                            marginBottom: '0.5rem',
+                            marginTop: 0
+                        },
+                        h2: {
+                            fontSize: '32px',
+                            marginBottom: '0.5rem',
+                            marginTop: 0
+                        },
+                        h3: {
+                            fontSize: '28px',
+                            marginBottom: '0.5rem',
+                            marginTop: 0
+                        },
+                        h4: {
+                            fontSize: '24px',
+                            marginBottom: '0.5rem',
+                            marginTop: 0
+                        },
+                        h5: {
+                            fontSize: '20px',
+                            marginBottom: '0.5rem',
+                            marginTop: 0
+                        },
+                        h6: {
+                            fontSize: '16px',
+                            marginBottom: '0.5rem',
+                            marginTop: 0
+                        },
+                        p: {
+                            marginBottom: '0.5rem'
+                        },
+                        li: {
+                            margin: 0
+                        },
+                        img: {
+                            margin: 0
+                        },
                     },
                 },
             }),

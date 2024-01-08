@@ -7,9 +7,32 @@ import { toast } from 'react-toastify';
 import IconTrash from '../../../components/Icon/IconTrash';
 import IconUpload from '../../../components/Icon/icon-upload';
 
+interface CategoriesProps {
+    id: number;
+    product_category_name: string;
+}
+
+interface SuplierProps {
+    id: number;
+    suplier_name: string;
+}
+
+interface DataProps {
+    product_category_id: number;
+    supplier_id: number;
+    product_name: string;
+    product_price: number;
+    product_modal: number;
+    product_pos: boolean;
+    product_ecommers: boolean;
+    product_responsibility: string;
+    product_barcode: string;
+    product_ime: string;
+    product_weight: number;
+}
 const InputProduk = () => {
-    const [categoriesProduct, setCategoriesProduct] = useState([]);
-    const [supliers, setSupliers] = useState([]);
+    const [categoriesProduct, setCategoriesProduct] = useState<CategoriesProps[]>([]);
+    const [supliers, setSupliers] = useState<SuplierProps[]>([]);
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -18,34 +41,46 @@ const InputProduk = () => {
 
     const navigate = useNavigate();
     const token = localStorage.getItem('accessToken') ?? '';
-    const [file, setFile] = useState(null);
+    const [file, setFile] = useState<File | null>(null);
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<DataProps>({
         product_category_id: 0,
         supplier_id: 0,
         product_name: '',
         product_price: 0,
         product_modal: 0,
-        product_pos: '',
-        product_ecommers: '',
+        product_pos: false,
+        product_ecommers: false,
         product_responsibility: '',
         product_barcode: '',
         product_ime: '',
         product_weight: 0,
     });
 
-    const onChangeImage = (e) => {
+    const onChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             setFile(e.target.files[0]);
         }
     };
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
+    const handleChangeRadio = (e: ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
+
+        const { name, type, checked } = e.target;
         if (type === 'checkbox') {
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: checked,
+            }));
+        }
+    };
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+        if (type === 'number') {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: parseFloat(value),
             }));
         } else {
             setFormData((prevData) => ({
@@ -55,13 +90,13 @@ const InputProduk = () => {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         const data = new FormData();
         data.append('product_name', formData.product_name);
-        data.append('product_price', formData.product_price);
-        data.append('product_category_id', formData.product_category_id);
-        data.append('product_modal', formData.product_modal);
+        data.append('product_price', formData.product_price.toString());
+        data.append('product_category_id', formData.product_category_id.toString());
+        data.append('product_modal', formData.product_modal.toString());
         data.append('product_responsibility', formData.product_responsibility);
 
         if (file) {
@@ -72,8 +107,8 @@ const InputProduk = () => {
         data.append('product_ecommers', formData.product_ecommers ? 'yes' : 'no');
         data.append('product_barcode', formData.product_barcode);
         data.append('product_ime', formData.product_ime);
-        data.append('product_weight', formData.product_weight);
-        data.append('suplier_id', formData.supplier_id);
+        data.append('product_weight', formData.product_weight.toString());
+        data.append('suplier_id', formData.supplier_id.toString());
 
         axios
             .post('https://erp.digitalindustryagency.com/api/products', data, {
@@ -84,7 +119,7 @@ const InputProduk = () => {
             })
             .then((response) => {
                 console.log('Customer data successfully added:', response.data);
-                navigate('/menupenjualan/product/produk');
+                // navigate('/menupenjualan/product/produk');
                 toast.success('Data berhasil ditambahkan', {
                     position: 'top-right',
                     autoClose: 3000,
@@ -253,14 +288,14 @@ const InputProduk = () => {
                                 </div>
                                 <div>
                                     <label className="flex items-center mt-1 cursor-pointer">
-                                        <input type="checkbox" className="form-checkbox" name="product_pos" checked={formData.product_pos} onChange={handleChange} />
+                                        <input type="checkbox" className="form-checkbox" name="product_pos" checked={formData.product_pos} onChange={handleChangeRadio} />
 
                                         <span className="text-white-dark">POS</span>
                                     </label>
                                 </div>
                                 <div>
                                     <label className="flex items-center mt-1 cursor-pointer">
-                                        <input type="checkbox" className="form-checkbox" name="product_ecommers" checked={formData.product_ecommers} onChange={handleChange} />
+                                        <input type="checkbox" className="form-checkbox" name="product_ecommers" checked={formData.product_ecommers} onChange={handleChangeRadio} />
                                         <span className="text-white-dark">E-Commerce</span>
                                     </label>
                                 </div>
@@ -273,7 +308,7 @@ const InputProduk = () => {
                                                     <button
                                                         className="w-12 h-12 rounded-full bg-red-700 flex justify-center items-center cursor-default hover:bg-red-700/80"
                                                         onClick={() => {
-                                                            setFormData({ ...formData, product_image: null });
+                                                            setFile(null);
                                                         }}
                                                     >
                                                         <IconTrash className="w-6 h-6 text-red-100" />

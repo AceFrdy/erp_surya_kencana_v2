@@ -18,6 +18,8 @@ interface DetailProps {
     privilage_id: number;
     username: string;
     name: string;
+    password: string;
+    password_confirmation: string;
 }
 
 interface BranchProps {
@@ -47,6 +49,8 @@ const EditKaryawan = () => {
         privilage_id: 0,
         username: '',
         name: '',
+        password: '',
+        password_confirmation: '',
     });
 
     const handleCancel = () => {
@@ -75,6 +79,8 @@ const EditKaryawan = () => {
             contact: formData.contact,
             address: formData.address,
             branch_id: branches.find((item) => item.branch_name === cabang)?.id,
+            password: formData.password,
+            password_confirmation: formData.password_confirmation,
         };
 
         axios
@@ -91,7 +97,6 @@ const EditKaryawan = () => {
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate('/menuhumanresource/karyawan');
-                console.log(response);
             })
             .catch((err: any) => {
                 console.log(err);
@@ -119,13 +124,13 @@ const EditKaryawan = () => {
                 setCabang(response.data.data.resource.branch.branch_name);
             })
             .catch((err: any) => {
-                console.log(err.message);
+                console.log('ERROR_GETTING_DATA', err.message);
             });
     }, []);
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/dropDownAddKaryawan', {
+            .get('https://erp.digitalindustryagency.com/api/dropdown-karyawan', {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -133,6 +138,9 @@ const EditKaryawan = () => {
             })
             .then((response) => {
                 setPrevilages(response.data.data.resource);
+            })
+            .catch((err: any) => {
+                console.log('ERROR_GETTING_DROPDOWN', err.message);
             });
         axios
             .get('https://erp.digitalindustryagency.com/api/branches', {
@@ -143,6 +151,9 @@ const EditKaryawan = () => {
             })
             .then((response) => {
                 setBranches(response.data.data.resource.data);
+            })
+            .catch((err: any) => {
+                console.log('ERROR_GETTING_BRANCHES', err.message);
             });
     }, []);
 
@@ -160,10 +171,10 @@ const EditKaryawan = () => {
             } else if (type === 'error') {
                 toast.error(message);
                 console.log(title, log);
+                return localStorage.removeItem('notification');
             }
         }
         return () => {
-            localStorage.removeItem('notification');
             sessionStorage.removeItem('old_value');
         };
     }, []);
@@ -235,24 +246,24 @@ const EditKaryawan = () => {
                                 <label htmlFor="address">Address</label>
                                 <input id="address" name="address" type="text" placeholder="Enter Address" className="form-input" onChange={handleChange} value={formData.address} />
                             </div>
-                            {/* <div className=" grid grid-cols-2 gap-4">
-                                <div>
+                            <div className="flex space-x-5">
+                                <div className="w-full">
                                     <label htmlFor="password">Password</label>
-                                    <input id="password" name="password" type="password" placeholder="Enter Password *" className="form-input" onChange={handleChange} value={formData.password} />
+                                    <input id="password" name="password" type="password" placeholder="****" className="form-input" onChange={handleChange} value={formData.password} />
                                 </div>
-                                <div>
-                                    <label htmlFor="confirmPassword">Confirm Password</label>
+                                <div className="w-full">
+                                    <label htmlFor="password_confirmation">Confirm Password</label>
                                     <input
-                                        id="confirmPassword"
-                                        name="confirmPassword"
+                                        id="password_confirmation"
+                                        name="password_confirmation"
                                         type="password"
-                                        placeholder="Enter Confirm Password *"
+                                        placeholder="****"
                                         className="form-input"
                                         onChange={handleChange}
-                                        value={formData.confirmPassword}
+                                        value={formData.password_confirmation}
                                     />
                                 </div>
-                            </div> */}
+                            </div>
                             <div className="!mt-2">
                                 <span className="text-white-dark text-[11px] inline-block">*Required Fields</span>
                             </div>
