@@ -1,25 +1,32 @@
-import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState, Fragment } from 'react';
-import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-// import IconBell from '../../../components/Icon/IconBell';
-// import IconXCircle from '../../../components/Icon/IconXCircle';
-import IconPencil from '../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
-// import { Dialog, Transition } from '@headlessui/react';
-import IconPlus from '../../../components/Icon/IconPlus';
 import axios from 'axios';
-import { formatPrice } from '../../../utils';
+import sortBy from 'lodash/sortBy';
+import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState, Fragment } from 'react';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
 import { useModal } from '../../../hooks/use-modal';
+import IconPlus from '../../../components/Icon/IconPlus';
+import IconPencil from '../../../components/Icon/IconPencil';
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import IconTrashLines from '../../../components/Icon/IconTrashLines';
+
+import 'react-toastify/dist/ReactToastify.css';
+import Pagination from '../../../components/Pagination';
+
+interface StockProps {
+    branch_id: number;
+    stock_qty: number;
+}
 
 interface ProductList {
     id: number;
     product_image: string;
     product_barcode: string;
     product_name: string;
-    product_stock: number;
+    product_stock: StockProps[];
     product_price: number;
 }
 
@@ -29,9 +36,6 @@ const Produk = () => {
     useEffect(() => {
         dispatch(setPageTitle('Produk'));
     });
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
     const [initialRecords, setInitialRecords] = useState<ProductList[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
 
@@ -43,38 +47,33 @@ const Produk = () => {
     const { onOpen } = useModal();
 
     useEffect(() => {
-        setPage(1);
-    }, [pageSize]);
-
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
-
-    useEffect(() => {
         if (!initialRecords) {
             return;
         }
         setRecordsData(() => {
             return initialRecords.filter((item) => {
-                return item.product_name.toLowerCase().includes(search.toLowerCase());
+                return item.product_name.toLowerCase().includes(search.toLowerCase()) || item.product_barcode.toLowerCase().includes(search.toLowerCase());
             });
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, initialRecords]);
+    }, [search, recordsData]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
+
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/products');
 
     // get produk
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/products', {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -83,11 +82,27 @@ const Produk = () => {
             .then((response) => {
                 const product = response.data.data.resource.data;
                 setInitialRecords(product);
-                console.log(product);
+                setMetaLink(response.data.data.resource.meta);
+                setMetaLinksLink(response.data.data.resource.meta.links);
+                setLinksLink(response.data.data.resource.links);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
+    }, [url]);
+
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+            }
+        }
+        return localStorage.removeItem('notification');
     }, []);
 
     return (
@@ -123,9 +138,9 @@ const Produk = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={initialRecords}
+                        records={recordsData}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
                             {
                                 accessor: 'product_image',
                                 title: 'Foto',
@@ -145,6 +160,12 @@ const Produk = () => {
                                 accessor: 'product_name',
                                 title: 'Nama',
                                 sortable: true,
+                            },
+                            {
+                                accessor: 'product_stock',
+                                title: 'Stok',
+                                sortable: true,
+                                render: (e) => (e.product_stock.find((item) => item.branch_id === 1)?.stock_qty ? e.product_stock.find((item) => item.branch_id === 1)?.stock_qty : '-'),
                             },
                             {
                                 accessor: 'product_price',
@@ -175,6 +196,7 @@ const Produk = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
                 </div>
             </div>
         </div>
