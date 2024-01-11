@@ -1,11 +1,14 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+
+import { setPageTitle } from '../../../store/themeConfigSlice';
 import IconTrash from '../../../components/Icon/IconTrash';
 import IconUpload from '../../../components/Icon/icon-upload';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface CategoriesProps {
     id: number;
@@ -19,7 +22,7 @@ interface SuplierProps {
 
 interface DataProps {
     product_category_id: number;
-    supplier_id: number;
+    suplier_id: number;
     product_name: string;
     product_price: number;
     product_modal: number;
@@ -30,6 +33,7 @@ interface DataProps {
     product_ime: string;
     product_weight: number;
 }
+
 const InputProduk = () => {
     const [categoriesProduct, setCategoriesProduct] = useState<CategoriesProps[]>([]);
     const [supliers, setSupliers] = useState<SuplierProps[]>([]);
@@ -45,7 +49,7 @@ const InputProduk = () => {
 
     const [formData, setFormData] = useState<DataProps>({
         product_category_id: 0,
-        supplier_id: 0,
+        suplier_id: 0,
         product_name: '',
         product_price: 0,
         product_modal: 0,
@@ -58,26 +62,21 @@ const InputProduk = () => {
     });
 
     const onChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
         if (e.target.files) {
             setFile(e.target.files[0]);
         }
     };
 
-    const handleChangeRadio = (e: ChangeEvent<HTMLInputElement>) => {
-        e.preventDefault();
-
-        const { name, type, checked } = e.target;
-        if (type === 'checkbox') {
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: checked,
-            }));
-        }
-    };
-
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
-        if (type === 'number') {
+        if (type === 'checkbox') {
+            const checkboxValue = (e.target as HTMLInputElement).checked ? 'yes' : '';
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: checkboxValue,
+            }));
+        } else if (type === 'number') {
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: parseFloat(value),
@@ -88,6 +87,10 @@ const InputProduk = () => {
                 [name]: value,
             }));
         }
+    };
+
+    const handleCancel = () => {
+        navigate('/menupenjualan/product/produk');
     };
 
     const handleSubmit = (e: FormEvent) => {
@@ -108,7 +111,7 @@ const InputProduk = () => {
         data.append('product_barcode', formData.product_barcode);
         data.append('product_ime', formData.product_ime);
         data.append('product_weight', formData.product_weight.toString());
-        data.append('suplier_id', formData.supplier_id.toString());
+        data.append('suplier_id', formData.suplier_id.toString());
 
         axios
             .post('https://erp.digitalindustryagency.com/api/products', data, {
@@ -118,20 +121,39 @@ const InputProduk = () => {
                 },
             })
             .then((response) => {
-                console.log('Customer data successfully added:', response.data);
-                // navigate('/menupenjualan/product/produk');
-                toast.success('Data berhasil ditambahkan', {
-                    position: 'top-right',
-                    autoClose: 3000,
-                });
+                const notification = {
+                    type: 'success',
+                    message: 'Produk Berhasil Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                handleCancel();
             })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    console.error('Server Response Data:', error.response.data);
-                    // ... your existing error handling code
-                }
-                console.error('Error adding customer data:', error);
-                toast.error('Error adding data');
+            .catch((err: any) => {
+                // set_old_value
+                const oldValueBefore = {
+                    product_category_id: formData.product_category_id,
+                    suplier_id: formData.suplier_id,
+                    product_name: formData.product_name,
+                    product_price: formData.product_price,
+                    product_modal: formData.product_modal,
+                    product_pos: formData.product_pos,
+                    product_ecommers: formData.product_ecommers,
+                    product_responsibility: formData.product_responsibility,
+                    product_barcode: formData.product_barcode,
+                    product_ime: formData.product_ime,
+                    product_weight: formData.product_weight,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
+                const notification = {
+                    type: 'error',
+                    message: 'Produk Gagal Ditambahkan',
+                    log: err.message,
+                    title: 'ERROR_ADDING_PRODUCT',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
@@ -154,11 +176,25 @@ const InputProduk = () => {
             });
     }, []);
 
-    // const [productData, setProductData] = useState<any>({});
-    const handleCancel = () => {
-        // Instead of using a Link, directly use the navigate function
-        navigate('/menupenjualan/product/produk');
-    };
+    useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+
+            return sessionStorage.removeItem('old_value');
+        }
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+
+                return localStorage.removeItem('notification');
+            }
+        }
+    }, []);
 
     return (
         <div>
@@ -221,7 +257,7 @@ const InputProduk = () => {
                                 </div>
                                 <div>
                                     <label htmlFor="gridState">Suplier</label>
-                                    <select id="gridState" className="form-select text-black" name="supplier_id" value={formData.supplier_id} onChange={handleChange}>
+                                    <select id="gridState" className="form-select text-black" name="suplier_id" value={formData.suplier_id} onChange={handleChange}>
                                         <option value="">Choose...</option>
                                         {supliers.map((item) => (
                                             <option value={item.id} key={item.id}>
@@ -288,14 +324,14 @@ const InputProduk = () => {
                                 </div>
                                 <div>
                                     <label className="flex items-center mt-1 cursor-pointer">
-                                        <input type="checkbox" className="form-checkbox" name="product_pos" checked={formData.product_pos} onChange={handleChangeRadio} />
+                                        <input type="checkbox" className="form-checkbox" name="product_pos" checked={formData.product_pos} onChange={handleChange} />
 
                                         <span className="text-white-dark">POS</span>
                                     </label>
                                 </div>
                                 <div>
                                     <label className="flex items-center mt-1 cursor-pointer">
-                                        <input type="checkbox" className="form-checkbox" name="product_ecommers" checked={formData.product_ecommers} onChange={handleChangeRadio} />
+                                        <input type="checkbox" className="form-checkbox" name="product_ecommers" checked={formData.product_ecommers} onChange={handleChange} />
                                         <span className="text-white-dark">E-Commerce</span>
                                     </label>
                                 </div>

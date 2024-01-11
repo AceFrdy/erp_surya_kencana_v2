@@ -8,18 +8,23 @@ import IconTrash from '../../../components/Icon/IconTrash';
 import IconUpload from '../../../components/Icon/icon-upload';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 
+import 'react-toastify/dist/ReactToastify.css';
+
 interface FormState {
     product_category_id: number;
-    supplier_id: number;
+    suplier_id: number;
     product_name: string;
     product_price: number;
     product_modal: number;
-    product_pos: string;
-    product_ecommers: string;
     product_responsibility: string;
     product_barcode: string;
     product_ime: string;
     product_weight: number;
+}
+
+interface RadioProps {
+    product_pos: boolean;
+    product_ecommers: boolean;
 }
 
 interface CategoriesProductList {
@@ -46,20 +51,24 @@ const InputProduk = () => {
 
     const [formData, setFormData] = useState<FormState>({
         product_category_id: 0,
-        supplier_id: 0,
+        suplier_id: 0,
         product_name: '',
         product_price: 0,
         product_modal: 0,
-        product_pos: '',
-        product_ecommers: '',
         product_responsibility: '',
         product_barcode: '',
         product_ime: '',
         product_weight: 0,
     });
 
-    const onChangeImage = (e: any) => {
+    const [formRadio, setFormRadio] = useState<RadioProps>({
+        product_pos: false,
+        product_ecommers: false,
+    });
+
+    const onChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
+            setFileGambar(e.target.files[0]);
         }
     };
 
@@ -75,7 +84,23 @@ const InputProduk = () => {
                 const data = response.data.data.resource;
                 setFormData(data);
                 setUrlImage(data.product_image);
-                console.log(response.data.data.resource);
+                setFormRadio({ product_ecommers: data.product_ecommers === 'yes' ? true : false, product_pos: data.product_pos === 'yes' ? true : false });
+            });
+        axios
+            .get('https://erp.digitalindustryagency.com/api/product-categories', { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
+            .then((response) => {
+                setCategoriesProduct(response.data.data.resource.data);
+            })
+            .catch((err: any) => {
+                console.log('ERROR_CATEGORIES_PRODUCT', err.message);
+            });
+        axios
+            .get('https://erp.digitalindustryagency.com/api/supliers', { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
+            .then((response) => {
+                setSupliers(response.data.data.resource.data);
+            })
+            .catch((err: any) => {
+                console.log('ERROR_SUPLIER', err.message);
             });
     }, []);
 
@@ -83,9 +108,14 @@ const InputProduk = () => {
         const { name, value, type } = e.target;
         if (type === 'checkbox') {
             const checkboxValue = (e.target as HTMLInputElement).checked ? 'yes' : '';
-            setFormData((prevData) => ({
+            setFormRadio((prevData) => ({
                 ...prevData,
                 [name]: checkboxValue,
+            }));
+        } else if (type === 'number') {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: parseFloat(value),
             }));
         } else {
             setFormData((prevData) => ({
@@ -95,74 +125,98 @@ const InputProduk = () => {
         }
     };
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleCancel = () => {
+        navigate('/menupenjualan/product/produk');
+    };
+
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
-        const data = {
-            product_category_id: formData.product_category_id,
-            suplier_id: formData.supplier_id,
-            product_name: formData.product_name,
-            product_price: formData.product_price,
-            product_modal: formData.product_modal,
-            product_pos: formData.product_pos,
-            product_ecommers: formData.product_ecommers,
-            product_responsibility: formData.product_responsibility,
-            product_barcode: formData.product_barcode,
-            product_ime: formData.product_ime,
-            product_weight: formData.product_weight,
-        };
-        console.log('Data to be sent:', data);
+        const dataRequest = new FormData();
+        dataRequest.append('product_name', formData.product_name);
+        dataRequest.append('product_price', formData.product_price.toString());
+        dataRequest.append('product_category_id', formData.product_category_id.toString());
+        dataRequest.append('product_modal', formData.product_modal.toString());
+        dataRequest.append('product_responsibility', formData.product_responsibility);
 
-        await axios
-            .put(`https://erp.digitalindustryagency.com/api/products/${id}`, data, {
+        if (fileGambar) {
+            dataRequest.append('product_image', fileGambar);
+        }
+
+        dataRequest.append('product_pos', formRadio.product_pos ? 'yes' : 'no');
+        dataRequest.append('product_ecommers', formRadio.product_ecommers ? 'yes' : 'no');
+        dataRequest.append('product_barcode', formData.product_barcode);
+        dataRequest.append('product_ime', formData.product_ime);
+        dataRequest.append('product_weight', formData.product_weight.toString());
+        dataRequest.append('suplier_id', formData.suplier_id.toString());
+        dataRequest.append('_method', 'put');
+
+        axios
+            .post(`https://erp.digitalindustryagency.com/api/products/${id}`, dataRequest, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {
-                console.log('Customer data successfully added:', response.data);
-                navigate('/menupenjualan/product/produk');
-                toast.success('Data berhasil ditambahkan', {
-                    position: 'top-right',
-                    autoClose: 3000,
-                });
-            })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    console.error('Server Response Data:', error.response.data);
-                    // ... your existing error handling code
-                }
-                console.error('Error adding customer data:', error);
-                toast.error('Error adding data');
-            });
-    };
-
-    const handleCancel = () => {
-        navigate('/menupenjualan/product/produk');
-    };
-
-    useEffect(() => {
-        axios
-            .get('https://erp.digitalindustryagency.com/api/product-categories', { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
-            .then((response) => {
-                setCategoriesProduct(response.data.data.resource.data);
+                const notification = {
+                    type: 'success',
+                    message: 'Produk Berhasil Diperbarui',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                handleCancel();
             })
             .catch((err: any) => {
-                console.log('CATEGORIES PRODUCT', err.message);
+                // set_old_value
+                const oldValueBefore = {
+                    product_category_id: formData.product_category_id,
+                    suplier_id: formData.suplier_id,
+                    product_name: formData.product_name,
+                    product_price: formData.product_price,
+                    product_modal: formData.product_modal,
+                    product_pos: formRadio.product_pos,
+                    product_ecommers: formRadio.product_ecommers,
+                    product_responsibility: formData.product_responsibility,
+                    product_barcode: formData.product_barcode,
+                    product_ime: formData.product_ime,
+                    product_weight: formData.product_weight,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
+                const notification = {
+                    type: 'error',
+                    message: 'Produk Gagal Diperbarui',
+                    log: err.message,
+                    title: 'ERROR_EDITING_PRODUCT',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
-        axios
-            .get('https://erp.digitalindustryagency.com/api/supliers', { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
-            .then((response) => {
-                setSupliers(response.data.data.resource.data);
-            })
-            .catch((err: any) => {
-                console.log('SUPLIER', err.message);
-            });
-    }, []);
+    };
 
     useEffect(() => {
         dispatch(setPageTitle('Edit Produk'));
+    }, []);
+
+    useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+
+            return sessionStorage.removeItem('old_value');
+        }
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+
+                return localStorage.removeItem('notification');
+            }
+        }
     }, []);
 
     return (
@@ -226,7 +280,7 @@ const InputProduk = () => {
                                 </div>
                                 <div>
                                     <label htmlFor="gridState">Suplier</label>
-                                    <select id="gridState" className="form-select text-black" name="supplier_id" value={formData.supplier_id} onChange={handleChange}>
+                                    <select id="gridState" className="form-select text-black" name="suplier_id" value={formData.suplier_id} onChange={handleChange}>
                                         <option value="">Choose...</option>
                                         {supliers.map((item) => (
                                             <option value={item.id} key={item.id}>
@@ -293,40 +347,42 @@ const InputProduk = () => {
                                 </div>
                                 <div>
                                     <label className="flex items-center mt-1 cursor-pointer">
-                                        <input type="checkbox" className="form-checkbox" name="product_pos" checked={formData.product_pos === 'yes'} onChange={handleChange} />
+                                        <input type="checkbox" className="form-checkbox" name="product_pos" checked={formRadio.product_pos} onChange={handleChange} />
 
                                         <span className="text-white-dark">POS</span>
                                     </label>
                                 </div>
                                 <div>
                                     <label className="flex items-center mt-1 cursor-pointer">
-                                        <input type="checkbox" className="form-checkbox" name="product_ecommers" checked={formData.product_ecommers === 'yes'} onChange={handleChange} />
+                                        <input type="checkbox" className="form-checkbox" name="product_ecommers" checked={formRadio.product_ecommers} onChange={handleChange} />
                                         <span className="text-white-dark">E-Commerce</span>
                                     </label>
                                 </div>
                                 <div className="relative">
-                                    {urlImage ? (
+                                    {fileGambar ? (
                                         <>
-                                            {fileGambar ? (
-                                                <div className="group w-60">
-                                                    <label>Gambar Produk</label>
-                                                    <div className="h-60 absolute top-[26px] w-60 rounded-md bg-red-100/80 hidden backdrop-blur-sm group-hover:flex justify-center items-center">
-                                                        <div className="w-40 h-40  rounded-md flex justify-center items-center border-red-700 border border-dashed">
-                                                            <button
-                                                                className="w-12 h-12 rounded-full bg-red-700 flex justify-center items-center cursor-default hover:bg-red-700/80"
-                                                                onClick={() => {
-                                                                    setFileGambar(null);
-                                                                }}
-                                                            >
-                                                                <IconTrash className="w-6 h-6 text-red-100" />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <div className="w-60 h-60 top-0 overflow-hidden rounded-md">
-                                                        <img className="object-cover" src={fileGambar ? URL.createObjectURL(fileGambar) : urlImage} />
+                                            <div className="group w-60">
+                                                <label>Gambar Produk</label>
+                                                <div className="h-60 absolute top-[26px] w-60 rounded-md bg-red-100/80 hidden backdrop-blur-sm group-hover:flex justify-center items-center">
+                                                    <div className="w-40 h-40  rounded-md flex justify-center items-center border-red-700 border border-dashed">
+                                                        <button
+                                                            className="w-12 h-12 rounded-full bg-red-700 flex justify-center items-center cursor-default hover:bg-red-700/80"
+                                                            onClick={() => {
+                                                                setFileGambar(null);
+                                                            }}
+                                                        >
+                                                            <IconTrash className="w-6 h-6 text-red-100" />
+                                                        </button>
                                                     </div>
                                                 </div>
-                                            ) : (
+                                                <div className="w-60 h-60 top-0 overflow-hidden rounded-md">
+                                                    <img className="object-cover" src={URL.createObjectURL(fileGambar)} />
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            {urlImage ? (
                                                 <div className="group w-60">
                                                     <label>Gambar Produk</label>
                                                     <label
@@ -341,23 +397,23 @@ const InputProduk = () => {
                                                     </label>
                                                     <input className="hidden" onChange={onChangeImage} id="input-gambar" type="file" accept="image/*" />
                                                     <div className="w-60 h-60 top-0 overflow-hidden rounded-md">
-                                                        <img className="object-cover" src={fileGambar ? URL.createObjectURL(fileGambar) : urlImage} />
+                                                        <img className="object-cover" src={urlImage} alt="" />
                                                     </div>
                                                 </div>
+                                            ) : (
+                                                <>
+                                                    <label htmlFor="input-gambar">Gambar Produk</label>
+                                                    <label htmlFor="input-gambar" className="h-60 absolute top-[26px] w-60 rounded-md border flex items-center justify-center hover:bg-blue-50">
+                                                        <span className="w-40 h-40 flex justify-center items-center rounded-md border border-dashed border-black">
+                                                            <div className="w-12 h-12 rounded-full bg-black hover:bg-black/80 flex justify-center items-center">
+                                                                <IconUpload className="text-white w-6 h-6" />
+                                                            </div>
+                                                        </span>
+                                                    </label>
+                                                    <div className="w-60 h-60" />
+                                                    <input className="hidden" onChange={onChangeImage} id="input-gambar" type="file" accept="image/*" />
+                                                </>
                                             )}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <label htmlFor="input-gambar">Gambar Produk</label>
-                                            <label htmlFor="input-gambar" className="h-60 absolute top-[26px] w-60 rounded-md border flex items-center justify-center hover:bg-blue-50">
-                                                <span className="w-40 h-40 flex justify-center items-center rounded-md border border-dashed border-black">
-                                                    <div className="w-12 h-12 rounded-full bg-black hover:bg-black/80 flex justify-center items-center">
-                                                        <IconUpload className="text-white w-6 h-6" />
-                                                    </div>
-                                                </span>
-                                            </label>
-                                            <div className="w-60 h-60" />
-                                            <input className="hidden" onChange={onChangeImage} id="input-gambar" type="file" accept="image/*" />
                                         </>
                                     )}
                                 </div>
