@@ -5,16 +5,18 @@ import { DataTable } from 'mantine-datatable';
 import { Dialog, Transition } from '@headlessui/react';
 import { FormEvent, Fragment, MouseEvent, useEffect, useState } from 'react';
 
-import Pagination from '../../components/Pagination';
 import IconPlus from '../../components/Icon/IconPlus';
 import IconPencil from '../../components/Icon/IconPencil';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../utils';
 
 interface MenusProps {
     id: number;
     menu_title: string;
+}
+interface MenuAksesProps {
+    id: number;
+    menu_id: number;
 }
 
 interface MenuPrivilageProps {
@@ -42,7 +44,12 @@ const HakAkses = () => {
         dispatch(setPageTitle('Hak Akses'));
     });
     const [initialRecords, setInitialRecords] = useState<DataState[]>([]);
+    const [menuAll, setMenuAll] = useState<MenusProps[]>([]);
     const [menuRecord, setMenuRecord] = useState<MenusProps[]>([]);
+    const [menuRecordSecond, setMenuRecordSecond] = useState<MenusProps[]>([]);
+    const [menuHalfLength, setMenuHalfLength] = useState<number>(0);
+
+    const [menuAksesRecord, setMenuAksesRecord] = useState<MenuAksesProps[]>([]);
 
     const handleOpenModal = (data: modalData, event: MouseEvent, form?: number) => {
         event.preventDefault();
@@ -142,49 +149,35 @@ const HakAkses = () => {
                 },
             })
             .then((response) => {
-                console.log(response);
+                setMenuAksesRecord(response.data.data.resource.menu_privilages);
+                console.log('edit_privilage', response.data.data.resource);
             });
     };
 
-    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
-    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
-    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/menus');
+    const getValueData = (id: number) => {
+        return menuAksesRecord.find((item) => item.menu_id === id)?.menu_id !== undefined ? true : false;
+    };
 
     useEffect(() => {
         axios
-            .get(url, {
+            .get('https://erp.digitalindustryagency.com/api/menus', {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {
-                setMenuRecord(response.data.data.resource.data);
-                console.log(response.data);
-                // page
-                setMetaLink({
-                    current_page: response.data.data.resource.current_page,
-                    last_page: response.data.data.resource.last_page,
-                    from: response.data.data.resource.from,
-                    to: response.data.data.resource.to,
-                    per_page: response.data.data.resource.per_page,
-                    total: response.data.data.resource.total,
-                });
-                setMetaLinksLink(response.data.data.resource.links);
-                setLinksLink({
-                    first: response.data.data.resource.first_page_url,
-                    last: response.data.data.resource.last_page_url,
-                    next: response.data.data.resource.next_page_url,
-                    prev: response.data.data.resource.prev_page_url,
-                });
+                const menuLength = response.data.data.resource.length;
+                const halfLength = Math.trunc(menuLength / 2);
+                setMenuHalfLength(halfLength);
+                setMenuRecord(response.data.data.resource.slice(0, halfLength));
+                setMenuRecordSecond(response.data.data.resource.slice(halfLength, menuLength));
+                setMenuAll(response.data.data.resource);
+                console.log('menu_All', response.data.data.resource);
             })
             .catch((err: any) => {
                 console.log('ERROR_GET_MENUS', err.message);
             });
-    }, [url]);
-
-    useEffect(() => {
         axios
             .get('https://erp.digitalindustryagency.com/api/privilages', {
                 headers: {
@@ -224,47 +217,49 @@ const HakAkses = () => {
                                             <div className="text-lg font-bold">Edit Distribusi Product</div>
                                         </div>
                                         <div className="p-5">
-                                            {dataModal === 'edit-hak-akses' && (
-                                                <div className="datatables">
-                                                    <DataTable
-                                                        highlightOnHover
-                                                        className="whitespace-nowrap table-hover"
-                                                        records={menuRecord}
-                                                        columns={[
-                                                            { accessor: 'id', title: 'No', width: 60, render: (e) => menuRecord.indexOf(e) + 1 },
-                                                            {
-                                                                accessor: 'menu_title',
-                                                                title: 'Nama Menu',
-                                                            },
-                                                            {
-                                                                accessor: 'action',
-                                                                title: 'Opsi',
-                                                                width: 100,
-                                                                cellsClassName: 'flex justify-center',
-                                                                titleClassName: '!text-center',
-                                                                render: (e) => <input type="checkbox" />,
-                                                            },
-                                                        ]}
-                                                        minHeight={200}
-                                                    />
-                                                </div>
-                                            )}
-                                            {(dataModal === 'new-menu' || dataModal === 'edit-menu') && (
-                                                <div className="gap-2">
-                                                    <label htmlFor="namaMenu">Nama Menu</label>
-                                                    <input
-                                                        type="text"
-                                                        id="namaMenu"
-                                                        className="form-input"
-                                                        value={menuForm}
-                                                        onChange={(e) => {
-                                                            e.preventDefault();
-                                                            setMenuForm(e.target.value);
-                                                        }}
-                                                    />
-                                                </div>
-                                            )}
-                                            {dataModal === 'delete-menu' && <p>Apakah anda yakin ingin menghapus menu berikut?</p>}
+                                            <div className="max-h-[50dvh] overflow-y-scroll snap-y">
+                                                {dataModal === 'edit-hak-akses' && (
+                                                    <div className="datatables">
+                                                        <DataTable
+                                                            highlightOnHover
+                                                            className="whitespace-nowrap table-hover"
+                                                            records={menuAll}
+                                                            columns={[
+                                                                { accessor: 'id', title: 'No', width: 60, render: (e) => menuAll.indexOf(e) + 1 },
+                                                                {
+                                                                    accessor: 'menu_title',
+                                                                    title: 'Nama Menu',
+                                                                },
+                                                                {
+                                                                    accessor: 'action',
+                                                                    title: 'Opsi',
+                                                                    width: 100,
+                                                                    cellsClassName: 'flex justify-center',
+                                                                    titleClassName: '!text-center',
+                                                                    render: (e) => <input type="checkbox" checked={getValueData(e.id)} />,
+                                                                },
+                                                            ]}
+                                                            minHeight={200}
+                                                        />
+                                                    </div>
+                                                )}
+                                                {(dataModal === 'new-menu' || dataModal === 'edit-menu') && (
+                                                    <div className="gap-2">
+                                                        <label htmlFor="namaMenu">Nama Menu</label>
+                                                        <input
+                                                            type="text"
+                                                            id="namaMenu"
+                                                            className="form-input"
+                                                            value={menuForm}
+                                                            onChange={(e) => {
+                                                                e.preventDefault();
+                                                                setMenuForm(e.target.value);
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                                {dataModal === 'delete-menu' && <p>Apakah anda yakin ingin menghapus menu berikut?</p>}
+                                            </div>
                                         </div>
                                         <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-end px-5 gap-x-2 py-3">
                                             {dataModal === 'new-menu' && (
@@ -362,7 +357,7 @@ const HakAkses = () => {
                     </div>
                 </div>
                 <div className="grid xl:grid-cols-3 gap-6 grid-cols-1 mt-5">
-                    <div className="datatables panel xl:col-span-3">
+                    <div className="panel xl:col-span-3">
                         <div className="flex justify-between items-center mb-5">
                             <h5 className="font-semibold text-lg dark:text-white-light">List Menu</h5>
                             <button className="btn btn-primary" onClick={(event) => handleOpenModal('new-menu', event)}>
@@ -370,10 +365,10 @@ const HakAkses = () => {
                                 <span className="ml-2">Add New</span>
                             </button>
                         </div>
-                        <div>
+                        <div className="flex gap-5 w-full">
                             <DataTable
                                 highlightOnHover
-                                className="whitespace-nowrap table-hover"
+                                className="whitespace-nowrap table-hover w-full"
                                 records={menuRecord}
                                 columns={[
                                     { accessor: 'id', title: 'No', sortable: true, width: '100px', render: (e) => menuRecord.indexOf(e) + 1 },
@@ -408,7 +403,43 @@ const HakAkses = () => {
                                 ]}
                                 minHeight={200}
                             />
-                            {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                            <DataTable
+                                highlightOnHover
+                                className="whitespace-nowrap table-hover w-full"
+                                records={menuRecordSecond}
+                                columns={[
+                                    { accessor: 'id', title: 'No', sortable: true, width: '100px', render: (e) => menuHalfLength + menuRecordSecond.indexOf(e) + 1 },
+                                    {
+                                        accessor: 'menu_title',
+                                        title: 'Nama Menu',
+                                        sortable: true,
+                                    },
+                                    {
+                                        accessor: 'action',
+                                        title: 'Opsi',
+                                        width: '150px',
+                                        titleClassName: '!text-center',
+                                        render: (e) => (
+                                            <div className="flex items-center w-max mx-auto gap-2">
+                                                <button
+                                                    type="button"
+                                                    style={{ color: 'orange' }}
+                                                    onClick={(event) => {
+                                                        handleOpenModal('edit-menu', event, e.id);
+                                                        getDataEdit(e.id, event);
+                                                    }}
+                                                >
+                                                    <IconPencil className="ltr:mr-2 rtl:ml-2 " />
+                                                </button>
+                                                <button type="button" style={{ color: 'red' }} onClick={(event) => handleOpenModal('delete-menu', event, e.id)}>
+                                                    <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                                                </button>
+                                            </div>
+                                        ),
+                                    },
+                                ]}
+                                minHeight={200}
+                            />
                         </div>
                     </div>
                 </div>
