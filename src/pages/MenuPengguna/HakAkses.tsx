@@ -74,7 +74,7 @@ const HakAkses = () => {
         data.append('menu_title', menuForm);
         data.append('menu_icon', '-');
         data.append('menu_url', '-');
-        data.append('user_menu_id', '-');
+        data.append('user_menu_id', '1');
 
         axios
             .post('https://erp.digitalindustryagency.com/api/menus', data, {
@@ -109,7 +109,7 @@ const HakAkses = () => {
         data.append('menu_title', menuForm);
         data.append('menu_icon', '-');
         data.append('menu_url', '-');
-        data.append('user_menu_id', '-');
+        data.append('user_menu_id', '1');
         data.append('_method', 'put');
         axios
             .post(`https://erp.digitalindustryagency.com/api/menus/${dataFormModal}`, data, {
@@ -150,12 +150,12 @@ const HakAkses = () => {
             })
             .then((response) => {
                 setMenuAksesRecord(response.data.data.resource.menu_privilages);
-                console.log('edit_privilage', response.data.data.resource);
+                console.log('edit_privilage', response.data.data);
             });
     };
 
     const getValueData = (id: number) => {
-        return menuAksesRecord.find((item) => item.menu_id === id)?.menu_id !== undefined ? true : false;
+        return menuAksesRecord.find((item) => item.menu_id === id)?.menu_id !== undefined;
     };
 
     useEffect(() => {
