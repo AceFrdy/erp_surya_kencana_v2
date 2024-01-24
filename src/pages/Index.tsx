@@ -1,25 +1,42 @@
 import { useDispatch, useSelector } from 'react-redux';
-import Dropdown from '../components/Dropdown';
+import { useState } from 'react';
+// import Dropdown from '../components/Dropdown';
 import IconEye from '../components/Icon/IconEye';
-import IconHorizontalDots from '../components/Icon/IconHorizontalDots';
+// import IconHorizontalDots from '../components/Icon/IconHorizontalDots';
 import { IRootState } from '../store';
 import IconBolt from '../components/Icon/IconBolt';
 import IconNetflix from '../components/Icon/IconNetflix';
 import IconUser from '../components/Icon/IconUser';
 import IconCashBanknotes from '../components/Icon/IconCashBanknotes';
-import IconServer from '../components/Icon/IconServer';
-import IconFile from '../components/Icon/IconFile';
-import IconChecks from '../components/Icon/IconChecks';
-import IconMail from '../components/Icon/IconMail';
-import IconPlus from '../components/Icon/IconPlus';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 import ReactApexChart from 'react-apexcharts';
 import { Link } from 'react-router-dom';
 import IconMultipleForwardRight from '../components/Icon/IconMultipleForwardRight';
 import { useEffect } from 'react';
 import { setPageTitle } from '../store/themeConfigSlice';
+import { formatPrice } from '../utils';
+import axios from 'axios';
+
+interface DashboardCard {
+    total_sales: number;
+    revenue: number;
+    total_customers: number;
+    total_employers: number;
+}
+// interface Flow {
+//     date: string;
+//     amount: number;
+//     user_id: number;
+//     index_id: number;
+// }
+interface RecentOrder{
+    sale_report_customer: string;
+    sale_report_invoice: string;
+    sale_report_grand_total: number;
+    sale_report_status: string;
+}
 
 const Index = () => {
+
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const uniqueVisitorSeries: any = {
@@ -118,20 +135,57 @@ const Index = () => {
             },
         },
     };
+    const token = localStorage.getItem('accessToken') ?? '';
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('Dashboard'));
     });
+    const [card, setCard] = useState<DashboardCard>({
+        total_sales: 0,
+        revenue: 0,
+        total_customers: 0,
+        total_employers: 0,
+    });
+    const [recent, setRecent] = useState<RecentOrder>({
+        sale_report_customer: '',
+        sale_report_invoice: '',
+        sale_report_grand_total: 0,
+        sale_report_status: '',
+    });
+    // const [flow, setFlow] = useState<Flow>({
+    //     date: '',
+    //     amount: 0,
+    //     user_id: 0,
+    //     index_id: 0,
+    // });
+    // const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/dashboard');
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/dashboard', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setCard(response.data.data.resource);
+                setRecent(response.data.data.resource.recent_orders);
+                // setFlow(response.data.data.resource.cash_flows);
+            })
+            .catch((err: any) => {
+                console.log('ERROR_GETTING_Data:', err.message);
+            });
+    }, []);
+
     return (
         <div>
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-6 text-white">
                 <div className="panel bg-gradient-to-r from-cyan-500 to-cyan-400">
                     <div className="flex justify-between">
                         <div className="ltr:mr-1 rtl:ml-1 text-md font-semibold">Total Penjualan</div>
-                        
                     </div>
                     <div className="flex items-center mt-5">
-                        <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> $170.46 </div>
+                        <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> {formatPrice(card.total_sales)} </div>
                         <div className="badge bg-white/30">+ 2.35% </div>
                     </div>
                     <div className="flex items-center font-semibold mt-5">
@@ -147,7 +201,7 @@ const Index = () => {
                         
                     </div>
                     <div className="flex items-center mt-5">
-                        <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> 74,137 </div>
+                        <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> {card.revenue} </div>
                         <div className="badge bg-white/30">- 2.35% </div>
                     </div>
                     <div className="flex items-center font-semibold mt-5">
@@ -163,7 +217,7 @@ const Index = () => {
                         
                     </div>
                     <div className="flex items-center mt-5">
-                        <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> 38,085 </div>
+                        <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> {card.total_customers} </div>
                         <div className="badge bg-white/30">+ 1.35% </div>
                     </div>
                     <div className="flex items-center font-semibold mt-5">
@@ -179,7 +233,7 @@ const Index = () => {
                         
                     </div>
                     <div className="flex items-center mt-5">
-                        <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> 49.10% </div>
+                        <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3"> {card.total_employers} </div>
                         <div className="badge bg-white/30">- 0.35% </div>
                     </div>
                     <div className="flex items-center font-semibold mt-5">
@@ -283,7 +337,7 @@ const Index = () => {
                                         <td className="min-w-[150px] text-black dark:text-white">
                                             <div className="flex items-center">
                                                 <img className="w-8 h-8 rounded-md ltr:mr-3 rtl:ml-3 object-cover" src="/assets/images/profile-6.jpeg" alt="avatar" />
-                                                <span className="whitespace-nowrap">Luke Ivory</span>
+                                                <span className="whitespace-nowrap">{recent.sale_report_customer}</span>
                                             </div>
                                         </td>
                                         <td className="text-primary">Headphone</td>
