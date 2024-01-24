@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { DataTable } from 'mantine-datatable';
+import { Link, useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import { FormEvent, Fragment, MouseEvent, useEffect, useState } from 'react';
 
@@ -14,14 +15,18 @@ interface MenusProps {
     id: number;
     menu_title: string;
 }
+
 interface MenuAksesProps {
-    id: number;
+    has_access: boolean;
     menu_id: number;
+    menu_title: string;
+    pivot_id: number;
 }
 
 interface MenuPrivilageProps {
     id: number;
     menu: MenusProps;
+    menu_id: number;
 }
 
 interface DataState {
@@ -35,6 +40,8 @@ type modalData = 'new-menu' | 'edit-menu' | 'delete-menu' | 'edit-hak-akses';
 const HakAkses = () => {
     const dispatch = useDispatch();
 
+    const navigate = useNavigate();
+
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataModal, setDataModal] = useState<modalData | null>(null);
     const [dataFormModal, setDataFormModal] = useState<number>(0);
@@ -42,14 +49,14 @@ const HakAkses = () => {
     const token = localStorage.getItem('accessToken') ?? '';
     useEffect(() => {
         dispatch(setPageTitle('Hak Akses'));
-    });
+    }, []);
     const [initialRecords, setInitialRecords] = useState<DataState[]>([]);
-    const [menuAll, setMenuAll] = useState<MenusProps[]>([]);
     const [menuRecord, setMenuRecord] = useState<MenusProps[]>([]);
     const [menuRecordSecond, setMenuRecordSecond] = useState<MenusProps[]>([]);
     const [menuHalfLength, setMenuHalfLength] = useState<number>(0);
 
     const [menuAksesRecord, setMenuAksesRecord] = useState<MenuAksesProps[]>([]);
+    const [privilageId, setPrivilageId] = useState<number>(0);
 
     const handleOpenModal = (data: modalData, event: MouseEvent, form?: number) => {
         event.preventDefault();
@@ -84,7 +91,16 @@ const HakAkses = () => {
                 },
             })
             .then((response) => {
-                console.log(response);
+                navigate(0);
+                const notification = {
+                    type: 'success',
+                    message: 'Menu Berhasil Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+            })
+            .catch((err: any) => {
+                console.log('ERROR_ADD_MENU', err.message);
+                toast.error('Menu Gagal Ditambahkan');
             });
     };
 
@@ -100,6 +116,9 @@ const HakAkses = () => {
             })
             .then((response) => {
                 setMenuForm(response.data.data.resource.menu_title);
+            })
+            .catch((err: any) => {
+                console.log('ERROR_GET_DATA_EDIT_MENU', err.message);
             });
     };
 
@@ -119,7 +138,16 @@ const HakAkses = () => {
                 },
             })
             .then((response) => {
-                console.log(response);
+                navigate(0);
+                const notification = {
+                    type: 'success',
+                    message: 'Menu Berhasil Diperbarui',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+            })
+            .catch((err: any) => {
+                console.log('ERROR_EDIT_MENU', err.message);
+                toast.error('Menu Gagal Diperbarui');
             });
     };
 
@@ -134,13 +162,23 @@ const HakAkses = () => {
                 },
             })
             .then((response) => {
-                console.log(response);
+                navigate(0);
+                const notification = {
+                    type: 'success',
+                    message: 'Menu Berhasil Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+            })
+            .catch((err: any) => {
+                console.log('ERROR_DELETE_MENU', err.message);
+                toast.error('Menu Gagal Dihapus');
             });
     };
 
     const getDataEditAkses = (id: number, event: MouseEvent) => {
         event.preventDefault();
 
+        setPrivilageId(id);
         axios
             .get(`https://erp.digitalindustryagency.com/api/privilages/${id}`, {
                 headers: {
@@ -149,13 +187,61 @@ const HakAkses = () => {
                 },
             })
             .then((response) => {
-                setMenuAksesRecord(response.data.data.resource.menu_privilages);
-                console.log('edit_privilage', response.data.data);
+                setMenuAksesRecord(response.data.data.resource.menu_access);
+            })
+            .catch((err: any) => {
+                console.log('ERROR_GET_DATA_EDIT', err.message);
             });
     };
 
-    const getValueData = (id: number) => {
-        return menuAksesRecord.find((item) => item.menu_id === id)?.menu_id !== undefined;
+    const handleAksesChange = async (event: FormEvent, menuId: number, akses: boolean, pivotId: number) => {
+        event.preventDefault();
+
+        if (akses === true) {
+            await axios
+                .delete(`https://erp.digitalindustryagency.com/api/menu-privilage/${pivotId}`, {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                .then((response) => {
+                    navigate(0);
+                    const notification = {
+                        type: 'success',
+                        message: 'Akses Berhasil Dihapus',
+                    };
+                    localStorage.setItem('notification', JSON.stringify(notification));
+                })
+                .catch((err: any) => {
+                    console.log('ERROR_DELETE_ACCESS', err.message);
+                    toast.error('Akses Gagal Dihapus');
+                });
+        } else {
+            const data = new FormData();
+            data.append('menu_id', menuId.toString());
+            data.append('privilage_id', privilageId.toString());
+
+            await axios
+                .post('https://erp.digitalindustryagency.com/api/menu-privilage', data, {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                .then((response) => {
+                    navigate(0);
+                    const notification = {
+                        type: 'success',
+                        message: 'Akses Berhasil Ditambahkan',
+                    };
+                    localStorage.setItem('notification', JSON.stringify(notification));
+                })
+                .catch((err: any) => {
+                    console.log('ERROR_DELETE_ACCESS', err.message);
+                    toast.error('Akses Gagal Ditambahkan');
+                });
+        }
     };
 
     useEffect(() => {
@@ -169,11 +255,10 @@ const HakAkses = () => {
             .then((response) => {
                 const menuLength = response.data.data.resource.length;
                 const halfLength = Math.trunc(menuLength / 2);
+
                 setMenuHalfLength(halfLength);
                 setMenuRecord(response.data.data.resource.slice(0, halfLength));
                 setMenuRecordSecond(response.data.data.resource.slice(halfLength, menuLength));
-                setMenuAll(response.data.data.resource);
-                console.log('menu_All', response.data.data.resource);
             })
             .catch((err: any) => {
                 console.log('ERROR_GET_MENUS', err.message);
@@ -191,6 +276,19 @@ const HakAkses = () => {
             .catch((err: any) => {
                 console.log('ERROR_GET_PRIVILAGES', err.message);
             });
+    }, []);
+
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+            }
+        }
+        return localStorage.removeItem('notification');
     }, []);
 
     return (
@@ -223,9 +321,9 @@ const HakAkses = () => {
                                                         <DataTable
                                                             highlightOnHover
                                                             className="whitespace-nowrap table-hover"
-                                                            records={menuAll}
+                                                            records={menuAksesRecord}
                                                             columns={[
-                                                                { accessor: 'id', title: 'No', width: 60, render: (e) => menuAll.indexOf(e) + 1 },
+                                                                { accessor: 'id', title: 'No', width: 60, render: (e) => menuAksesRecord.indexOf(e) + 1 },
                                                                 {
                                                                     accessor: 'menu_title',
                                                                     title: 'Nama Menu',
@@ -236,7 +334,15 @@ const HakAkses = () => {
                                                                     width: 100,
                                                                     cellsClassName: 'flex justify-center',
                                                                     titleClassName: '!text-center',
-                                                                    render: (e) => <input type="checkbox" checked={getValueData(e.id)} />,
+                                                                    render: (e) => (
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={e.has_access}
+                                                                            onChange={(event) => {
+                                                                                handleAksesChange(event, e.menu_id, e.has_access, e.pivot_id);
+                                                                            }}
+                                                                        />
+                                                                    ),
                                                                 },
                                                             ]}
                                                             minHeight={200}
@@ -323,11 +429,13 @@ const HakAkses = () => {
                                     sortable: true,
                                     render: (e) => (
                                         <div className="flex gap-2 max-w-3xl flex-wrap">
-                                            {e.menu_privilages.map((item) => (
-                                                <span key={item.id} className="px-3 py-0.5 bg-blue-500 rounded-md text-white">
-                                                    {item.menu.menu_title}
-                                                </span>
-                                            ))}
+                                            {e.menu_privilages
+                                                .sort((a, b) => a.menu_id - b.menu_id)
+                                                .map((item) => (
+                                                    <span key={item.id} className="px-3 py-0.5 bg-blue-500 rounded-md text-white">
+                                                        {item.menu.menu_title}
+                                                    </span>
+                                                ))}
                                         </div>
                                     ),
                                 },
