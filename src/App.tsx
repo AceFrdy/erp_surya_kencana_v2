@@ -1,8 +1,7 @@
 import { PropsWithChildren, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { IRootState } from './store';
+import store, { IRootState } from './store';
 import { toggleRTL, toggleTheme, toggleLocale, toggleMenu, toggleLayout, toggleAnimation, toggleNavbar, toggleSemidark } from './store/themeConfigSlice';
-import store from './store';
 import { ToastContainer } from 'react-toastify';
 import ModalProvider from './providers/modal-provider';
 
