@@ -6,6 +6,7 @@ import { toggleRTL, toggleTheme,toggleSidebar } from '../../store/themeConfigSli
 import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
 import Dropdown from '../Dropdown';
+import axios from 'axios';
 
 const Header = () => {
     const location = useLocation();
@@ -111,6 +112,38 @@ const Header = () => {
     const [flag, setFlag] = useState(themeConfig.locale);
 
     const { t } = useTranslation();
+
+    const token = localStorage.getItem('accessToken') ?? '';
+    const storedId = localStorage.getItem('id');
+
+    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
+    const [name, setName] = useState('');
+
+    const handleFetch = () => {
+        if (token && storedId) {
+            axios
+                .get(`https://erp.digitalindustryagency.com/api/users/${storedId}`, {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                .then((response) => {
+                    const userData = response.data.data.resource;
+                    setEmail(userData.email);
+                    setUsername(userData.username);
+                    setName(userData.name);
+                })
+                .catch((error) => {
+                    console.error('Error fetching user data profil:', error);
+                });
+        }
+    };
+
+    useEffect(() => {
+        handleFetch();
+    }, []);
 
     return (
         <header className={`z-40 ${themeConfig.semidark && themeConfig.menu === 'horizontal' ? 'dark' : ''}`}>
@@ -541,17 +574,17 @@ const Header = () => {
                                             <img className="rounded-md w-10 h-10 object-cover" src="/assets/images/user-profile.jpeg" alt="userProfile" />
                                             <div className="ltr:pl-4 rtl:pr-4 truncate">
                                                 <h4 className="text-base">
-                                                    John Doe
+                                                    {username}
                                                     <span className="text-xs bg-success-light rounded text-success px-1 ltr:ml-2 rtl:ml-2">Pro</span>
                                                 </h4>
                                                 <button type="button" className="text-black/60 hover:text-primary dark:text-dark-light/60 dark:hover:text-white">
-                                                    johndoe@gmail.com
+                                                    {email}
                                                 </button>
                                             </div>
                                         </div>
                                     </li>
                                     <li>
-                                        <Link to="/users/profile" className="dark:hover:text-white">
+                                        <Link to="/user/profile" className="dark:hover:text-white">
                                             <svg className="ltr:mr-2 rtl:ml-2 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <circle cx="12" cy="6" r="4" stroke="currentColor" strokeWidth="1.5" />
                                                 <path
@@ -1123,7 +1156,7 @@ const Header = () => {
                                 </button>
                                 <ul className="rounded absolute top-0 ltr:left-[95%] rtl:right-[95%] min-w-[180px] bg-white z-[10] text-dark dark:text-white-dark dark:bg-[#1b2e4b] shadow p-0 py-2 hidden">
                                     <li>
-                                        <NavLink to="/users/profile">{t('profile')}</NavLink>
+                                        <NavLink to="/user/profile">{t('profile')}</NavLink>
                                     </li>
                                     <li>
                                         <NavLink to="/users/user-account-settings">{t('account_settings')}</NavLink>

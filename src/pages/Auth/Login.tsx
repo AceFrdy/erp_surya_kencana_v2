@@ -80,6 +80,7 @@ const Login = () => {
             .then((response) => {
                 if (response.data.data.status) {
                     localStorage.setItem('accessToken', response.data.data.resource.token);
+                    localStorage.setItem('id', response.data.data.resource.id);
                     navigate('/');
                 } else {
                     setLoginMessage(response.data.message);

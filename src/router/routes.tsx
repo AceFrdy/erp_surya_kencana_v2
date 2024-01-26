@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import Profile from '../pages/User/Profil';
 const Karyawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/Karyawan'));
 const AddKaryawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/AddKaryawan'));
 const EditKaryawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/EditKaryawan'));
@@ -249,6 +250,13 @@ const routes = [
         path: '/menupenjualan/distribution/detaildistribution/:id',
         element: <DetailDistribusi />,
         layout: 'default',
+    },
+
+    // User
+    {
+        path: '/user/profile',
+        element: <Profile />,
+        layout: 'blank',
     },
     //Auth
     {
