@@ -99,23 +99,37 @@ const AddUangMasuk = () => {
                 },
             })
             .then((response) => {
-                console.log('Data Uang Masuk berhasil ditambahkan:', response.data);
+                const notification = {
+                    type: 'success',
+                    message: 'Uang masuk berhasil ditambahkan.',
+                };
                 navigate('/menukeuangan/flowcash/uangmasuk');
-                toast.success('Data berhasil ditambahkan', {
-                    position: 'top-right',
-                    autoClose: 3000,
-                });
+                localStorage.setItem('notification', JSON.stringify(notification));
+                // console.log('Data Uang Masuk berhasil ditambahkan:', response.data);
+                // navigate('/menukeuangan/flowcash/uangmasuk');
+                // toast.success('Data berhasil ditambahkan', {
+                //     position: 'top-right',
+                //     autoClose: 3000,
+                // });
             })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    const apiErrors = error.response.data;
-                    setFormData((prevData) => ({
-                        ...prevData,
-                        errors: apiErrors,
-                    }));
-                }
-                console.error('Error adding cash inflow data:', error);
-                toast.error('Error adding data');
+            .catch((err: any) => {
+                // if (error.response && error.response.data) {
+                //     const apiErrors = error.response.data;
+                //     setFormData((prevData) => ({
+                //         ...prevData,
+                //         errors: apiErrors,
+                //     }));
+                // }
+                // console.error('Error adding cash inflow data:', error);
+                // toast.error('Error adding data');
+                const notification = {
+                    type: 'error',
+                    message: 'Uang Masuk Gagal Ditambahkan',
+                    log: err.message,
+                    title: 'ERROR_ADDING_UANG_MASUK',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
@@ -123,10 +137,33 @@ const AddUangMasuk = () => {
         navigate('/menukeuangan/flowcash/uangmasuk');
     };
 
+    useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+        }
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+                return localStorage.removeItem('notification');
+            }
+        }
+        return () => {
+            sessionStorage.removeItem('old_value');
+        };
+    }, []);
+
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse mb-10">
                 <li>
+                    
                     <Link to="/" className="text-primary hover:underline">
                         Home
                     </Link>

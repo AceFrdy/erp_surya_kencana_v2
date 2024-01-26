@@ -44,15 +44,15 @@ const AddSaldo = () => {
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/detail-accounts', {
+            .get('https://erp.digitalindustryagency.com/api/saldo-dropdown', {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {
-                setDetailAccount(response.data.data.resource.data);
-                console.log("DETAIL ACCOUNT", response.data.data.resource.data)
+                setDetailAccount(response.data.data.resource.dataDetailAcc);
+                console.log("DETAIL ACCOUNT", response.data.data.resource.dataDetailAcc)
             })
             .catch((err: any) => {
                 console.log('DETAIL ACCOUNT', err.message);

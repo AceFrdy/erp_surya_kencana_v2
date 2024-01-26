@@ -54,8 +54,8 @@ const DetailHutang = () => {
                 return (
                     item.id.toString().includes(search.toLowerCase()) ||
                     item.payment_date.toLowerCase().includes(search.toLowerCase()) ||
-                    item.debt_id.toString().includes(search.toLowerCase()) ||
-                    item.payment_total.toString().includes(search.toLowerCase())
+                    item.payment_total.toString().includes(search.toLowerCase()) ||
+                    item.debt_unpaid.toString().includes(search.toLowerCase())
                 );
             });
         });
@@ -94,6 +94,8 @@ const DetailHutang = () => {
             })
             .then((response) => {
                 setInitialRecords(response.data.data.resource.data);
+                setRecordsData(response.data.data.resource.data);
+                console.log("Table HUTANG",response.data.data.resource.data )
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
