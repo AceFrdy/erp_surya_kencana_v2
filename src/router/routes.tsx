@@ -1,5 +1,4 @@
 import { lazy } from 'react';
-import Profile from '../pages/User/Profil';
 const Karyawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/Karyawan'));
 const AddKaryawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/AddKaryawan'));
 const EditKaryawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/EditKaryawan'));
@@ -69,6 +68,10 @@ const CustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/Custo
 const AddCustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/AddCustomerOnline'));
 const EditCustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/EditCustomerOnline'));
 const NotFound = lazy(() => import('../pages/not-found'));
+const Error404 = lazy(() => import('../pages/Error/Erorr404'));
+const Error500 = lazy(() => import('../pages/Error/Error500'));
+const Error503 = lazy(() => import('../pages/Error/Error503'));
+const Profile = lazy(() => import('../pages/User/Profil'));
 
 const routes = [
     //not-found
@@ -513,6 +516,25 @@ const routes = [
     {
         path: '/menupengguna/akun/akundetail',
         element: <DetailUser />,
+        layout: 'default',
+        middleware: 'auth',
+    },
+    //Error Page
+    {
+        path: '/pages/error/error404',
+        element: <Error404 />,
+        layout: 'default',
+        middleware: 'auth',
+    },
+    {
+        path: '/pages/error/error500',
+        element: <Error500 />,
+        layout: 'default',
+        middleware: 'auth',
+    },
+    {
+        path: '/pages/error/error503',
+        element: <Error503 />,
         layout: 'default',
         middleware: 'auth',
     },
