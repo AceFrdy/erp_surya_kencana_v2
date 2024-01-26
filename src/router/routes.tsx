@@ -68,6 +68,10 @@ const CustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/Custo
 const AddCustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/AddCustomerOnline'));
 const EditCustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/EditCustomerOnline'));
 const NotFound = lazy(() => import('../pages/not-found'));
+const Error404 = lazy(() => import('../pages/Error/Erorr404'));
+const Error500 = lazy(() => import('../pages/Error/Error500'));
+const Error503 = lazy(() => import('../pages/Error/Error503'));
+const Profile = lazy(() => import('../pages/User/Profil'));
 
 const routes = [
     //not-found
@@ -77,6 +81,13 @@ const routes = [
         layout: 'blank',
         middleware: 'public',
         menuAkses: '-',
+    },
+
+    // User
+    {
+        path: '/user/profile',
+        element: <Profile />,
+        layout: 'blank',
     },
     //Auth
     {
@@ -560,22 +571,38 @@ const routes = [
         element: <HakAkses />,
         layout: 'default',
         middleware: 'auth',
-        menuAkses: 'hak akses',
     },
-    // {
-    //     path: '/menupengguna/akun',
-    //     element: <User />,
-    //     layout: 'default',
-    //     middleware: 'auth',
-    //     menuAkses: '',
-    // },
-    // {
-    //     path: '/menupengguna/akun/akundetail',
-    //     element: <DetailUser />,
-    //     layout: 'default',
-    //     middleware: 'auth',
-    //     menuAkses: '',
-    // },
+    {
+        path: '/menupengguna/akun',
+        element: <User />,
+        layout: 'default',
+        middleware: 'auth',
+    },
+    {
+        path: '/menupengguna/akun/akundetail',
+        element: <DetailUser />,
+        layout: 'default',
+        middleware: 'auth',
+    },
+    //Error Page
+    {
+        path: '/pages/error/error404',
+        element: <Error404 />,
+        layout: 'default',
+        middleware: 'auth',
+    },
+    {
+        path: '/pages/error/error500',
+        element: <Error500 />,
+        layout: 'default',
+        middleware: 'auth',
+    },
+    {
+        path: '/pages/error/error503',
+        element: <Error503 />,
+        layout: 'default',
+        middleware: 'auth',
+    },
 ];
 
 export { routes };
