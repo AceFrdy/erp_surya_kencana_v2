@@ -571,37 +571,41 @@ const routes = [
         element: <HakAkses />,
         layout: 'default',
         middleware: 'auth',
+        menuAkses: 'hak akses',
     },
-    {
-        path: '/menupengguna/akun',
-        element: <User />,
-        layout: 'default',
-        middleware: 'auth',
-    },
-    {
-        path: '/menupengguna/akun/akundetail',
-        element: <DetailUser />,
-        layout: 'default',
-        middleware: 'auth',
-    },
+    // {
+    //     path: '/menupengguna/akun',
+    //     element: <User />,
+    //     layout: 'default',
+    //     middleware: 'auth',
+    // },
+    // {
+    //     path: '/menupengguna/akun/akundetail',
+    //     element: <DetailUser />,
+    //     layout: 'default',
+    //     middleware: 'auth',
+    // },
     //Error Page
     {
         path: '/pages/error/error404',
         element: <Error404 />,
         layout: 'default',
-        middleware: 'auth',
+        middleware: 'public',
+        menuAkses: '-',
     },
     {
         path: '/pages/error/error500',
         element: <Error500 />,
         layout: 'default',
-        middleware: 'auth',
+        middleware: 'public',
+        menuAkses: '-',
     },
     {
         path: '/pages/error/error503',
         element: <Error503 />,
         layout: 'default',
-        middleware: 'auth',
+        middleware: 'public',
+        menuAkses: '-',
     },
 ];
 
