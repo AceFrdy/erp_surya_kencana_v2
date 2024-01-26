@@ -10,6 +10,7 @@ import IconPlus from '../../components/Icon/IconPlus';
 import IconPencil from '../../components/Icon/IconPencil';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
+import { useAuth } from '../../hooks/auth';
 
 interface MenusProps {
     id: number;
@@ -38,9 +39,9 @@ interface DataState {
 type modalData = 'new-menu' | 'edit-menu' | 'delete-menu' | 'edit-hak-akses';
 
 const HakAkses = () => {
-    const dispatch = useDispatch();
-
     const navigate = useNavigate();
+
+    const dispatch = useDispatch();
 
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [dataModal, setDataModal] = useState<modalData | null>(null);
@@ -272,6 +273,19 @@ const HakAkses = () => {
             })
             .then((response) => {
                 setInitialRecords(response.data.data.resource.data);
+            })
+            .catch((err: any) => {
+                console.log('ERROR_GET_PRIVILAGES', err.message);
+            });
+        axios
+            .get('https://erp.digitalindustryagency.com/api/user-profile', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                console.log(response.data.data.resource);
             })
             .catch((err: any) => {
                 console.log('ERROR_GET_PRIVILAGES', err.message);
