@@ -8,7 +8,7 @@ import { useModal } from '../../hooks/use-modal';
 const DeleteDataDetailPenjualanModal = () => {
     const { isOpen, type, onClose, data } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
-    const navigate = useNavigate;
+    const navigate = useNavigate();
 
     const isModalOpen = isOpen && type === 'delete-data-detail-penjualan';
 
