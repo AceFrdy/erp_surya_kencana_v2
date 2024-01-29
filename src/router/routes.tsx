@@ -1,12 +1,11 @@
 import { lazy } from 'react';
+
 const Karyawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/Karyawan'));
 const AddKaryawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/AddKaryawan'));
 const EditKaryawan = lazy(() => import('../pages/MenuHumanResource/Karyawan/EditKaryawan'));
 const Jabatan = lazy(() => import('../pages/MenuHumanResource/Jabatan/Jabatan'));
 const DetailJabatan = lazy(() => import('../pages/MenuHumanResource/Jabatan/DetailJabatan'));
 const HakAkses = lazy(() => import('../pages/MenuPengguna/HakAkses'));
-const User = lazy(() => import('../pages/MenuPengguna/User'));
-const DetailUser = lazy(() => import('../pages/MenuPengguna/DetailUser'));
 const AddProduk = lazy(() => import('../pages/MenuPenjualan/Product/InputProduk'));
 const Index = lazy(() => import('../pages/Index'));
 const Ecommerce = lazy(() => import('../pages/Ecommerce'));
@@ -77,466 +76,457 @@ const routes = [
     //not-found
     {
         path: '*',
-        element: <Error404 />,
-        layout: 'blank',
+        element: <NotFound />,
         middleware: 'public',
+        menuAkses: '-',
     },
 
-    // User
-    {
-        path: '/user/profile',
-        element: <Profile />,
-        layout: 'blank',
-    },
     //Auth
     {
         path: '/auth/boxed-signin',
         element: <Login />,
-        layout: 'blank',
         middleware: 'public',
+        menuAkses: '-',
+    },
+    // User
+    {
+        path: '/user/profile',
+        element: <Profile />,
+        middleware: 'auth',
+        menuAkses: '-',
     },
     // dashboard
     {
         path: '/',
         element: <Index />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '0',
     },
     {
         path: '/ecommerce',
         element: <Ecommerce />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '1',
     },
     // menu penjualan bagian Product
     {
         path: '/menupenjualan/product/produk',
         element: <Produk />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '2',
     },
     {
         path: '/menupenjualan/product/produk/addproduk',
         element: <AddProduk />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '2',
     },
     {
         path: '/menupenjualan/product/produk/editproduk/:id',
         element: <EditProduk />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '2',
     },
     // Kategori Produk
     {
         path: '/menupenjualan/product/kategoriproduk',
         element: <Kategoriproduk />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '2',
     },
     //Unit
     {
         path: '/menupenjualan/product/unit',
         element: <Unit />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '2',
     },
     {
         path: '/menupenjualan/product/unit/addunit',
         element: <AddUnit />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '2',
     },
     {
         path: '/menupenjualan/product/unit/editunit/:id',
         element: <EditUnit />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '2',
+    },
+    // -->restock
+    // Restock
+    {
+        path: '/menupenjualan/restock/listrestock',
+        element: <ListRestock />,
+        middleware: 'auth',
+        menuAkses: '3',
+    },
+    {
+        path: '/menupenjualan/restock/restock',
+        element: <Restock />,
+        middleware: 'auth',
+        menuAkses: '3',
+    },
+    {
+        path: '/menupenjualan/restock/editrestock/:id',
+        element: <EditRestock />,
+        middleware: 'auth',
+        menuAkses: '3',
+    },
+    {
+        path: '/menupenjualan/restock/detailrestock/:id',
+        element: <DetailRestock />,
+        middleware: 'auth',
+        menuAkses: '3',
+    },
+    // ---> cabang
+    // Cabang
+    {
+        path: '/menupenjualan/cabang/listcabang',
+        element: <ListCabang />,
+        middleware: 'auth',
+        menuAkses: '4',
+    },
+    {
+        path: '/menupenjualan/cabang/listcabang/addcabang',
+        element: <AddCabang />,
+        middleware: 'auth',
+        menuAkses: '4',
+    },
+    {
+        path: '/menupenjualan/cabang/listcabang/editcabang/:id',
+        element: <EditCabang />,
+        middleware: 'auth',
+        menuAkses: '4',
+    },
+    {
+        path: '/menupenjualan/cabang/detailcabang',
+        element: <DetailCabang />,
+        middleware: 'auth',
+        menuAkses: '4',
     },
     // Customer
     {
         path: '/customer/offline',
         element: <CustomerOffline />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '5',
     },
     {
         path: '/customer/offline/tambah-customer-offline',
         element: <AddCustomerOffline />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '5',
     },
     {
         path: '/customer/offline/edit-customer-offline/:id',
         element: <EditCustomer />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '5',
     },
     {
         path: '/customer/online',
         element: <CustomerOnline />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '5',
     },
     {
         path: '/customer/online/tambah-customer-online',
         element: <AddCustomerOnline />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '5',
     },
     {
         path: '/customer/online/edit-customer-online',
         element: <EditCustomerOnline />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '5',
     },
     {
         path: '/customer/online/detailcustomeronline/:id',
         element: <DetailCustomerOnline />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '5',
     },
-    // Cabang
-    {
-        path: '/menupenjualan/cabang/listcabang',
-        element: <ListCabang />,
-        layout: 'default',
-        middleware: 'auth',
-    },
-    {
-        path: '/menupenjualan/cabang/listcabang/addcabang',
-        element: <AddCabang />,
-        layout: 'default',
-        middleware: 'auth',
-    },
-    {
-        path: '/menupenjualan/cabang/listcabang/editcabang/:id',
-        element: <EditCabang />,
-        layout: 'default',
-        middleware: 'auth',
-    },
-    {
-        path: '/menupenjualan/cabang/detailcabang',
-        element: <DetailCabang />,
-        layout: 'default',
-        middleware: 'auth',
-    },
-    // Suplier
-    {
-        path: '/menupenjualan/supplier',
-        element: <Supplier />,
-        layout: 'default',
-        middleware: 'auth',
-    },
-    {
-        path: '/menupenjualan/supplier/addsupplier',
-        element: <AddSupplier />,
-        layout: 'default',
-        middleware: 'auth',
-    },
-    {
-        path: '/menupenjualan/supplier/editsupplier/:id',
-        element: <EditSupplier />,
-        layout: 'default',
-        middleware: 'auth',
-    },
-    // Restock
-    {
-        path: '/menupenjualan/restock/listrestock',
-        element: <ListRestock />,
-        layout: 'default',
-        middleware: 'auth',
-    },
-    {
-        path: '/menupenjualan/restock/restock',
-        element: <Restock />,
-        layout: 'default',
-        middleware: 'auth',
-    },
-    {
-        path: '/menupenjualan/restock/editrestock/:id',
-        element: <EditRestock />,
-        layout: 'default',
-        middleware: 'auth',
-    },
-    {
-        path: '/menupenjualan/restock/detailrestock/:id',
-        element: <DetailRestock />,
-        layout: 'default',
-        middleware: 'auth',
-    },
+    // ---> penjualan
     // Penjualan
     {
         path: '/menupenjualan/penjualan/penjualan',
         element: <Penjualan />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '6',
     },
     {
         path: '/menupenjualan/penjualan/laporanpenjualan',
         element: <LaporanPenjualan />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '6',
     },
     {
         path: '/menupenjualan/penjualan/detailpenjualan/:id',
         element: <DetailPenjualan />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '6',
     },
     {
         path: '/menupenjualan/penjualan/editpenjualan/:id',
         element: <EditPenjualan />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '6',
     },
     // Distribution
     {
         path: '/menupenjualan/distribution/distribution',
         element: <Distribusi />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '7',
     },
     {
         path: '/menupenjualan/distribution/laporandistribution',
         element: <LaporanDistribusi />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '7',
     },
     {
         path: '/menupenjualan/distribution/detaildistribution/:id',
         element: <DetailDistribusi />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '7',
+    },
+    // Suplier
+    {
+        path: '/menupenjualan/supplier',
+        element: <Supplier />,
+        middleware: 'auth',
+        menuAkses: '8',
+    },
+    {
+        path: '/menupenjualan/supplier/addsupplier',
+        element: <AddSupplier />,
+        middleware: 'auth',
+        menuAkses: '8',
+    },
+    {
+        path: '/menupenjualan/supplier/editsupplier/:id',
+        element: <EditSupplier />,
+        middleware: 'auth',
+        menuAkses: '8',
     },
     // Menu keuangan Akun
     {
         path: '/menukeuangan/akun/akun',
         element: <Akun />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '9',
     },
     {
         path: '/menukeuangan/akun/addakun',
         element: <AddAkun />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '9',
     },
     {
         path: '/menukeuangan/akun/editakun/:id',
-        // path: '/menupenjualan/cabang/listcabang/editcabang/:id',
         element: <EditAkun />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '9',
     },
     {
         path: '/menukeuangan/akun/detailakun',
         element: <DetailAkun />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '9',
     },
     {
         path: '/menukeuangan/akun/adddetailakun',
         element: <AddDetailAkun />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '9',
     },
     {
         path: '/menukeuangan/akun/editdetailakun/:id',
         element: <EditDetailAkun />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '9',
     },
     // Control Panel
     {
         path: '/menukeuangan/controlpanel',
         element: <ControlPanel />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '10',
     },
     // Saldo
     {
         path: '/menukeuangan/saldo',
         element: <Saldo />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '11',
     },
     {
         path: '/menukeuangan/saldo/addsaldo',
         element: <AddSaldo />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '11',
     },
     // FlowCash
     {
         path: '/menukeuangan/flowcash/uangmasuk',
         element: <UangMasuk />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '12',
     },
     {
         path: '/menukeuangan/flowcash/adduangmasuk',
         element: <AddUangMasuk />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '12',
     },
     {
         path: '/menukeuangan/flowcash/detailuangmasuk/:id',
         element: <DetailUangMasuk />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '12',
     },
     // Uang Keluar
     {
         path: '/menukeuangan/flowcash/uangkeluar',
         element: <UangKeluar />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '12',
     },
     {
         path: '/menukeuangan/flowcash/adduangkeluar',
         element: <AddUangKeluar />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '12',
     },
     {
         path: '/menukeuangan/flowcash/detailuangkeluar/:id',
         element: <DetailUangKeluar />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '12',
     },
     // Hutang
     {
         path: '/menukeuangan/hutang-piutang/hutang',
         element: <Hutang />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '13',
     },
     {
         path: '/menukeuangan/hutang-piutang/addhutang',
         element: <AddHutang />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '13',
     },
     {
         path: '/menukeuangan/hutang-piutang/detailhutang/:id',
         element: <DetailHutang />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '13',
     },
     {
         path: '/menukeuangan/hutang-piutang/edithutang/:id',
         element: <EditHutang />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '13',
     },
     // PIUTANG
     {
         path: '/menukeuangan/hutang-piutang/piutang',
         element: <Piutang />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '13',
     },
     {
         path: '/menukeuangan/hutang-piutang/addpiutang',
         element: <AddPiutang />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '13',
     },
     {
         path: '/menukeuangan/hutang-piutang/detailpiutang/:id',
         element: <DetailPiutang />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '13',
     },
     {
         path: '/menukeuangan/hutang-piutang/editpiutang/:id',
         element: <EditPiutang />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '13',
     },
     // Laporan
     {
         path: '/menukeuangan/laporan/laporan',
         element: <Laporan />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '14',
     },
     {
         path: '/menukeuangan/laporan/detaillaporan',
         element: <DetailLaporan />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '14',
     },
     // Karyawan
     {
         path: '/menuhumanresource/karyawan',
         element: <Karyawan />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '15',
     },
     {
         path: '/menuhumanresource/karyawan/addkaryawan',
         element: <AddKaryawan />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '15',
     },
     {
         path: '/menuhumanresource/karyawan/editkaryawan/:id',
         element: <EditKaryawan />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '15',
     },
     //Jabatan
     {
         path: '/menuhumanresource/jabatan',
         element: <Jabatan />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '16',
     },
     {
         path: '/menuhumanresource/jabatan/detailjabatan/:id',
         element: <DetailJabatan />,
-        layout: 'default',
         middleware: 'auth',
+        menuAkses: '16',
     },
     //Hak Akses
     {
         path: '/menupengguna/hakakses',
         element: <HakAkses />,
-        layout: 'default',
         middleware: 'auth',
-    },
-    {
-        path: '/menupengguna/akun',
-        element: <User />,
-        layout: 'default',
-        middleware: 'auth',
-    },
-    {
-        path: '/menupengguna/akun/akundetail',
-        element: <DetailUser />,
-        layout: 'default',
-        middleware: 'auth',
+        menuAkses: '17',
     },
     //Error Page
     {
         path: '/pages/error/error404',
         element: <Error404 />,
-        layout: 'default',
-        middleware: 'auth',
+        middleware: 'public',
+        menuAkses: '-',
     },
     {
         path: '/pages/error/error500',
         element: <Error500 />,
-        layout: 'default',
-        middleware: 'auth',
+        middleware: 'public',
+        menuAkses: '-',
     },
     {
         path: '/pages/error/error503',
         element: <Error503 />,
-        layout: 'default',
-        middleware: 'auth',
+        middleware: 'public',
+        menuAkses: '-',
     },
 ];
 

@@ -1,20 +1,21 @@
 import { createBrowserRouter } from 'react-router-dom';
-import BlankLayout from '../components/Layouts/BlankLayout';
-import DefaultLayout from '../components/Layouts/DefaultLayout';
+
 import { routes } from './routes';
-import Middleware from '../middleware';
+import AuthMiddleware from '../middleware/auth-middleware';
+import PublicMiddleware from '../middleware/public-middleware';
+import { Suspense } from 'react';
 
-const finalRoutes = routes.map((route) => {
+const finalMiddleware = routes.map((route) => {
     return {
         ...route,
-        element: route.layout === 'blank' ? <BlankLayout>{route.element}</BlankLayout> : <DefaultLayout>{route.element}</DefaultLayout>,
-    };
-});
-
-const finalMiddleware = finalRoutes.map((route) => {
-    return {
-        ...route,
-        element: route.middleware === 'auth' ? <Middleware>{route.element}</Middleware> : <>{route.element}</>,
+        element:
+            route.middleware === 'auth' ? (
+                <AuthMiddleware menu={route.menuAkses}>
+                    <Suspense fallback={<div>Loading...</div>}>{route.element}</Suspense>
+                </AuthMiddleware>
+            ) : (
+                <PublicMiddleware>{route.element}</PublicMiddleware>
+            ),
     };
 });
 

@@ -145,18 +145,18 @@ const Saldo = () => {
                                 sortable: true,
                                 render: (e) => formatPrice(e.saldo_amount),
                             },
-                            {
-                                accessor: 'action',
-                                title: 'Opsi',
-                                titleClassName: '!text-center',
-                                render: (e) => (
-                                    <div className="flex items-center w-max mx-auto gap-2">
-                                        <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-saldo', e.id)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button>
-                                    </div>
-                                ),
-                            },
+                            // {
+                            //     accessor: 'action',
+                            //     title: 'Opsi',
+                            //     titleClassName: '!text-center',
+                            //     render: (e) => (
+                            //         <div className="flex items-center w-max mx-auto gap-2">
+                            //             <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-saldo', e.id)}>
+                            //                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
+                            //             </button>
+                            //         </div>
+                            //     ),
+                            // },
                         ]}
                         sortStatus={sortStatus}
                         onSortStatusChange={setSortStatus}

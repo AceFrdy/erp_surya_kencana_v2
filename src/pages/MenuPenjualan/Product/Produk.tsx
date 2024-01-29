@@ -3,7 +3,7 @@ import sortBy from 'lodash/sortBy';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState } from 'react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 
 import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
@@ -31,38 +31,18 @@ interface ProductList {
 }
 
 const Produk = () => {
+    const { onOpen } = useModal();
     const dispatch = useDispatch();
+
     const token = localStorage.getItem('accessToken') ?? '';
-    useEffect(() => {
-        dispatch(setPageTitle('Produk'));
-    });
+
     const [initialRecords, setInitialRecords] = useState<ProductList[]>([]);
     const [recordsData, setRecordsData] = useState(initialRecords);
-
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const { onOpen } = useModal();
-
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return item.product_name.toLowerCase().includes(search.toLowerCase()) || item.product_barcode.toLowerCase().includes(search.toLowerCase());
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, recordsData]);
-
-    useEffect(() => {
-        const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sortStatus]);
 
     // pagination
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
@@ -86,10 +66,34 @@ const Produk = () => {
                 setMetaLinksLink(response.data.data.resource.meta.links);
                 setLinksLink(response.data.data.resource.links);
             })
-            .catch((error) => {
-                console.error('Error fetching data:', error);
+            .catch((err: any) => {
+                if (err.response && err.response.status === 500) {
+                    localStorage.setItem('error', '500');
+                } else if (err.response && err.response.status === 503) {
+                    localStorage.setItem('error', '503');
+                } else {
+                    console.log('ERROR_GETTING_DATA:', err.message);
+                }
             });
     }, [url]);
+
+    useEffect(() => {
+        if (!initialRecords) {
+            return;
+        }
+        setRecordsData(() => {
+            return initialRecords.filter((item) => {
+                return item.product_name.toLowerCase().includes(search.toLowerCase()) || item.product_barcode.toLowerCase().includes(search.toLowerCase());
+            });
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [search, recordsData]);
+
+    useEffect(() => {
+        const data = sortBy(initialRecords, sortStatus.columnAccessor);
+        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sortStatus]);
 
     useEffect(() => {
         const notificationMessage = localStorage.getItem('notification');
@@ -104,6 +108,11 @@ const Produk = () => {
         }
         return localStorage.removeItem('notification');
     }, []);
+
+    // page-title
+    useEffect(() => {
+        dispatch(setPageTitle('Produk'));
+    });
 
     return (
         <div>

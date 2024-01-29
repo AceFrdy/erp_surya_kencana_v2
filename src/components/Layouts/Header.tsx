@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { IRootState } from '../../store';
-import { toggleRTL, toggleTheme,toggleSidebar } from '../../store/themeConfigSlice';
+import { toggleRTL, toggleTheme, toggleSidebar } from '../../store/themeConfigSlice';
 import { useTranslation } from 'react-i18next';
 import i18next from 'i18next';
 import Dropdown from '../Dropdown';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Header = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     useEffect(() => {
         const selector = document.querySelector('ul.horizontal-menu a[href="' + window.location.pathname + '"]');
         if (selector) {
@@ -141,6 +143,24 @@ const Header = () => {
         }
     };
 
+    const handleSignOut = async () => {
+        try {
+            axios.post(
+                'https://erp.digitalindustryagency.com/api/logout',
+                {},
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            navigate('/auth/boxed-signin');
+        } catch (error) {
+            toast.error('Gagal logout.');
+        }
+    };
+
     useEffect(() => {
         handleFetch();
     }, []);
@@ -152,7 +172,9 @@ const Header = () => {
                     <div className="horizontal-logo flex lg:hidden justify-between items-center ltr:mr-2 rtl:ml-2">
                         <Link to="/" className="main-logo flex items-center shrink-0">
                             {/* <img className="w-8 ltr:-ml-1 rtl:-mr-1 inline" src="/assets/images/logo.svg" alt="logo" /> */}
-                            <span className="text-2xl ltr:ml-1.5 rtl:mr-1.5  font-semibold  align-middle hidden md:inline dark:text-white-light transition-all duration-300 hover:text-primary">ERP Sinar Kencana</span>
+                            <span className="text-2xl ltr:ml-1.5 rtl:mr-1.5  font-semibold  align-middle hidden md:inline dark:text-white-light transition-all duration-300 hover:text-primary">
+                                ERP Sinar Kencana
+                            </span>
                         </Link>
                         <button
                             type="button"
@@ -170,9 +192,7 @@ const Header = () => {
                     </div>
 
                     <div className="ltr:mr-2 rtl:ml-2 hidden sm:block">
-                        <ul className="flex items-center space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
-                            
-                        </ul>
+                        <ul className="flex items-center space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]"></ul>
                     </div>
                     <div className="sm:flex-1 justify-end ltr:sm:mr-0 ltr:mr-auto sm:rtl:ml-0 rtl:ml-auto flex items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
                         <div>
@@ -241,7 +261,7 @@ const Header = () => {
                                 </button>
                             )}
                         </div>
-                        
+
                         <div className="dropdown shrink-0 flex">
                             <Dropdown
                                 offset={[0, 8]}
@@ -322,7 +342,7 @@ const Header = () => {
                                         </Link>
                                     </li>
                                     <li className="border-t border-white-light dark:border-white-light/10">
-                                        <Link to="/auth/boxed-signin" className="text-danger !py-3">
+                                        <button onClick={handleSignOut} className="text-danger !py-3">
                                             <svg className="ltr:mr-2 rtl:ml-2 rotate-90 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path
                                                     opacity="0.5"
@@ -334,7 +354,7 @@ const Header = () => {
                                                 <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                             </svg>
                                             Sign Out
-                                        </Link>
+                                        </button>
                                     </li>
                                 </ul>
                             </Dropdown>

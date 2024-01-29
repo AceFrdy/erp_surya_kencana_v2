@@ -163,9 +163,9 @@ const UangMasuk = () => {
                                                     <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                                 </Link>
                                             </button> */}
-                                        <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-inflow-cash', e.id)}>
+                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-inflow-cash', e.id)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button>
+                                        </button> */}
                                     </div>
                                 ),
                             },
