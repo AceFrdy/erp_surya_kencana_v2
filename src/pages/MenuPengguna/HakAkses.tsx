@@ -279,19 +279,6 @@ const HakAkses = () => {
         fetchPrivilage();
     }, []);
 
-    // useEffect(() => {
-    //     const notificationMessage = localStorage.getItem('notification');
-    //     if (notificationMessage) {
-    //         const { type, message } = JSON.parse(notificationMessage);
-    //         if (type === 'success') {
-    //             toast.success(message);
-    //         } else if (type === 'error') {
-    //             toast.error(message);
-    //         }
-    //     }
-    //     return localStorage.removeItem('notification');
-    // }, []);
-
     return (
         <>
             <Transition appear show={openModal} as={Fragment}>

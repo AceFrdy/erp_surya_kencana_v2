@@ -19,13 +19,25 @@ const DeleteInflowCashModal = () => {
                     Authorization: `Bearer ${token}`,
                 },
             })
-            .then(() => {
+            .then((response) => {
                 onClose();
-                toast.success('Uang Masuk Berhasil Dihapus.');
+                const notification = {
+                    type: 'success',
+                    message: 'Data Uang Masuk Berhasil Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE INFLOW CASH', err);
+                onClose();
+                const notification = {
+                    type: 'error',
+                    message: 'Uang Masuk Gagal Dihapus.',
+                    log: err.message,
+                    title: 'ERROR_DELETING_INFLOW',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
