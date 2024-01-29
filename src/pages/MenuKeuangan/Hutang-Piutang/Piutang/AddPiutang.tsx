@@ -184,6 +184,7 @@ const AddPiutang = () => {
                                 </option>
                             ))}
                         </select>
+                        <p className="text-xs italic text-slate-500 mt-2">* Silahkan untuk membuat akun detail dari jenis Asset/Harta dan group piutang</p>
                     </div>
                     <div>
                         <label htmlFor="debitur_name">Nama Debitur</label>

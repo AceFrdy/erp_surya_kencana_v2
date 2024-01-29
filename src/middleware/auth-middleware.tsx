@@ -1,21 +1,27 @@
 import React, { PropsWithChildren } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAkses, useAuth } from '../hooks/auth';
+import { useAuth } from '../hooks/auth';
+import DefaultLayout from '../components/Layouts/DefaultLayout';
 
 interface AuthMiddlewareProps extends PropsWithChildren {
     menu: string;
 }
 
 const AuthMiddleware = ({ children, menu }: AuthMiddlewareProps) => {
-    const authorize = useAuth();
-    const akses = useAkses({ menu });
-    if (authorize === 'isUnauthorized') {
+    const { authorize, akses } = useAuth();
+
+    if (authorize === 'isLoading') {
+        return <div>loading...</div>;
+    } else if (authorize === 'isUnauthorized') {
         return <Navigate to="/auth/boxed-signin" />;
     }
-    if (authorize === 'isAuthorized') {
-        return <>{children}</>;
+
+    if (authorize === 'isAuthorized' && akses[parseFloat(menu)]) {
+        return <DefaultLayout>{children}</DefaultLayout>;
+    } else if (authorize === 'isAuthorized' && !akses[parseFloat(menu)]) {
+        return <Navigate to="/" />;
     }
-    return null;
+    return <DefaultLayout>{children}</DefaultLayout>;
 };
 
 export default AuthMiddleware;

@@ -1,44 +1,39 @@
-import axios from 'axios';
+import axios, { CancelTokenSource } from 'axios';
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 interface AksesProps {
     has_access: boolean;
     menu_title: string;
 }
-
-const token = localStorage.getItem('accessToken') ?? '';
+interface HasAksesProps {
+    has_access: boolean;
+}
 
 export const useAuth = () => {
     const [authorize, setAuthorize] = useState<string>('isLoading' || 'isAuthorized' || 'isUnauthorized');
-    useEffect(() => {
-        setAuthorize('isLoading');
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-            axios
-                .get('https://erp.digitalindustryagency.com/api/user-profile', { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
-                .then((response) => {
-                    setAuthorize('isAuthorized');
-                })
-                .catch((err) => {
-                    setAuthorize('isUnauthorized');
-                });
-        } else {
+    const [akses, setAkses] = useState<boolean[]>([]);
+
+    const token = localStorage.getItem('accessToken');
+    const getData = async () => {
+        try {
+            const response = await axios.get('https://erp.digitalindustryagency.com/api/user-profile', { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } });
+            setAuthorize('isAuthorized');
+            const data: HasAksesProps[] = response.data.data.resource[1].menu_access;
+            setAkses(data.map((item) => item.has_access));
+        } catch (error: any) {
+            console.clear();
             setAuthorize('isUnauthorized');
         }
-    }, []);
-    return authorize;
-};
-
-export const useAkses = ({ menu }: { menu: string }) => {
-    const [akses, setAkses] = useState<string>('isLoading' || 'hasAkses' || 'notAkses');
+    };
     useEffect(() => {
-        setAkses('isLoading');
-        axios.get('https://erp.digitalindustryagency.com/api/user-profile', { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } }).then((response) => {
-            const data: AksesProps[] = response.data.data.resource[1];
-            const isAkses = data.find((item) => item.menu_title.toLowerCase() === menu)?.has_access;
-
-            setAkses(isAkses ? 'hasAkses' : 'notAkses');
-        });
-    }, []);
-    return akses;
+        setAuthorize('isLoading');
+        if (token) {
+            getData();
+        } else {
+            console.clear();
+            setAuthorize('isUnauthorized');
+        }
+    }, [token]);
+    return { authorize, akses };
 };

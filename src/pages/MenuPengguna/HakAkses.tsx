@@ -2,7 +2,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { DataTable } from 'mantine-datatable';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 import { FormEvent, Fragment, MouseEvent, useEffect, useState } from 'react';
 
@@ -10,7 +10,6 @@ import IconPlus from '../../components/Icon/IconPlus';
 import IconPencil from '../../components/Icon/IconPencil';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
-import { useAuth } from '../../hooks/auth';
 
 interface MenusProps {
     id: number;
@@ -39,8 +38,6 @@ interface DataState {
 type modalData = 'new-menu' | 'edit-menu' | 'delete-menu' | 'edit-hak-akses';
 
 const HakAkses = () => {
-    const navigate = useNavigate();
-
     const dispatch = useDispatch();
 
     const [openModal, setOpenModal] = useState<boolean>(false);
@@ -76,6 +73,43 @@ const HakAkses = () => {
         setMenuForm('');
     };
 
+    const fetchMenu = () => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/menus', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const menuLength = response.data.data.resource.length;
+                const halfLength = Math.trunc(menuLength / 2);
+
+                setMenuHalfLength(halfLength);
+                setMenuRecord(response.data.data.resource.slice(0, halfLength));
+                setMenuRecordSecond(response.data.data.resource.slice(halfLength, menuLength));
+            })
+            .catch((err: any) => {
+                console.log('ERROR_GET_MENUS', err.message);
+            });
+    };
+
+    const fetchPrivilage = () => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/privilages', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setInitialRecords(response.data.data.resource.data);
+            })
+            .catch((err: any) => {
+                console.log('ERROR_GET_PRIVILAGES', err.message);
+            });
+    };
+
     const handleAddMenu = (e: FormEvent) => {
         e.preventDefault();
         const data = new FormData();
@@ -92,14 +126,13 @@ const HakAkses = () => {
                 },
             })
             .then((response) => {
-                navigate(0);
-                const notification = {
-                    type: 'success',
-                    message: 'Menu Berhasil Ditambahkan',
-                };
-                localStorage.setItem('notification', JSON.stringify(notification));
+                fetchMenu();
+                handleCloseModal();
+                toast.error('Menu Berhasil Ditambahkan');
             })
             .catch((err: any) => {
+                fetchMenu();
+                handleCloseModal();
                 console.log('ERROR_ADD_MENU', err.message);
                 toast.error('Menu Gagal Ditambahkan');
             });
@@ -139,14 +172,13 @@ const HakAkses = () => {
                 },
             })
             .then((response) => {
-                navigate(0);
-                const notification = {
-                    type: 'success',
-                    message: 'Menu Berhasil Diperbarui',
-                };
-                localStorage.setItem('notification', JSON.stringify(notification));
+                fetchMenu();
+                handleCloseModal();
+                toast.success('Menu Berhasil Diperbarui');
             })
             .catch((err: any) => {
+                fetchMenu();
+                handleCloseModal();
                 console.log('ERROR_EDIT_MENU', err.message);
                 toast.error('Menu Gagal Diperbarui');
             });
@@ -163,14 +195,13 @@ const HakAkses = () => {
                 },
             })
             .then((response) => {
-                navigate(0);
-                const notification = {
-                    type: 'success',
-                    message: 'Menu Berhasil Dihapus',
-                };
-                localStorage.setItem('notification', JSON.stringify(notification));
+                fetchMenu();
+                handleCloseModal();
+                toast.success('Menu Berhasil Dihapus');
             })
             .catch((err: any) => {
+                fetchMenu();
+                handleCloseModal();
                 console.log('ERROR_DELETE_MENU', err.message);
                 toast.error('Menu Gagal Dihapus');
             });
@@ -207,14 +238,13 @@ const HakAkses = () => {
                     },
                 })
                 .then((response) => {
-                    navigate(0);
-                    const notification = {
-                        type: 'success',
-                        message: 'Akses Berhasil Dihapus',
-                    };
-                    localStorage.setItem('notification', JSON.stringify(notification));
+                    fetchPrivilage();
+                    handleCloseModal();
+                    toast.success('Akses Berhasil Dihapus');
                 })
                 .catch((err: any) => {
+                    fetchPrivilage();
+                    handleCloseModal();
                     console.log('ERROR_DELETE_ACCESS', err.message);
                     toast.error('Akses Gagal Dihapus');
                 });
@@ -231,14 +261,13 @@ const HakAkses = () => {
                     },
                 })
                 .then((response) => {
-                    navigate(0);
-                    const notification = {
-                        type: 'success',
-                        message: 'Akses Berhasil Ditambahkan',
-                    };
-                    localStorage.setItem('notification', JSON.stringify(notification));
+                    fetchPrivilage();
+                    handleCloseModal();
+                    toast.success('Akses Berhasil Ditambahkan');
                 })
                 .catch((err: any) => {
+                    fetchPrivilage();
+                    handleCloseModal();
                     console.log('ERROR_DELETE_ACCESS', err.message);
                     toast.error('Akses Gagal Ditambahkan');
                 });
@@ -246,64 +275,22 @@ const HakAkses = () => {
     };
 
     useEffect(() => {
-        axios
-            .get('https://erp.digitalindustryagency.com/api/menus', {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                const menuLength = response.data.data.resource.length;
-                const halfLength = Math.trunc(menuLength / 2);
-
-                setMenuHalfLength(halfLength);
-                setMenuRecord(response.data.data.resource.slice(0, halfLength));
-                setMenuRecordSecond(response.data.data.resource.slice(halfLength, menuLength));
-            })
-            .catch((err: any) => {
-                console.log('ERROR_GET_MENUS', err.message);
-            });
-        axios
-            .get('https://erp.digitalindustryagency.com/api/privilages', {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                setInitialRecords(response.data.data.resource.data);
-            })
-            .catch((err: any) => {
-                console.log('ERROR_GET_PRIVILAGES', err.message);
-            });
-        axios
-            .get('https://erp.digitalindustryagency.com/api/user-profile', {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                console.log(response.data.data.resource);
-            })
-            .catch((err: any) => {
-                console.log('ERROR_GET_PRIVILAGES', err.message);
-            });
+        fetchMenu();
+        fetchPrivilage();
     }, []);
 
-    useEffect(() => {
-        const notificationMessage = localStorage.getItem('notification');
-        if (notificationMessage) {
-            const { type, message } = JSON.parse(notificationMessage);
-            if (type === 'success') {
-                toast.success(message);
-            } else if (type === 'error') {
-                toast.error(message);
-            }
-        }
-        return localStorage.removeItem('notification');
-    }, []);
+    // useEffect(() => {
+    //     const notificationMessage = localStorage.getItem('notification');
+    //     if (notificationMessage) {
+    //         const { type, message } = JSON.parse(notificationMessage);
+    //         if (type === 'success') {
+    //             toast.success(message);
+    //         } else if (type === 'error') {
+    //             toast.error(message);
+    //         }
+    //     }
+    //     return localStorage.removeItem('notification');
+    // }, []);
 
     return (
         <>

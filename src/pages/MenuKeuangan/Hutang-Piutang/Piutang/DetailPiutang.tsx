@@ -67,7 +67,6 @@ const DetailPiutang = () => {
                 },
             })
             .then((response) => {
-                console.log(response.data.data.resource);
                 setData(response.data.data.resource);
                 setInitialRecords(response.data.data.resource.receivable_pays);
             })

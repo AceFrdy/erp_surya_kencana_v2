@@ -1,79 +1,36 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
-// import Dropdown from '../components/Dropdown';
-import IconEye from '../components/Icon/IconEye';
-// import IconHorizontalDots from '../components/Icon/IconHorizontalDots';
-import { IRootState } from '../store';
-import IconBolt from '../components/Icon/IconBolt';
-import IconNetflix from '../components/Icon/IconNetflix';
-import IconUser from '../components/Icon/IconUser';
-import IconCashBanknotes from '../components/Icon/IconCashBanknotes';
-import ReactApexChart from 'react-apexcharts';
-import { Link } from 'react-router-dom';
-import IconMultipleForwardRight from '../components/Icon/IconMultipleForwardRight';
-import { useEffect } from 'react';
-import { setPageTitle } from '../store/themeConfigSlice';
-import { formatPrice } from '../utils';
-import axios from 'axios';
 import clsx from 'clsx';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
 import { DataTable } from 'mantine-datatable';
+import { useDispatch, useSelector } from 'react-redux';
 
-interface DashboardCard {
-    total_sales: number;
-    revenue: number;
-    total_customers: number;
-    total_employers: number;
-}
-
-interface RecentOrderProps {
-    sale_report_customer: string;
-    sale_report_invoice: string;
-    sale_report_grand_total: number;
-    sale_report_status: string;
-}
-
-interface CashFlowProps {
-    amount: number;
-    date: string;
-    index: {
-        index_info: string;
-    };
-}
-interface TopSellingProps {
-    branch_name: string;
-    product_name: string;
-    product_price: number;
-    total_sold: number;
-}
-
-const iconClassFlow: Record<number, string> = {
-    1: 'bg-success-light dark:bg-success text-success dark:text-success-light',
-    2: 'bg-warning-light dark:bg-warning text-warning dark:text-warning-light',
-    3: 'bg-danger-light dark:bg-danger text-danger dark:text-danger-light',
-    4: 'bg-info-light dark:bg-info text-info dark:text-info-light',
-    5: 'bg-secondary-light dark:bg-secondary text-secondary dark:text-secondary-light',
-    6: 'bg-primary-light dark:bg-primary text-primary dark:text-primary-light',
-};
+import { IRootState } from '../store';
+import { formatPrice } from '../utils';
+import { setPageTitle } from '../store/themeConfigSlice';
+import { CashFlowProps, DashboardCard, RecentOrderProps, TopSellingProps, iconClassFlow } from '../lib/utils';
+import { Navigate } from 'react-router-dom';
 
 const Index = () => {
+    // sistem
+    const dispatch = useDispatch();
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl';
-    const token = localStorage.getItem('accessToken') ?? '';
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(setPageTitle('Dashboard'));
-    });
+
+    // state management
+    const [error, setError] = useState('');
+    const [recent, setRecent] = useState<RecentOrderProps[]>([]);
+    const [cashFlow, setCashFlow] = useState<CashFlowProps[]>([]);
+    const [topSelling, setTopSelling] = useState<TopSellingProps[]>([]);
+    const [anualSelling, setAnualSelling] = useState<[]>([]);
     const [card, setCard] = useState<DashboardCard>({
         total_sales: 0,
         revenue: 0,
         total_customers: 0,
         total_employers: 0,
     });
-    const [recent, setRecent] = useState<RecentOrderProps[]>([]);
 
-    const [cashFlow, setCashFlow] = useState<CashFlowProps[]>([]);
-    const [topSelling, setTopSelling] = useState<TopSellingProps[]>([]);
-    const [anualSelling, setAnualSelling] = useState<[]>([]);
+    const token = localStorage.getItem('accessToken') ?? '';
     const uniqueVisitorSeries: any = {
         series: [
             {
@@ -167,6 +124,7 @@ const Index = () => {
         },
     };
 
+    // function
     const getFirstWord = (data: string) => {
         return data
             .split(' ')
@@ -175,6 +133,7 @@ const Index = () => {
     };
     const getClassIconCashFlow = (data: number): string => iconClassFlow[data] || '';
 
+    // get_data
     useEffect(() => {
         axios
             .get('https://erp.digitalindustryagency.com/api/dashboard', {
@@ -189,12 +148,28 @@ const Index = () => {
                 setCashFlow(response.data.data.resource.cash_flows);
                 setTopSelling(response.data.data.resource.top_selling_product);
                 setAnualSelling(response.data.data.resource.anual_sales.map((item: any) => item.total_sales));
-                console.log('dashboard', response.data.data.resource);
             })
             .catch((err: any) => {
-                console.log('ERROR_GETTING_Data:', err.message);
+                if (err.response && err.response.status === 500) {
+                    setError('500');
+                } else if (err.response && err.response.status === 503) {
+                    setError('503');
+                } else {
+                    console.log('ERROR_GETTING_Data:', err.message);
+                }
             });
     }, []);
+
+    // page-title
+    useEffect(() => {
+        dispatch(setPageTitle('Dashboard'));
+    }, []);
+
+    if (error === '503') {
+        return <Navigate to="/pages/error/error503" />;
+    } else if (error === '500') {
+        return <Navigate to="/pages/error/error500" />;
+    }
 
     return (
         <div>
@@ -289,6 +264,7 @@ const Index = () => {
                             highlightOnHover
                             className="whitespace-nowrap table-hover"
                             records={recent}
+                            idAccessor="sale_report_invoice"
                             columns={[
                                 { accessor: 'id', title: 'No', render: (e) => recent.indexOf(e) + 1 },
                                 {
@@ -333,6 +309,7 @@ const Index = () => {
                             highlightOnHover
                             className="whitespace-nowrap table-hover"
                             records={topSelling}
+                            idAccessor="product_name"
                             columns={[
                                 { accessor: 'id', title: 'No', render: (e) => topSelling.indexOf(e) + 1 },
                                 {

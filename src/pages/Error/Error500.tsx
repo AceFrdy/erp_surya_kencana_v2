@@ -10,6 +10,7 @@ const Error500 = () => {
         dispatch(setPageTitle('Error 500'));
     });
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
+    localStorage.removeItem('error');
 
     return (
         <div className="relative flex min-h-screen items-center justify-center overflow-hidden">
