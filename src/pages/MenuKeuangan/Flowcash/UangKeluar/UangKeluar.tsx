@@ -180,9 +180,9 @@ const UangKeluar = () => {
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-uang-keluar', e.id)}>
+                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-uang-keluar', e.id)}>
                                             <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button>
+                                        </button> */}
                                     </div>
                                 ),
                             },
