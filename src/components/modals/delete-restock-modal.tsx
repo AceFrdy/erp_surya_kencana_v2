@@ -19,7 +19,7 @@ const DeleteRestockModal = () => {
                     Authorization: `Bearer ${token}`,
                 },
             })
-            .then(() => {
+            .then((response) => {
                 onClose();
                 const notification = {
                     type: 'success',
@@ -29,13 +29,15 @@ const DeleteRestockModal = () => {
                 navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE CUSTOMER', err);
+                onClose();
                 const notification = {
                     type: 'error',
-                    message: 'Data Restock Berhasil Dihapus',
+                    message: 'Data Restock Gagal Dihapus.',
+                    log: err.message,
+                    title: 'ERROR_DELETING_RESTOCK',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
-                // navigate(0);
+                navigate(0);
             });
     };
 

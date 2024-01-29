@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, ProductList, formatPrice } from '../../../utils';
 import { useModal } from '../../../hooks/use-modal';
 import IconPlus from '../../../components/Icon/IconPlus';
 import IconPencil from '../../../components/Icon/IconPencil';
@@ -15,20 +15,6 @@ import IconTrashLines from '../../../components/Icon/IconTrashLines';
 
 import 'react-toastify/dist/ReactToastify.css';
 import Pagination from '../../../components/Pagination';
-
-interface StockProps {
-    branch_id: number;
-    stock_qty: number;
-}
-
-interface ProductList {
-    id: number;
-    product_image: string;
-    product_barcode: string;
-    product_name: string;
-    product_stock: StockProps[];
-    product_price: number;
-}
 
 const Produk = () => {
     const { onOpen } = useModal();
