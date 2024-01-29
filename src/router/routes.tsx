@@ -77,7 +77,7 @@ const routes = [
     //not-found
     {
         path: '*',
-        element: <NotFound />,
+        element: <Error404 />,
         layout: 'blank',
         middleware: 'public',
     },
