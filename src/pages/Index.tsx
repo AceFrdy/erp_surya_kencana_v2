@@ -6,9 +6,8 @@ import { DataTable } from 'mantine-datatable';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { IRootState } from '../store';
-import { formatPrice } from '../utils';
 import { setPageTitle } from '../store/themeConfigSlice';
-import { CashFlowProps, DashboardCard, RecentOrderProps, TopSellingProps, iconClassFlow } from '../lib/utils';
+import { CashFlowProps, DashboardCard, RecentOrderProps, TopSellingProps, iconClassFlow, formatPrice } from '../utils';
 import { Navigate } from 'react-router-dom';
 
 const Index = () => {

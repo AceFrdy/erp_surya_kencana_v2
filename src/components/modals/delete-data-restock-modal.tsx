@@ -23,18 +23,21 @@ const DeleteDataRestockModal = () => {
                 onClose();
                 const notification = {
                     type: 'success',
-                    message: 'Data Restock Berhasil Dihapus',
+                    message: 'Restock Berhasil Dihapus',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
             })
             .catch((err) => {
+                onClose();
                 const notification = {
                     type: 'error',
-                    message: 'Data Restock Gagal Dihapus',
+                    message: 'Restock Gagal Dihapus.',
+                    log: err.message,
+                    title: 'ERROR_DELETING_RESTOCK',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
-                console.log('DELETE CUSTOMER', err);
+                navigate(0);
             });
     };
 

@@ -2,12 +2,13 @@ import { Fragment } from 'react';
 import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 const DeleteDataPenjualanModal = () => {
     const { isOpen, type, onClose, data } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
+    const navigate = useNavigate();
 
     const isModalOpen = isOpen && type === 'delete-data-penjualan';
 
@@ -21,10 +22,23 @@ const DeleteDataPenjualanModal = () => {
             })
             .then(() => {
                 onClose();
-                toast.success('Hapus Data Penjualan Berhasil.');
+                const notification = {
+                    type: 'success',
+                    message: 'Penjualan Berhasil Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE PENJUALAN', err);
+                onClose();
+                const notification = {
+                    type: 'error',
+                    message: 'Penjualan Gagal Dihapus.',
+                    log: err.message,
+                    title: 'ERROR_DELETING_SALE',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 

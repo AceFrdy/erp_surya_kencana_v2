@@ -29,10 +29,12 @@ const DeleteDataDistribusiModal = () => {
                 navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE CUSTOMER', err);
+                onClose();
                 const notification = {
-                    type: 'success',
-                    message: 'Distribusi Gagal Dihapus',
+                    type: 'error',
+                    message: 'Distribusi Gagal Dihapus.',
+                    log: err.message,
+                    title: 'ERROR_DELETING_DISTRIBUSI',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);

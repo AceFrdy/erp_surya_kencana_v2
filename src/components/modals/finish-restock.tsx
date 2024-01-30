@@ -33,10 +33,12 @@ const FinishRestock = () => {
                 navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE DISTRIBUSI', err);
+                onClose();
                 const notification = {
                     type: 'error',
-                    message: 'Status Restock Gagal Diperbarui',
+                    message: 'Status Restock Gagal Diperbarui.',
+                    log: err.message,
+                    title: 'ERROR_UPDATING_RESTOCK',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);

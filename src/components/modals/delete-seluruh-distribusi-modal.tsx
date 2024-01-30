@@ -29,10 +29,12 @@ const DeleteSeluruhDistribusiModal = () => {
                 navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE DISTRIBUSI', err);
+                onClose();
                 const notification = {
                     type: 'error',
-                    message: 'Data Distribusi Gagal Dihapus',
+                    message: 'Data Distribusi Gagal Dihapus.',
+                    log: err.message,
+                    title: 'ERROR_DELETING_DISTRIBUTION',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);

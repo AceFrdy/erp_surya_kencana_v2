@@ -1,10 +1,9 @@
-import { Fragment } from 'react';
-import { useModal } from '../../hooks/use-modal';
-import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Dialog, Transition } from '@headlessui/react';
+
+import { useModal } from '../../hooks/use-modal';
 
 const DeleteCustomerOfflineModal = () => {
     const { isOpen, type, onClose, data } = useModal();
@@ -23,9 +22,23 @@ const DeleteCustomerOfflineModal = () => {
             })
             .then(() => {
                 onClose();
+                const notification = {
+                    type: 'success',
+                    message: 'Customer Offline Berhasil Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE CUSTOMER', err);
+                onClose();
+                const notification = {
+                    type: 'error',
+                    message: 'Customer Offline Gagal Dihapus.',
+                    log: err.message,
+                    title: 'ERROR_DELETING_CUSTOMER_OFFLINE',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 

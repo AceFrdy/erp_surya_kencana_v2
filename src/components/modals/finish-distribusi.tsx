@@ -33,10 +33,12 @@ const FinishDistribusi = () => {
                 navigate(0);
             })
             .catch((err) => {
-                console.log('STATUS_DISTRIBUSI_ERROR', err.message);
+                onClose();
                 const notification = {
                     type: 'error',
-                    message: 'Status Distribusi Gagal Diperbarui',
+                    message: 'Status Distribusi Gagal Diperbarui.',
+                    log: err.message,
+                    title: 'ERROR_UPDATE_DISTRIBUTION',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);

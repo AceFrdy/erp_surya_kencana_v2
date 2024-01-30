@@ -22,11 +22,23 @@ const DeleteCabangModal = () => {
             })
             .then(() => {
                 onClose();
-                toast.success('Cabang Berhasil Dihapus.');
+                const notification = {
+                    type: 'success',
+                    message: 'Cabang Berhasil Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE CABANG', err);
+                onClose();
+                const notification = {
+                    type: 'error',
+                    message: 'Cabang Gagal Dihapus.',
+                    log: err.message,
+                    title: 'ERROR_DELETING_CABANG',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 

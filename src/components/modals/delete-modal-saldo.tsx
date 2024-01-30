@@ -22,11 +22,23 @@ const DeleteSaldoModal = () => {
             })
             .then(() => {
                 onClose();
-                toast.success('Saldo Stock Berhasil Dihapus.');
+                const notification = {
+                    type: 'success',
+                    message: 'Salso Berhasil Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE SALDO', err);
+                onClose();
+                const notification = {
+                    type: 'error',
+                    message: 'Salso Gagal Dihapus.',
+                    log: err.message,
+                    title: 'ERROR_DELETING_SALDO',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 

@@ -4,10 +4,12 @@ import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 const DeleteProductModal = () => {
     const { isOpen, type, onClose, data } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
+    const navigate = useNavigate();
 
     const isModalOpen = isOpen && type === 'delete-product';
 
@@ -19,12 +21,26 @@ const DeleteProductModal = () => {
                     Authorization: `Bearer ${token}`,
                 },
             })
-            .then(() => {
+            .then((response) => {
                 onClose();
-                toast.success('Product Berhasil Dihapus.');
+                const notification = {
+                    type: 'success',
+                    message: 'Data Product Berhasil Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE PRODUCT', err);
+                onClose();
+                console.log(err);
+                const notification = {
+                    type: 'error',
+                    message: 'Product Gagal Dihapus.',
+                    log: err.message,
+                    title: 'ERROR_DELETING_PRODUCT',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                // navigate(0);
             });
     };
 

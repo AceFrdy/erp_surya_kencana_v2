@@ -20,13 +20,25 @@ const DeleteUnitModal = () => {
                     Authorization: `Bearer ${token}`,
                 },
             })
-            .then(() => {
+            .then((response) => {
                 onClose();
-                toast.success('Unit Stock Berhasil Dihapus.');
+                const notification = {
+                    type: 'success',
+                    message: 'Data Unit Berhasil Dihapus',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE UNIT', err);
+                onClose();
+                const notification = {
+                    type: 'error',
+                    message: 'Unit Gagal Dihapus.',
+                    log: err.message,
+                    title: 'ERROR_DELETING_UNIT',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 

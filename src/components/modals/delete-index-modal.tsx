@@ -19,7 +19,7 @@ const DeleteIndexModal = () => {
                     Authorization: `Bearer ${token}`,
                 },
             })
-            .then((response) => {
+            .then(() => {
                 onClose();
                 const notification = {
                     type: 'success',
@@ -29,10 +29,12 @@ const DeleteIndexModal = () => {
                 navigate(0);
             })
             .catch((err) => {
-                console.log('DELETE_INDEX', err);
+                onClose();
                 const notification = {
                     type: 'error',
-                    message: 'Index Gagal Dihapus/Index Sedang Dipakai',
+                    message: 'Index Gagal Dihapus/Sedang Dipakai.',
+                    log: err.message,
+                    title: 'ERROR_DELETING_INDEX',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
