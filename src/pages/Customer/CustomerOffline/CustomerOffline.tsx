@@ -1,15 +1,17 @@
-import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import IconPencil from '../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
-import IconPlus from '../../../components/Icon/IconPlus';
 import axios from 'axios';
 import { orderBy } from 'lodash';
-import { useModal } from '../../../hooks/use-modal';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+
+import { useModal } from '../../../hooks/use-modal';
+import IconPlus from '../../../components/Icon/IconPlus';
+import IconPencil from '../../../components/Icon/IconPencil';
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import IconTrashLines from '../../../components/Icon/IconTrashLines';
+
 import 'react-toastify/dist/ReactToastify.css';
 
 interface CustomersDataProps {
@@ -24,9 +26,6 @@ const CustomerOffline = () => {
     useEffect(() => {
         dispatch(setPageTitle('Customer Offline'));
     });
-    const [page, setPage] = useState(1);
-    const PAGE_SIZES = [10, 20, 30, 50, 100];
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
 
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
@@ -35,62 +34,40 @@ const CustomerOffline = () => {
     });
     const token = localStorage.getItem('accessToken') ?? '';
     const [initialRecords, setInitialRecords] = useState<CustomersDataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
     const { onOpen } = useModal();
 
     useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/customers-offline${search && '?q=' + search}`;
         axios
-            .get('https://erp.digitalindustryagency.com/api/customers-offline', {
+            .get(url, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
             .then((response) => {
-                setInitialRecords(orderBy(response.data.data.resource, 'created_at', 'desc'));
+                setInitialRecords(response.data.data.resource);
             })
             .catch((err) => {
                 console.log(err.message);
             });
-    }, []);
-
-    useEffect(() => {
-        setPage(1);
-    }, [pageSize]);
-
-    useEffect(() => {
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize;
-        setRecordsData([...initialRecords.slice(from, to)]);
-    }, [page, pageSize, initialRecords]);
-
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return item.name.toLowerCase().includes(search.toLowerCase()) || item.address.toLowerCase().includes(search.toLowerCase()) || item.contact.toString().includes(search.toLowerCase());
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, recordsData]);
+    }, [search]);
 
     useEffect(() => {
         const data = orderBy(initialRecords, sortStatus.columnAccessor, 'desc');
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
-        setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
 
     useEffect(() => {
         const notificationMessage = localStorage.getItem('notification');
         if (notificationMessage) {
-            const { type, message } = JSON.parse(notificationMessage);
+            const { title, log, type, message } = JSON.parse(notificationMessage);
             if (type === 'success') {
                 toast.success(message);
             } else if (type === 'error') {
                 toast.error(message);
+                console.log(title, log);
             }
         }
         return localStorage.removeItem('notification');
@@ -127,9 +104,9 @@ const CustomerOffline = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'index', title: 'No', render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'index', title: 'No', render: (e) => initialRecords.indexOf(e) + 1 },
                             { accessor: 'name', title: 'Nama Customer', sortable: true },
                             {
                                 accessor: 'address',
@@ -155,16 +132,9 @@ const CustomerOffline = () => {
                                 ),
                             },
                         ]}
-                        totalRecords={initialRecords.length}
-                        recordsPerPage={pageSize}
-                        page={page}
-                        onPageChange={(p) => setPage(p)}
-                        recordsPerPageOptions={PAGE_SIZES}
-                        onRecordsPerPageChange={setPageSize}
                         sortStatus={sortStatus}
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
-                        paginationText={({ from, to, totalRecords }) => `Showing  ${from} to ${to} of ${totalRecords} entries`}
                     />
                 </div>
             </div>

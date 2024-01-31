@@ -1,9 +1,12 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+
 import { setPageTitle } from '../../../store/themeConfigSlice';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 const EditPenjualan = () => {
     const dispatch = useDispatch();
@@ -19,9 +22,6 @@ const EditPenjualan = () => {
         sale_order_discount: 0,
         unit_stock_id: 0,
     });
-
-    const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         axios
@@ -43,9 +43,6 @@ const EditPenjualan = () => {
             .catch((error) => {
                 console.error('Error fetching penjualan data:', error);
                 toast.error('Error fetching data');
-            })
-            .finally(() => {
-                setLoading(false);
             });
     }, [id, token]);
 
@@ -66,30 +63,57 @@ const EditPenjualan = () => {
                 },
             })
             .then((response) => {
-                console.log('Sale data successfully updated:', response.data);
-                navigate('/menupenjualan/penjualan/penjualan');
-                toast.success('Data berhasil diedit', {
-                    position: 'top-right',
-                    autoClose: 3000,
-                });
+                const notification = {
+                    type: 'success',
+                    message: 'Penjualan Berhasil Diperbarui',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                handleCancel();
             })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    setErrors(error.response.data);
-                    console.log('Validation Errors:', error.response.data);
-                }
-                console.error('Error updating Sale data:', error);
-                toast.error('Error updating data');
+            .catch((err: any) => {
+                // set_old_value
+                const oldValueBefore = {
+                    sale_order_qty: formData.sale_order_qty,
+                    sale_order_discount: formData.sale_order_discount,
+                    unit_stock_id: formData.unit_stock_id,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
+                const notification = {
+                    type: 'error',
+                    message: 'Penjualan Gagal Diperbarui',
+                    log: err.message,
+                    title: 'ERROR_UPDATING_SALE',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
     const handleCancel = () => {
-        navigate('/menupenjualan/penjualan/penjualan');
+        navigate(-1);
     };
 
-    if (loading) {
-        return <div>Loading...</div>; // You can replace this with a loading spinner or any other UI element.
-    }
+    useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+
+            return sessionStorage.removeItem('old_value');
+        }
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+
+                return localStorage.removeItem('notification');
+            }
+        }
+    }, []);
 
     return (
         <div>
@@ -108,7 +132,7 @@ const EditPenjualan = () => {
                 <div className="grid lg:grid-cols-1 grid-cols-1 gap-6">
                     <div className="panel " id="single_file">
                         <div className="flex items-center justify-between mb-5"></div>
-                        <form className="space-y-5">
+                        <form className="space-y-5" onSubmit={handleEditSale}>
                             <h1 className="text-lg font-bold mb-12">Edit Penjualan</h1>
                             <div>
                                 <label htmlFor="qtyPenjualan"> Qty Penjualan </label>
@@ -144,16 +168,12 @@ const EditPenjualan = () => {
                                 <span className="text-white-dark text-[11px] inline-block">*Required Fields</span>
                             </div>
                             <div className="flex">
-                                <Link to="/menupenjualan/penjualan/penjualan">
-                                    <button type="submit" className="btn btn-primary !mt-6" onClick={handleEditSale}>
-                                        Simpan
-                                    </button>
-                                </Link>
-                                <Link to="/menupenjualan/penjualan/penjualan">
-                                    <button type="submit" className="btn btn-primary !mt-6 ml-6" onClick={handleCancel}>
-                                        Batal
-                                    </button>
-                                </Link>
+                                <button type="submit" className="btn btn-primary !mt-6">
+                                    Simpan
+                                </button>
+                                <button type="button" className="btn btn-primary !mt-6 ml-6" onClick={handleCancel}>
+                                    Batal
+                                </button>
                             </div>
                         </form>
                     </div>

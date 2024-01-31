@@ -99,10 +99,19 @@ const EditKaryawan = () => {
                 navigate('/menuhumanresource/karyawan');
             })
             .catch((err: any) => {
-                console.log(err);
+                const oldValueBefore = {
+                    privilage_id: formData.privilage_id,
+                    name: formData.name,
+                    username: formData.username,
+                    email: formData.email,
+                    contact: formData.contact,
+                    address: formData.address,
+                    branch_id: cabang,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
                 const notification = {
                     type: 'error',
-                    message: 'Uang Keluar Gagal DiPerbarui.',
+                    message: 'Karyawan Gagal Diperbarui',
                     log: err.message,
                     title: 'ERROR_UPDATING_KARYAWAN',
                 };
@@ -162,21 +171,17 @@ const EditKaryawan = () => {
         if (isOldValue) {
             const oldValue = JSON.parse(isOldValue);
             setFormData(oldValue);
+            sessionStorage.removeItem('old_value');
         }
         const notificationMessage = localStorage.getItem('notification');
         if (notificationMessage) {
             const { title, log, type, message } = JSON.parse(notificationMessage);
-            if (type === 'success') {
-                toast.success(message);
-            } else if (type === 'error') {
+            if (type === 'error') {
                 toast.error(message);
                 console.log(title, log);
                 return localStorage.removeItem('notification');
             }
         }
-        return () => {
-            sessionStorage.removeItem('old_value');
-        };
     }, []);
     return (
         <div>

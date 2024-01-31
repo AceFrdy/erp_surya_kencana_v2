@@ -140,6 +140,7 @@ const EditPiutang = () => {
             .then((response) => {
                 setDataPiutang(response.data.data.resource);
                 setInitialRecords(response.data.data.resource.receivable_pays);
+                console.log(response.data.data.resource);
             })
             .catch((err: any) => {
                 console.log('ERROR_GETTING_DATA:', err.message);
@@ -170,12 +171,13 @@ const EditPiutang = () => {
         const notificationMessage = localStorage.getItem('notification');
         if (notificationMessage) {
             const { title, log, type, message } = JSON.parse(notificationMessage);
-            if (type === 'error') {
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
                 toast.error(message);
                 console.log(title, log);
-
-                return localStorage.removeItem('notification');
             }
+            return localStorage.removeItem('notification');
         }
     }, []);
 
@@ -194,8 +196,6 @@ const EditPiutang = () => {
                     <span> Edit Data Piutang </span>
                 </li>
             </ul>
-            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
-            </div> */}
             <div className="panel mt-6 ">
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center">

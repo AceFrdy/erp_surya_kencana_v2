@@ -1,10 +1,12 @@
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+
 import { setPageTitle } from '../../../store/themeConfigSlice';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface FormState {
     name: string;
@@ -28,37 +30,47 @@ const EditCustomerOffline = () => {
     });
 
     const handleAddData = (e: FormEvent) => {
-        try {
-            e.preventDefault();
-            const data = {
-                name: formData.name,
-                contact: formData.contact,
-                address: formData.address,
-            };
+        e.preventDefault();
+        const data = {
+            name: formData.name,
+            contact: formData.contact,
+            address: formData.address,
+        };
 
-            axios
-                .put(`https://erp.digitalindustryagency.com/api/customers/${id}`, data, {
-                    headers: {
-                        Accept: 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                .then((response) => {
-                    const notification = {
-                        type: 'success',
-                        message: 'Customer Berhasil Diperbarui',
-                    };
-                    localStorage.setItem('notification', JSON.stringify(notification));
-                    navigate('/customer/offline');
-                });
-        } catch (error: any) {
-            const notification = {
-                type: 'error',
-                message: 'Customer Gagal Diperbarui',
-            };
-            localStorage.setItem('notification', JSON.stringify(notification));
-            navigate(0);
-        }
+        axios
+            .put(`https://erp.digitalindustryagency.com/api/customers/${id}`, data, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                const notification = {
+                    type: 'success',
+                    message: 'Customer Offline Berhasil Diperbarui',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                handleCancel();
+            })
+            .catch((err: any) => {
+                // set_old_value
+                const oldValueBefore = {
+                    name: formData.name,
+                    contact: formData.contact,
+                    address: formData.address,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
+                const notification = {
+                    type: 'error',
+                    message: 'Customer Offline Gagal Diperbarui',
+                    log: err.message,
+                    title: 'ERROR_UPDATING_CUSTOMER_OFFLINE',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
+            });
     };
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -70,7 +82,7 @@ const EditCustomerOffline = () => {
     };
 
     const handleCancel = () => {
-        navigate('/customer/offline');
+        navigate(-1);
     };
 
     useEffect(() => {
@@ -82,7 +94,7 @@ const EditCustomerOffline = () => {
                 },
             })
             .then((response) => {
-                setFormData({ name: response.data.data.resource.name, contact: response.data.data.resource.contact, address: response.data.data.resource.address });
+                setFormData(response.data.data.resource);
             })
             .catch((err) => {
                 console.log(err);
@@ -90,16 +102,23 @@ const EditCustomerOffline = () => {
     }, []);
 
     useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+
+            return sessionStorage.removeItem('old_value');
+        }
         const notificationMessage = localStorage.getItem('notification');
         if (notificationMessage) {
-            const { type, message } = JSON.parse(notificationMessage);
-            if (type === 'success') {
-                toast.success(message);
-            } else if (type === 'error') {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'error') {
                 toast.error(message);
+                console.log(title, log);
+
+                return localStorage.removeItem('notification');
             }
         }
-        return localStorage.removeItem('notification');
     }, []);
 
     return (
@@ -127,7 +146,7 @@ const EditCustomerOffline = () => {
                         <input type="text" name="address" onChange={handleChange} value={formData.address} placeholder="Alamat" className="form-input" />
                     </div>
                     <div className="flex justify-center">
-                        <button onClick={handleCancel} className="btn btn-primary !mt-6 mr-8">
+                        <button onClick={handleCancel} type="button" className="btn btn-primary !mt-6 mr-8">
                             Back
                         </button>
                         <button type="submit" className="btn btn-primary !mt-6 ">

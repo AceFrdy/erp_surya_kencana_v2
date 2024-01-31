@@ -24,22 +24,22 @@ const Unit = () => {
     useEffect(() => {
         dispatch(setPageTitle('Unit'));
     });
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState<string>('');
+    const [page, setPage] = useState<string>('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
     });
     const token = localStorage.getItem('accessToken') || '';
     const [initialRecords, setInitialRecords] = useState<UnitsDataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
     const { onOpen } = useModal();
     // pagination
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/unit-stock');
 
     useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/unit-stock${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -49,7 +49,6 @@ const Unit = () => {
             })
             .then((response) => {
                 const unit = response.data.data.resource.data;
-                setRecordsData(unit);
                 setInitialRecords(unit);
                 // page
                 setMetaLink({
@@ -71,23 +70,26 @@ const Unit = () => {
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, [url]);
-
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return item.unit_stock_name.toLowerCase().includes(search.toLowerCase()) || item.number_of_units.toString().includes(search.toLowerCase());
-            });
-        });
-    }, [search]);
+    }, [search, page]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
         setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
     }, [sortStatus]);
+
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+            }
+        }
+        return localStorage.removeItem('notification');
+    }, []);
 
     return (
         <div>
@@ -120,9 +122,9 @@ const Unit = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             {
                                 accessor: 'unit_stock_name',
                                 title: 'Nama Unit',
@@ -151,7 +153,7 @@ const Unit = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

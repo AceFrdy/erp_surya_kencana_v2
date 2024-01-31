@@ -1,18 +1,21 @@
+import axios from 'axios';
+import sortBy from 'lodash/sortBy';
+import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { Dialog, Transition } from '@headlessui/react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { ChangeEvent, FormEvent, Fragment, useEffect, useState } from 'react';
-import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import IconPencil from '../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link, useNavigate } from 'react-router-dom';
-import IconNotes from '../../../components/Icon/IconNotes';
-import IconPlus from '../../../components/Icon/IconPlus';
-import { Dialog, Transition } from '@headlessui/react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+
 import Pagination from '../../../components/Pagination';
+import IconPlus from '../../../components/Icon/IconPlus';
+import IconNotes from '../../../components/Icon/IconNotes';
+import IconPencil from '../../../components/Icon/IconPencil';
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import IconTrashLines from '../../../components/Icon/IconTrashLines';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface PrivilagesDataProps {
     id: number;
@@ -27,12 +30,12 @@ const Jabatan = () => {
         dispatch(setPageTitle('Uang Masuk'));
     });
     const [initialRecords, setInitialRecords] = useState<PrivilagesDataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
     const [addPrivilages, setAddPrivilages] = useState(false);
     const [editPrivilages, setEditPrivilages] = useState(false);
     const [deletePrivilages, setDeletePrivilages] = useState(false);
     const [editedPrivilagesId, setEditedPrivilagesId] = useState<number | null>(null);
     const [deletePrivilagesId, setDeletePrivilagesId] = useState<number | null>(null);
+    const [page, setPage] = useState('');
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -43,18 +46,6 @@ const Jabatan = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/privilages');
-
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return item.privilage_name.toLowerCase().includes(search.toLowerCase());
-            });
-        });
-    }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -62,6 +53,7 @@ const Jabatan = () => {
     }, [sortStatus]);
 
     const fetchData = () => {
+        const url = `https://erp.digitalindustryagency.com/api/privilages${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -72,7 +64,6 @@ const Jabatan = () => {
             .then((response) => {
                 const privilages = response.data.data.resource.data;
                 setInitialRecords(privilages);
-                setRecordsData(privilages);
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
@@ -97,11 +88,10 @@ const Jabatan = () => {
 
     useEffect(() => {
         fetchData();
-    }, [url, token]);
+    }, [page, search]);
 
     const [formData, setFormData] = useState({
-        privilage_name: '', 
-        errors: {},
+        privilage_name: '',
     });
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -130,15 +120,10 @@ const Jabatan = () => {
                 console.log('Data privilage berhasil ditambahkan:', response.data);
                 setFormData({
                     privilage_name: '',
-                    errors: {},
                 });
                 fetchData();
                 setAddPrivilages(false);
-                navigate('/menuhumanresource/jabatan');
-                toast.success('Data berhasil ditambahkan', {
-                    position: 'top-right',
-                    autoClose: 3000,
-                });
+                toast.success('success');
             })
             .catch((error) => {
                 if (error.response && error.response.data) {
@@ -158,7 +143,6 @@ const Jabatan = () => {
         if (editedPrivilages) {
             setFormData({
                 privilage_name: editedPrivilages.privilage_name,
-                errors: {},
             });
             setEditedPrivilagesId(privilagesId);
             setEditPrivilages(true);
@@ -214,7 +198,6 @@ const Jabatan = () => {
         if (deletePrivilages) {
             setFormData({
                 privilage_name: deletePrivilages.privilage_name,
-                errors: {},
             });
             setDeletePrivilagesId(privilagesId);
             setDeletePrivilages(true);
@@ -434,9 +417,9 @@ const Jabatan = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             { accessor: 'privilage_name', title: 'Nama Jabatan', sortable: true },
                             {
                                 accessor: 'action',
@@ -463,7 +446,7 @@ const Jabatan = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

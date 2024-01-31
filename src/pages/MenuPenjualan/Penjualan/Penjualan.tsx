@@ -110,7 +110,7 @@ const Penjualan = () => {
     // sale
     const [initialRecords, setInitialRecords] = useState<SaleOrderListProps[]>([]);
     const [grandTotal, setGrandTotal] = useState(0);
-    const [saleReportId, setSaleReportId] = useState<SaleOrderListProps[]>([]);
+    const [saleReportId, setSaleReportId] = useState<number>(0);
     const [changeAmount, setChangeAmount] = useState<number>(0);
 
     // unit
@@ -149,22 +149,6 @@ const Penjualan = () => {
         branch_id: 0,
     });
 
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-
-        setInitialRecords(() => {
-            return initialRecords.filter((item) => {
-                return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.sale_order_invoice.toLowerCase().includes(search.toLowerCase()) ||
-                    item.product.product_name.toLowerCase().includes(search.toLowerCase())
-                );
-            });
-        });
-    }, [search]);
-
     const handleGetSaleOrder = () => {
         axios
             .get(url, {
@@ -174,8 +158,8 @@ const Penjualan = () => {
                 },
             })
             .then((response) => {
-                const dataOrder = response.data.data.resource.data_order.data;
-                if (dataOrder.length > 0) {
+                const dataOrder: SaleOrderListProps[] = response.data.data.resource.data_order.data;
+                if (dataOrder && dataOrder.length > 0) {
                     const saleReportId = dataOrder[0].sale_report_id;
                     setSaleReportId(saleReportId);
                 }
@@ -247,7 +231,7 @@ const Penjualan = () => {
     }, [url, setCabang, setCabangList, token]);
 
     const handleGetBarcodeProduct = () => {
-        if (!cabang) {
+        if (cabang === '-') {
             return;
         }
 
@@ -461,7 +445,6 @@ const Penjualan = () => {
                                     e.preventDefault();
                                     // onOpen('search-product-barcode', undefined, productList, undefined, [], [], [], setProductBarcode);
                                     onOpen('search-product-barcode', undefined, productList, undefined, [], [], [], setProductBarcode);
-
                                 }}
                             >
                                 <IconSearch className="w-4 h-4" />
@@ -544,9 +527,7 @@ const Penjualan = () => {
                             />
                             <div className="flex w-full mt-8">
                                 <div className="w-full flex">
-                                    <p className="w-full flex">
-                                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
-                                    </p>
+                                    <p className="w-full flex">{metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}</p>
                                 </div>
                             </div>
                         </div>

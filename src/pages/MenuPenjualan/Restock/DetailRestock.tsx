@@ -2,7 +2,7 @@ import axios from 'axios';
 import sortBy from 'lodash/sortBy';
 import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 
 import { formatPrice } from '../../../utils';
@@ -33,6 +33,7 @@ const DetailRestock = () => {
     });
     const token = localStorage.getItem('accessToken') ?? '';
     const { id } = useParams();
+    const navigate = useNavigate();
 
     // get data
     useEffect(() => {
@@ -78,11 +79,9 @@ const DetailRestock = () => {
             </div> */}
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    <Link to="/menupenjualan/restock/listrestock">
-                        <button type="button" className=" px-2 btn btn-outline-info">
-                            <IconArrowBackward className="flex mx-2" fill={true} /> Kembali
-                        </button>
-                    </Link>
+                    <button type="button" className=" px-2 btn btn-outline-info" onClick={() => navigate(-1)}>
+                        <IconArrowBackward className="flex mx-2" fill={true} /> Kembali
+                    </button>
                 </div>
 
                 <h1 className="text-lg font-bold mb-4 flex items-center">

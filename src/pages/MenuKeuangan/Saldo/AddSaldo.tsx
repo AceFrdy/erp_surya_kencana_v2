@@ -1,9 +1,12 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
-import { setPageTitle } from '../../../store/themeConfigSlice';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+
+import { setPageTitle } from '../../../store/themeConfigSlice';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface DataDetailAccountProps {
     id: number;
@@ -52,7 +55,6 @@ const AddSaldo = () => {
             })
             .then((response) => {
                 setDetailAccount(response.data.data.resource.dataDetailAcc);
-                console.log("DETAIL ACCOUNT", response.data.data.resource.dataDetailAcc)
             })
             .catch((err: any) => {
                 console.log('DETAIL ACCOUNT', err.message);
@@ -77,30 +79,59 @@ const AddSaldo = () => {
                 },
             })
             .then((response) => {
-                console.log('Data saldo berhasil ditambahkan:', response.data);
-                navigate('/menukeuangan/saldo');
-                toast.success('Data berhasil ditambahkan', {
-                    position: 'top-right',
-                    autoClose: 3000,
-                });
+                const notification = {
+                    type: 'success',
+                    message: 'Saldo Berhasil Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                handleCancel();
             })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    const apiErrors = error.response.data;
-                    setFormData((prevData) => ({
-                        ...prevData,
-                        errors: apiErrors,
-                    }));
-                }
-                console.error('Error adding saldo data:', error);
-                toast.error('Error adding data');
+            .catch((err: any) => {
+                // set_old_value
+                const oldValueBefore = {
+                    saldo_date: formData.saldo_date,
+                    detail_account_id: formData.detail_account_id,
+                    saldo_amount: formData.saldo_amount,
+                    saldo_info: formData.saldo_info,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
+                const notification = {
+                    type: 'error',
+                    message: 'Produk Gagal Ditambahkan',
+                    log: err.message,
+                    title: 'ERROR_ADDING_PRODUCT',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
     const handleCancel = () => {
         // Instead of using a Link, directly use the navigate function
-        navigate('/menukeuangan/saldo');
+        navigate(-1);
     };
+
+    useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+
+            return sessionStorage.removeItem('old_value');
+        }
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+
+                return localStorage.removeItem('notification');
+            }
+        }
+    }, []);
 
     return (
         <div>
@@ -128,7 +159,7 @@ const AddSaldo = () => {
                         <label htmlFor="detail_account">Detail Akun</label>
                         <select className="form-select text-white-dark" name="detail_account_id" value={formData.detail_account_id} onChange={handleChange}>
                             <option value="">Choose...</option>
-                            {detailAccount && detailAccount.map((item) => (
+                            {detailAccount?.map((item) => (
                                 <option value={item.id} key={item.id}>
                                     {item.detail_acc_name}
                                 </option>
@@ -147,7 +178,7 @@ const AddSaldo = () => {
                         <button type="submit" className="btn btn-primary !mt-6 mr-8">
                             Tambah
                         </button>
-                        <button type="submit" className="btn btn-primary !mt-6" onClick={handleCancel}>
+                        <button type="button" className="btn btn-primary !mt-6" onClick={handleCancel}>
                             Kembali
                         </button>
                     </div>

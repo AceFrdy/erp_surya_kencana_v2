@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
-import { setPageTitle } from '../../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
-import IconArrowBackward from '../../../../components/Icon/IconArrowBackward';
 import axios from 'axios';
-import { formatPrice } from '../../../../utils';
-import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { sortBy } from 'lodash';
-import IconTrashLines from '../../../../components/Icon/IconTrashLines';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+
+import { formatPrice } from '../../../../utils';
+import { setPageTitle } from '../../../../store/themeConfigSlice';
+import IconArrowBackward from '../../../../components/Icon/IconArrowBackward';
 
 interface DataProps {
     direction_acc: {
