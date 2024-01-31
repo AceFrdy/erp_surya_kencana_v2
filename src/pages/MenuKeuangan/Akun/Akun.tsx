@@ -34,8 +34,8 @@ const Akun = () => {
 
     // State untuk menyimpan data dari API
     const [initialRecords, setInitialRecords] = useState<AkunDataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
 
+    const [page, setPage] = useState('');
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -46,10 +46,10 @@ const Akun = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/accounts');
 
     // get data
     useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/accounts${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -80,24 +80,7 @@ const Akun = () => {
             .catch((error: any) => {
                 console.error('ERROR_GETTING_ACCOUNT:', error);
             });
-    }, [url]);
-
-    // search
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return (
-                    item.acc_code.toLowerCase().includes(search.toLowerCase()) ||
-                    item.acc_type.toLowerCase().includes(search.toLowerCase()) ||
-                    item.acc_group_name.toLowerCase().includes(search.toLowerCase())
-                );
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, initialRecords]);
+    }, [search, page]);
 
     // sort
     useEffect(() => {
@@ -154,9 +137,9 @@ const Akun = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', render: (e) => initialRecords.indexOf(e) + 1 },
                             { accessor: 'acc_code', title: 'Kode Akun', sortable: true },
                             { accessor: 'acc_type', title: 'Jenis Akun', sortable: true },
                             { accessor: 'acc_group_name', title: 'Group Akun', sortable: true },
@@ -182,7 +165,7 @@ const Akun = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

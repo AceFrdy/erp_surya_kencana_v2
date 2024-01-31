@@ -1,9 +1,10 @@
-import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+
+import { setPageTitle } from '../../../store/themeConfigSlice';
 
 const AddCabang = () => {
     const dispatch = useDispatch();
@@ -37,8 +38,6 @@ const AddCabang = () => {
             branch_contact: formData.branch_contact,
         };
 
-        console.log('DATA SENT:', data);
-
         axios
             .post('https://erp.digitalindustryagency.com/api/branches', data, {
                 headers: {
@@ -47,29 +46,57 @@ const AddCabang = () => {
                 },
             })
             .then((response) => {
-                console.log('Data cabang berhasil ditambahkan:', response.data);
-                navigate('/menupenjualan/cabang/listcabang');
-                toast.success('Data berhasil ditambahkan', {
-                    position: 'top-right',
-                    autoClose: 3000,
-                });
+                const notification = {
+                    type: 'success',
+                    message: 'Cabang Berhasil Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                handleCancel();
             })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    const apiErrors = error.response.data;
-                    setFormData((prevData) => ({
-                        ...prevData,
-                        errors: apiErrors,
-                    }));
-                }
-                console.error('Error adding cabang data:', error);
-                toast.error('Error adding data');
+            .catch((err: any) => {
+                // set_old_value
+                const oldValueBefore = {
+                    branch_name: formData.branch_name,
+                    branch_address: formData.branch_address,
+                    branch_contact: formData.branch_contact,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
+                const notification = {
+                    type: 'error',
+                    message: 'Cabang Gagal Ditambahkan',
+                    log: err.message,
+                    title: 'ERROR_ADDING_CABANG',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
     const handleCancel = () => {
-        navigate('/menupenjualan/cabang/listcabang');
+        navigate(-1);
     };
+
+    useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+
+            return sessionStorage.removeItem('old_value');
+        }
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+
+                return localStorage.removeItem('notification');
+            }
+        }
+    }, []);
 
     return (
         <div>

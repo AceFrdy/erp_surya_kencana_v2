@@ -1,15 +1,13 @@
-import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState, Fragment } from 'react';
-import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import IconPencil from '../../../components/Icon/IconPencil';
-import { Link } from 'react-router-dom';
-import IconNotes from '../../../components/Icon/IconNotes';
-import Swal from 'sweetalert2';
 import axios from 'axios';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
+import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+
 import Pagination from '../../../components/Pagination';
+import IconNotes from '../../../components/Icon/IconNotes';
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
 
 interface PenjualanDataProps {
     id: number;
@@ -35,8 +33,8 @@ const LaporanPenjualan = () => {
         dispatch(setPageTitle('Laporan Penjualan'));
     });
     const [initialRecords, setInitialRecords] = useState<PenjualanDataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
     const [search, setSearch] = useState('');
+    const [page, setPage] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
@@ -45,25 +43,9 @@ const LaporanPenjualan = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/sale-reports');
 
     useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return (
-                    item.sale_report_invoice.toLowerCase().includes(search.toLowerCase()) ||
-                    item.sale_report_customer.toLowerCase().includes(search.toLowerCase()) ||
-                    item.sale_report_status.toLowerCase().includes(search.toLowerCase()) ||
-                    item.branch.branch_name.toLowerCase().includes(search.toLowerCase())
-                );
-            });
-        });
-    }, [search, recordsData]);
-
-    useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/sale-reports${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -76,14 +58,14 @@ const LaporanPenjualan = () => {
                 setInitialRecords(penjualan);
                 // page
                 setMetaLink({
-                    current_page: response.data.data.resource.meta.current_page,
-                    last_page: response.data.data.resource.meta.last_page,
-                    from: response.data.data.resource.meta.from,
-                    to: response.data.data.resource.meta.to,
-                    per_page: response.data.data.resource.meta.per_page,
-                    total: response.data.data.resource.meta.total,
+                    current_page: response.data.data.resource.current_page,
+                    last_page: response.data.data.resource.last_page,
+                    from: response.data.data.resource.from,
+                    to: response.data.data.resource.to,
+                    per_page: response.data.data.resource.per_page,
+                    total: response.data.data.resource.total,
                 });
-                setMetaLinksLink(response.data.data.resource.meta.links);
+                setMetaLinksLink(response.data.data.resource.links);
                 setLinksLink({
                     first: response.data.data.resource.links.first,
                     last: response.data.data.resource.links.last,
@@ -94,7 +76,7 @@ const LaporanPenjualan = () => {
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, [url, token]);
+    }, [search, page]);
 
     return (
         <div>
@@ -111,17 +93,10 @@ const LaporanPenjualan = () => {
                     <span> Laporan Penjualan </span>
                 </li>
             </ul>
-            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
-            </div> */}
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    {/* <Link to="/menupenjualan/cabang/listcabang/addcabang">
-                        <button type="button" className=" px-2 btn btn-outline-info">
-                            <IconPlus className="flex mx-2" fill={true} /> Add
-                        </button>
-                    </Link> */}
                     <div className="ltr:ml-auto rtl:mr-auto">
-                        <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />{' '}
+                        <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                     </div>
                 </div>
                 <h5 className="font-semibold text-lg dark:text-white-light mb-2">Laporan Penjualan</h5>
@@ -129,9 +104,9 @@ const LaporanPenjualan = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             { accessor: 'sale_report_invoice', title: 'Kode Penjualan', sortable: true },
                             {
                                 accessor: 'sale_report_customer',
@@ -164,9 +139,6 @@ const LaporanPenjualan = () => {
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => showAlert(11)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
                                     </div>
                                 ),
                             },
@@ -175,7 +147,7 @@ const LaporanPenjualan = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

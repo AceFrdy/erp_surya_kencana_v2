@@ -27,13 +27,12 @@ const DetailHutang = () => {
         dispatch(setPageTitle('Detail Hutang'));
     });
     const [initialRecords, setInitialRecords] = useState<DebtPayDataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
     const [locationAcc, setLocationAcc] = useState<string>('');
     const [directionAcc, setDirectionAcc] = useState<string>('');
     const [debtDate, setDebtDate] = useState<string>('');
     const [debtBalance, setDebtBalance] = useState<number>(0);
     const [creditureName, setCreditureName] = useState<string>('');
-    const [search, setSearch] = useState('');
+    const [page, setPage] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
@@ -42,24 +41,6 @@ const DetailHutang = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>(`https://erp.digitalindustryagency.com/api/debt-pays/${id}`);
-
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.payment_date.toLowerCase().includes(search.toLowerCase()) ||
-                    item.payment_total.toString().includes(search.toLowerCase()) ||
-                    item.debt_unpaid.toString().includes(search.toLowerCase())
-                );
-            });
-        });
-    }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -67,6 +48,7 @@ const DetailHutang = () => {
     }, [sortStatus]);
 
     const fetchData = () => {
+        const url = `https://erp.digitalindustryagency.com/api/debt-pays/${id + (page && '?page=' + page)}`;
         axios
             .get(`https://erp.digitalindustryagency.com/api/debts/${id}`, {
                 headers: {
@@ -94,8 +76,6 @@ const DetailHutang = () => {
             })
             .then((response) => {
                 setInitialRecords(response.data.data.resource.data);
-                setRecordsData(response.data.data.resource.data);
-                console.log("Table HUTANG",response.data.data.resource.data )
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
@@ -120,7 +100,7 @@ const DetailHutang = () => {
 
     useEffect(() => {
         fetchData();
-    }, [url, token]);
+    }, [page]);
 
     return (
         <div>
@@ -171,20 +151,15 @@ const DetailHutang = () => {
                         </div>
                     </form>
                 </div>
-                <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
-                    <div className="ltr:ml-auto rtl:mr-auto mt-8">
-                        <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
-                    </div>
-                </div>
 
-                <h5 className="font-semibold text-lg dark:text-white-light mb-2">Table Hutang</h5>
+                <h5 className="font-semibold text-lg dark:text-white-light mt-6 mb-2">Table Hutang</h5>
                 <div className="datatables">
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             { accessor: 'payment_total', title: 'Bayar', sortable: true, render: (e) => formatPrice(e.payment_total) },
                             {
                                 accessor: 'payment_date',
@@ -197,7 +172,7 @@ const DetailHutang = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

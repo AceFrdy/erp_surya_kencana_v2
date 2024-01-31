@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'react-toastify/dist/ReactToastify.css';
@@ -15,6 +15,7 @@ const DetailCustomerOnline = () => {
     const [name, setName] = useState<string>('');
     const [contact, setContact] = useState<number>(0);
     const [address, setAddress] = useState<string>('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         axios
@@ -62,6 +63,9 @@ const DetailCustomerOnline = () => {
                         <input className="form-input" value={address} disabled />
                     </div>
                 </form>
+                <button className="btn btn-primary mt-8" type="button" onClick={() => navigate(-1)}>
+                    Back
+                </button>
             </div>
         </div>
     );

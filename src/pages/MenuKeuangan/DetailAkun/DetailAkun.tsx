@@ -30,6 +30,7 @@ const DetailAkun = () => {
     const token = localStorage.getItem('accessToken') ?? '';
     const { onOpen } = useModal();
     const [search, setSearch] = useState('');
+    const [page, setPage] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
@@ -37,16 +38,15 @@ const DetailAkun = () => {
 
     // handle_data
     const [initialRecords, setInitialRecords] = useState<DetailAkunProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
 
     // pagination
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/detail-accounts');
 
     // get_data
     useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/detail-accounts${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -77,20 +77,7 @@ const DetailAkun = () => {
             .catch((error: any) => {
                 console.error('ERROR_GETTING_DATA:', error);
             });
-    }, [url]);
-
-    // handle_search
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return item.detail_acc_code.toLowerCase().includes(search.toLowerCase()) || item.detail_acc_type.toLowerCase().includes(search.toLowerCase());
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, initialRecords]);
+    }, [page, search]);
 
     // handle_sort
     useEffect(() => {
@@ -150,9 +137,9 @@ const DetailAkun = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', render: (e) => initialRecords.indexOf(e) + 1 },
                             { accessor: 'detail_acc_code', title: 'Kode', sortable: true },
                             { accessor: 'detail_acc_type', title: 'Tipe', sortable: true },
                             { accessor: 'detail_acc_name', title: 'Nama', sortable: true },
@@ -163,7 +150,7 @@ const DetailAkun = () => {
                                 titleClassName: '!text-center',
                                 render: (row) => (
                                     <div className="flex items-center w-max mx-auto gap-2">
-                                        <Link to={`/menukeuangan/akun/editdetailakun/${row.id}`}>
+                                        <Link style={{ color: 'orange' }} to={`/menukeuangan/akun/editdetailakun/${row.id}`}>
                                             <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                         </Link>
 
@@ -178,7 +165,7 @@ const DetailAkun = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

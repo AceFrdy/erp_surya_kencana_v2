@@ -24,8 +24,8 @@ const Laporan = () => {
         dispatch(setPageTitle('Laporan'));
     });
     const [initialRecords, setInitialRecords] = useState<DataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
 
+    const [page, setPage] = useState('');
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -36,10 +36,10 @@ const Laporan = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/financial-statements');
 
     // get_data
     useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/financial-statements${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -70,20 +70,7 @@ const Laporan = () => {
             .catch((err: any) => {
                 console.log('ERROR_GETTING_DATA:', err.message);
             });
-    }, [url]);
-
-    // handle_search
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return item.financial_statement_date.toLowerCase().includes(search.toLowerCase()) || item.financial_statement_info.toLowerCase().includes(search.toLowerCase());
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, recordsData]);
+    }, [search, page]);
 
     // handle_sort
     useEffect(() => {
@@ -120,9 +107,9 @@ const Laporan = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             {
                                 accessor: 'financial_statement_date',
                                 title: 'Tanggal',
@@ -156,7 +143,7 @@ const Laporan = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

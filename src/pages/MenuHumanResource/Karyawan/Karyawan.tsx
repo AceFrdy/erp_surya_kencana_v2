@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 
+import { useModal } from '../../../hooks/use-modal';
 import Pagination from '../../../components/Pagination';
 import IconPlus from '../../../components/Icon/IconPlus';
 import IconPencil from '../../../components/Icon/IconPencil';
@@ -14,7 +15,6 @@ import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
-import { useModal } from '../../../hooks/use-modal';
 
 interface UsersDataProps {
     id: number;
@@ -33,32 +33,13 @@ const Karyawan = () => {
         dispatch(setPageTitle('Uang Masuk'));
     });
     const [initialRecords, setInitialRecords] = useState<UsersDataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
 
+    const [page, setPage] = useState('');
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
     });
-
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.contact.toString().includes(search.toLowerCase()) ||
-                    item.name.toLowerCase().includes(search.toLowerCase()) ||
-                    item.created_at.toLowerCase().includes(search.toLowerCase()) ||
-                    item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.address.toLowerCase().includes(search.toLowerCase())
-                );
-            });
-        });
-    }, [search, recordsData]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -78,9 +59,9 @@ const Karyawan = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/users');
 
     useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/users${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -111,7 +92,7 @@ const Karyawan = () => {
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, [setUrl]);
+    }, [page, search]);
 
     useEffect(() => {
         const notificationMessage = localStorage.getItem('notification');
@@ -157,9 +138,9 @@ const Karyawan = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             { accessor: 'name', title: 'Name', sortable: true },
                             { accessor: 'email', title: 'Email', sortable: true },
                             { accessor: 'contact', title: 'Contact', sortable: true },
@@ -196,7 +177,7 @@ const Karyawan = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

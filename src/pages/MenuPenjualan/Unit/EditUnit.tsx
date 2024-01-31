@@ -1,8 +1,9 @@
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+
 import { setPageTitle } from '../../../store/themeConfigSlice';
 
 const EditUnit = () => {
@@ -19,9 +20,6 @@ const EditUnit = () => {
         number_of_units: '',
     });
 
-    const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(true);
-
     useEffect(() => {
         axios
             .get(`https://erp.digitalindustryagency.com/api/unit-stock/${id}`, {
@@ -31,19 +29,12 @@ const EditUnit = () => {
                 },
             })
             .then((response) => {
-                console.log('API Response:', response.data);
                 const unitData = response.data.data.resource;
-                setFormData({
-                    unit_stock_name: unitData.unit_stock_name,
-                    number_of_units: unitData.number_of_units,
-                });
+                setFormData(unitData);
             })
             .catch((error) => {
                 console.error('Error fetching unit data:', error);
                 toast.error('Error fetching data');
-            })
-            .finally(() => {
-                setLoading(false);
             });
     }, [id, token]);
 
@@ -64,30 +55,57 @@ const EditUnit = () => {
                 },
             })
             .then((response) => {
-                console.log('unit data successfully updated:', response.data);
-                navigate('/menupenjualan/product/unit');
-                toast.success('Data berhasil diedit', {
-                    position: 'top-right',
-                    autoClose: 3000,
-                });
+                const notification = {
+                    type: 'success',
+                    message: 'Unit Berhasil Diperbarui',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                handleCancel();
             })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    setErrors(error.response.data);
-                    console.log('Validation Errors:', error.response.data);
-                }
-                console.error('Error updating unit data:', error);
-                toast.error('Error updating data');
+            .catch((err: any) => {
+                // set_old_value
+                const oldValueBefore = {
+                    unit_stock_name: formData.unit_stock_name,
+                    number_of_units: formData.number_of_units,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
+                const notification = {
+                    type: 'error',
+                    message: 'Unit Gagal Diperbarui',
+                    log: err.message,
+                    title: 'ERROR_UPDATING_UNIT',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
     const handleCancel = () => {
-        navigate('/menupenjualan/product/unit');
+        // Instead of using a Link, directly use the navigate function
+        navigate(-1);
     };
 
-    if (loading) {
-        return <div>Loading...</div>; // You can replace this with a loading spinner or any other UI element.
-    }
+    useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+
+            return sessionStorage.removeItem('old_value');
+        }
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+
+                return localStorage.removeItem('notification');
+            }
+        }
+    }, []);
 
     return (
         <div>

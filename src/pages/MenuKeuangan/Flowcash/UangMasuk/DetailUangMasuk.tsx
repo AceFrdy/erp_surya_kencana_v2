@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import 'flatpickr/dist/flatpickr.css';
-import { useDispatch } from 'react-redux';
-import { setPageTitle } from '../../../../store/themeConfigSlice';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { setPageTitle } from '../../../../store/themeConfigSlice';
 
 const DetailUangMasuk = () => {
     const dispatch = useDispatch();
     const token = localStorage.getItem('accessToken') ?? '';
     const { id } = useParams();
+    const navigate = useNavigate();
     useEffect(() => {
         dispatch(setPageTitle('Detail Uang Masuk'));
     });
@@ -17,11 +17,10 @@ const DetailUangMasuk = () => {
     const [cashInflowInfo, setCashInflowInfo] = useState<string>('');
     const [cashInflowIndexInfo, setCashInflowIndexInfo] = useState<string>('');
     const [cashInflowDetailAccount, setCashInflowDetailAccount] = useState<string>('');
-    const [url, setUrl] = useState<string>(`https://erp.digitalindustryagency.com/api/cash-inflows/${id}`);
 
     useEffect(() => {
         axios
-            .get(url, {
+            .get(`https://erp.digitalindustryagency.com/api/cash-inflows/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -37,7 +36,7 @@ const DetailUangMasuk = () => {
             .catch((err: any) => {
                 console.log('GET SALE REPORT', err.message);
             });
-    }, [url]);
+    }, []);
 
     return (
         <div>
@@ -59,30 +58,28 @@ const DetailUangMasuk = () => {
                 <form className="space-y-5">
                     <div>
                         <label htmlFor="Tanggal">Tanggal</label>
-                        <input className="form-input" value={cashInflowDate} disabled/>
+                        <input className="form-input" value={cashInflowDate} disabled />
                     </div>
                     <div>
                         <label htmlFor="gridState">Detail Akun</label>
-                        <input className="form-input" value={cashInflowDetailAccount} disabled/>
+                        <input className="form-input" value={cashInflowDetailAccount} disabled />
                     </div>
                     <div>
                         <label htmlFor="gridState">Index</label>
-                        <input className="form-input" value={cashInflowIndexInfo} disabled/>
+                        <input className="form-input" value={cashInflowIndexInfo} disabled />
                     </div>
                     <div>
                         <label htmlFor="Cost">Cash</label>
-                        <input className="form-input" value={cashInflowAmount} disabled/>
+                        <input className="form-input" value={cashInflowAmount} disabled />
                     </div>
                     <div>
                         <label htmlFor="gridState">Keterangan</label>
-                        <input className="form-input" value={cashInflowInfo}disabled/>
+                        <input className="form-input" value={cashInflowInfo} disabled />
                     </div>
                     <div className="flex">
-                        <Link to="/menukeuangan/flowcash/uangmasuk">
-                            <button type="submit" className="btn btn-primary !mt-6">
-                                Kembali
-                            </button>
-                        </Link>
+                        <button type="button" onClick={() => navigate(-1)} className="btn btn-primary !mt-6">
+                            Kembali
+                        </button>
                     </div>
                 </form>
             </div>

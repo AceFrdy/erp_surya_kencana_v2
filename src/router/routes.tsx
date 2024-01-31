@@ -58,14 +58,11 @@ const AddPiutang = lazy(() => import('../pages/MenuKeuangan/Hutang-Piutang/Piuta
 const DetailPiutang = lazy(() => import('../pages/MenuKeuangan/Hutang-Piutang/Piutang/DetailPiutang'));
 const EditPiutang = lazy(() => import('../pages/MenuKeuangan/Hutang-Piutang/Piutang/EditPiutang'));
 const Laporan = lazy(() => import('../pages/MenuKeuangan/Laporan/Laporan'));
-const DetailLaporan = lazy(() => import('../pages/MenuKeuangan/Laporan/DetailLaporan'));
 const EditPenjualan = lazy(() => import('../pages/MenuPenjualan/Penjualan/EditPenjualan'));
 const CustomerOffline = lazy(() => import('../pages/Customer/CustomerOffline/CustomerOffline'));
 const EditCustomer = lazy(() => import('../pages/Customer/CustomerOffline/EditCustomerOffline'));
 const AddCustomerOffline = lazy(() => import('../pages/Customer/CustomerOffline/AddCustomerOffline'));
 const CustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/CustomerOnline'));
-const AddCustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/AddCustomerOnline'));
-const EditCustomerOnline = lazy(() => import('../pages/Customer/CustomerOnline/EditCustomerOnline'));
 const NotFound = lazy(() => import('../pages/not-found'));
 const Error404 = lazy(() => import('../pages/Error/Erorr404'));
 const Error500 = lazy(() => import('../pages/Error/Error500'));
@@ -227,18 +224,6 @@ const routes = [
     {
         path: '/customer/online',
         element: <CustomerOnline />,
-        middleware: 'auth',
-        menuAkses: '5',
-    },
-    {
-        path: '/customer/online/tambah-customer-online',
-        element: <AddCustomerOnline />,
-        middleware: 'auth',
-        menuAkses: '5',
-    },
-    {
-        path: '/customer/online/edit-customer-online',
-        element: <EditCustomerOnline />,
         middleware: 'auth',
         menuAkses: '5',
     },
@@ -461,12 +446,6 @@ const routes = [
     {
         path: '/menukeuangan/laporan/laporan',
         element: <Laporan />,
-        middleware: 'auth',
-        menuAkses: '14',
-    },
-    {
-        path: '/menukeuangan/laporan/detaillaporan',
-        element: <DetailLaporan />,
         middleware: 'auth',
         menuAkses: '14',
     },

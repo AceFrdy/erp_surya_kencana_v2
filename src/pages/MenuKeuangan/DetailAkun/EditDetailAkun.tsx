@@ -101,7 +101,7 @@ const EditDetailAkun = () => {
                     message: 'Detail Akun Berhasil Ditambahkan',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
-                navigate('/menukeuangan/akun/detailakun');
+                navigate(-1);
             })
             .catch((err: any) => {
                 // set_old_value
@@ -145,21 +145,19 @@ const EditDetailAkun = () => {
         if (isOldValue) {
             const oldValue = JSON.parse(isOldValue);
             setFormData(oldValue);
+
+            return sessionStorage.removeItem('old_value');
         }
         const notificationMessage = localStorage.getItem('notification');
         if (notificationMessage) {
             const { title, log, type, message } = JSON.parse(notificationMessage);
-            if (type === 'success') {
-                toast.success(message);
-            } else if (type === 'error') {
+            if (type === 'error') {
                 toast.error(message);
                 console.log(title, log);
+
+                return localStorage.removeItem('notification');
             }
         }
-        return () => {
-            localStorage.removeItem('notification');
-            sessionStorage.removeItem('old_value');
-        };
     }, []);
 
     return (
@@ -233,9 +231,9 @@ const EditDetailAkun = () => {
                         <button type="submit" className="btn btn-primary !mt-6 mr-8">
                             Edit
                         </button>
-                        <Link to="/menukeuangan/akun/detailakun">
-                            <button className="btn btn-primary !mt-6">Kembali</button>
-                        </Link>
+                        <button onClick={() => navigate(-1)} type="button" className="btn btn-primary !mt-6">
+                            Kembali
+                        </button>
                     </div>
                 </form>
             </div>

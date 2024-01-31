@@ -1,16 +1,19 @@
-import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState, Fragment } from 'react';
-import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import IconPencil from '../../../components/Icon/IconPencil';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link } from 'react-router-dom';
-import IconPlus from '../../../components/Icon/IconPlus';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+
 import { useModal } from '../../../hooks/use-modal';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
 import Pagination from '../../../components/Pagination';
+import IconPlus from '../../../components/Icon/IconPlus';
+import IconPencil from '../../../components/Icon/IconPencil';
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import IconTrashLines from '../../../components/Icon/IconTrashLines';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface BranchDataProps {
     id: number;
@@ -26,38 +29,22 @@ const ListCabang = () => {
         dispatch(setPageTitle('List Cabang'));
     });
     const [initialRecords, setInitialRecords] = useState<BranchDataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
     const [search, setSearch] = useState('');
+    const [page, setPage] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
     });
-    const [branch, setBranch] = useState([]);
     const { onOpen } = useModal();
 
     // pagination
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/branches');
-
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return (
-                    item.branch_name.toLowerCase().includes(search.toLowerCase()) ||
-                    item.branch_address.toLowerCase().includes(search.toLowerCase()) ||
-                    item.branch_contact.toString().includes(search.toLowerCase())
-                );
-            });
-        });
-    }, [search]);
 
     // get branch
     useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/branches${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -67,9 +54,7 @@ const ListCabang = () => {
             })
             .then((response) => {
                 const branch = response.data.data.resource.data;
-                setInitialRecords(response.data.data.resource.data);
-                setBranch(branch);
-                setRecordsData(branch);
+                setInitialRecords(branch);
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
@@ -90,7 +75,21 @@ const ListCabang = () => {
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, [url]);
+    }, [search, page]);
+
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+            }
+        }
+        return localStorage.removeItem('notification');
+    }, []);
 
     return (
         <div>
@@ -123,9 +122,9 @@ const ListCabang = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', render: (e) => initialRecords.indexOf(e) + 1 },
                             { accessor: 'branch_name', title: 'Nama Cabang', sortable: true },
                             {
                                 accessor: 'branch_address',
@@ -155,7 +154,7 @@ const ListCabang = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>
