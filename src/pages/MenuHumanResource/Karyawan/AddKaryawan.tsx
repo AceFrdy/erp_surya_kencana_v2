@@ -110,14 +110,24 @@ const AddKaryawan = () => {
                         message: 'Karyawan berhasil ditambahkan.',
                     };
                     localStorage.setItem('notification', JSON.stringify(notification));
-                    navigate('/menuhumanresource/karyawan');
+                    navigate(-1);
                 })
                 .catch((err: any) => {
+                    const oldValueBefore = {
+                        privilage_id: formData.privilage_id,
+                        name: formData.name,
+                        username: formData.username,
+                        email: formData.email,
+                        contact: formData.contact,
+                        address: formData.address,
+                        branch_id: cabang,
+                    };
+                    sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
                     const notification = {
                         type: 'error',
-                        message: 'Uang Keluar Gagal Ditambahkan',
+                        message: 'Karyawan Gagal Ditambahkan',
                         log: err.message,
-                        title: 'ERROR_ADDING_UANG_KELUAR',
+                        title: 'ERROR_ADDING_KARYAWAN',
                     };
                     localStorage.setItem('notification', JSON.stringify(notification));
                     navigate(0);
@@ -159,21 +169,17 @@ const AddKaryawan = () => {
         if (isOldValue) {
             const oldValue = JSON.parse(isOldValue);
             setFormData(oldValue);
+            sessionStorage.removeItem('old_value');
         }
         const notificationMessage = localStorage.getItem('notification');
         if (notificationMessage) {
             const { title, log, type, message } = JSON.parse(notificationMessage);
-            if (type === 'success') {
-                toast.success(message);
-            } else if (type === 'error') {
+            if (type === 'error') {
                 toast.error(message);
                 console.log(title, log);
                 return localStorage.removeItem('notification');
             }
         }
-        return () => {
-            sessionStorage.removeItem('old_value');
-        };
     }, []);
 
     return (

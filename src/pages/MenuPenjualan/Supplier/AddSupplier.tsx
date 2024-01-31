@@ -45,30 +45,58 @@ const AddSupplier = () => {
                 },
             })
             .then((response) => {
-                console.log('Data supplier berhasil ditambahkan:', response.data);
-                navigate('/menupenjualan/supplier');
-                toast.success('Data berhasil ditambahkan', {
-                    position: 'top-right',
-                    autoClose: 3000,
-                });
+                const notification = {
+                    type: 'success',
+                    message: 'Suplier Berhasil Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                handleCancel();
             })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    const apiErrors = error.response.data;
-                    setFormData((prevData) => ({
-                        ...prevData,
-                        errors: apiErrors,
-                    }));
-                }
-                console.error('Error adding supplier data:', error);
-                toast.error('Error adding data');
+            .catch((err: any) => {
+                // set_old_value
+                const oldValueBefore = {
+                    suplier_name: formData.suplier_name,
+                    suplier_address: formData.suplier_address,
+                    suplier_contact: formData.suplier_contact,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
+                const notification = {
+                    type: 'error',
+                    message: 'Suplier Gagal Ditambahkan',
+                    log: err.message,
+                    title: 'ERROR_ADDING_SUPLIER',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
     const handleCancel = () => {
         // Instead of using a Link, directly use the navigate function
-        navigate('/menupenjualan/supplier');
+        navigate(-1);
     };
+
+    useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+
+            return sessionStorage.removeItem('old_value');
+        }
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+
+                return localStorage.removeItem('notification');
+            }
+        }
+    }, []);
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse mb-10">
@@ -104,7 +132,7 @@ const AddSupplier = () => {
                                 <button type="submit" className="btn btn-primary !mt-6">
                                     Simpan
                                 </button>
-                                <button type="submit" className="btn btn-primary !mt-6 ml-6" onClick={handleCancel}>
+                                <button type="button" className="btn btn-primary !mt-6 ml-6" onClick={handleCancel}>
                                     Batal
                                 </button>
                             </div>
@@ -116,5 +144,3 @@ const AddSupplier = () => {
     );
 };
 export default AddSupplier;
-
-

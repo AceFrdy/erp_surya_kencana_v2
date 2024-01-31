@@ -24,8 +24,8 @@ const Suplier = () => {
         dispatch(setPageTitle('Supplier'));
     });
     const [initialRecords, setInitialRecords] = useState<SuplierDataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
     const [search, setSearch] = useState('');
+    const [page, setPage] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
@@ -35,22 +35,6 @@ const Suplier = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/supliers');
-
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return (
-                    item.suplier_name.toLowerCase().includes(search.toLowerCase()) ||
-                    item.suplier_address.toLowerCase().includes(search.toLowerCase()) ||
-                    item.suplier_contact.toString().includes(search.toLowerCase())
-                );
-            });
-        });
-    }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -59,6 +43,7 @@ const Suplier = () => {
 
     // get supplier
     useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/supliers${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -69,7 +54,6 @@ const Suplier = () => {
             .then((response) => {
                 const suplier = response.data.data.resource.data;
                 setInitialRecords(suplier);
-                setRecordsData(suplier);
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
@@ -90,7 +74,7 @@ const Suplier = () => {
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, [url, token]);
+    }, [search, page]);
 
     return (
         <div>
@@ -123,9 +107,9 @@ const Suplier = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', render: (e) => initialRecords.indexOf(e) + 1 },
                             { accessor: 'suplier_name', title: 'Nama Supplier', sortable: true },
                             { accessor: 'suplier_contact', title: 'No HP', sortable: true },
                             {
@@ -152,7 +136,7 @@ const Suplier = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

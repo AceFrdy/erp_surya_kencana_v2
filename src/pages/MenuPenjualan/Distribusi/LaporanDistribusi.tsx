@@ -32,6 +32,7 @@ const LaporanDistribusi = () => {
         dispatch(setPageTitle('Laporan Distribusi'));
     });
 
+    const [page, setPage] = useState('');
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -39,16 +40,15 @@ const LaporanDistribusi = () => {
     });
     const token = localStorage.getItem('accessToken') ?? '';
     const [initialRecords, setInitialRecords] = useState<DataInitial[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
 
     // pagination
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-reports');
 
     // get distribution report
     useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/distribution-reports${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -79,23 +79,7 @@ const LaporanDistribusi = () => {
             .catch((err: any) => {
                 console.log('GET DISTRIBRUTION REPORT', err.message);
             });
-    }, [url]);
-
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return (
-                    item.distribution_report_code.toLowerCase().includes(search.toLowerCase()) ||
-                    item.branch.branch_name.toLowerCase().includes(search.toLowerCase()) ||
-                    item.status.toLowerCase().includes(search.toLowerCase())
-                );
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, recordsData]);
+    }, [search, page]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -131,8 +115,6 @@ const LaporanDistribusi = () => {
                     <span> Laporan Distribusi </span>
                 </li>
             </ul>
-            {/* <div className="panel flex items-center overflow-x-auto whitespace-nowrap p-3 text-primary">
-            </div> */}
             <div className="panel mt-6">
                 <div className="flex md:items-center md:flex-row flex-col mb-5 gap-5">
                     <div className="ltr:ml-auto rtl:mr-auto">
@@ -144,9 +126,9 @@ const LaporanDistribusi = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', render: (e) => initialRecords.indexOf(e) + 1 },
                             { accessor: 'distribution_report_code', title: 'No Dokumen', sortable: true },
                             {
                                 accessor: 'branch.branch_name',
@@ -188,7 +170,7 @@ const LaporanDistribusi = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

@@ -37,7 +37,7 @@ const Pagination = ({ links, metaLink, linksMeta, setUrl }: { metaLink: MetaLink
             <div className="w-full h-9 flex gap-x-2 text-white justify-center sm:justify-end">
                 {/* page > 3 */}
                 <button
-                    onClick={() => setUrl(links.prev)}
+                    onClick={() => setUrl((metaLink.current_page - 1).toString())}
                     className={clsx(
                         links.prev ? 'bg-emerald-700 hover:bg-emerald-700' : 'disabled:bg-slate-200 cursor-not-allowed text-slate-400',
                         'w-9 h-9 rounded-full  flex justify-center items-center'
@@ -58,7 +58,7 @@ const Pagination = ({ links, metaLink, linksMeta, setUrl }: { metaLink: MetaLink
                     <div className="flex gap-x-2">
                         {linksMeta.slice(1, metaLink.last_page + 1).map((item) => (
                             <button
-                                onClick={() => setUrl(item.url)}
+                                onClick={() => setUrl(item.label)}
                                 className={clsx(item.active ? 'bg-emerald-700' : 'bg-emerald-600', ' w-9 h-9 rounded-full  hover:bg-emerald-700 flex justify-center items-center')}
                                 key={item.label}
                             >
@@ -74,7 +74,7 @@ const Pagination = ({ links, metaLink, linksMeta, setUrl }: { metaLink: MetaLink
                             <div>
                                 {linksMeta.slice(1, metaLink.last_page + 1).map((item) => (
                                     <button
-                                        onClick={() => setUrl(item.url)}
+                                        onClick={() => setUrl(item.label)}
                                         className={clsx(item.active ? 'bg-emerald-700' : 'bg-emerald-600', 'w-9 h-9 rounded-full  hover:bg-emerald-700 flex justify-center items-center')}
                                         key={item.label}
                                     >
@@ -90,7 +90,7 @@ const Pagination = ({ links, metaLink, linksMeta, setUrl }: { metaLink: MetaLink
                                     <div className="h-9 flex gap-x-2 text-white justify-end">
                                         {linksMeta.slice(metaLink.last_page - 1, metaLink.last_page + 1).map((item) => (
                                             <button
-                                                onClick={() => setUrl(item.url)}
+                                                onClick={() => setUrl(item.label)}
                                                 className={clsx(item.active ? 'bg-emerald-700' : 'bg-emerald-600', 'w-9 h-9 rounded-full  hover:bg-emerald-700 flex justify-center items-center')}
                                                 key={item.label}
                                             >
@@ -103,7 +103,7 @@ const Pagination = ({ links, metaLink, linksMeta, setUrl }: { metaLink: MetaLink
                                         {/* page > 3 but current page !== last page || current page !== 1 */}
                                         {linksMeta.slice(metaLink.current_page - 1, metaLink.current_page + 1).map((item) => (
                                             <button
-                                                onClick={() => setUrl(item.url)}
+                                                onClick={() => setUrl(item.label)}
                                                 className={clsx(item.active ? 'bg-emerald-700' : 'bg-emerald-600', 'w-9 h-9 rounded-full  hover:bg-emerald-700 flex justify-center items-center')}
                                                 key={item.label}
                                             >
@@ -123,7 +123,7 @@ const Pagination = ({ links, metaLink, linksMeta, setUrl }: { metaLink: MetaLink
                     </button>
                 )}
                 <button
-                    onClick={() => setUrl(links.next)}
+                    onClick={() => setUrl((metaLink.current_page + 1).toString())}
                     className={clsx(
                         links.next ? 'bg-emerald-700 hover:bg-emerald-700' : 'disabled:bg-slate-200 cursor-not-allowed text-slate-400',
                         'w-9 h-9 rounded-full  flex justify-center items-center'

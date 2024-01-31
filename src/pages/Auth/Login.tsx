@@ -68,8 +68,6 @@ const Login = () => {
                     localStorage.setItem('accessToken', response.data.data.resource.token);
                     localStorage.setItem('id', response.data.data.resource.id);
                     navigate('/');
-                } else {
-                    throw new Error('Error');
                 }
             })
             .catch((error) => {

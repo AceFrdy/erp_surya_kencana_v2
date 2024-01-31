@@ -14,8 +14,6 @@ import { setPageTitle } from '../../../../store/themeConfigSlice';
 import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
-import IconTrashLines from '../../../../components/Icon/IconTrashLines';
-import { useModal } from '../../../../hooks/use-modal';
 
 interface DataProps {
     id: number;
@@ -27,12 +25,11 @@ interface DataProps {
 }
 
 const Piutang = () => {
-    const { onOpen } = useModal();
     const dispatch = useDispatch();
     const token = localStorage.getItem('accessToken') ?? '';
     const [initialRecords, setInitialRecords] = useState<DataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
 
+    const [page, setPage] = useState('');
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -41,10 +38,10 @@ const Piutang = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/receivables');
 
     // get_data
     useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/receivables${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -75,25 +72,7 @@ const Piutang = () => {
             .catch((err: any) => {
                 console.log('ERROR_GETTING_PIUTANG:', err.message);
             });
-    }, [url]);
-
-    // handle_search
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return (
-                    item.receivable_code.includes(search.toLowerCase()) ||
-                    item.debitur_name.toLowerCase().includes(search.toLowerCase()) ||
-                    item.receivable_date.toLowerCase().includes(search.toLowerCase()) ||
-                    item.receivable_status.toLowerCase().includes(search.toLowerCase())
-                );
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, recordsData]);
+    }, [search, page]);
 
     // handle_sort
     useEffect(() => {
@@ -153,9 +132,9 @@ const Piutang = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             {
                                 accessor: 'receivable_code',
                                 title: 'Kode Debitur',
@@ -196,9 +175,6 @@ const Piutang = () => {
                                                 <IconPencil className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-piutang', e.id)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
                                     </div>
                                 ),
                             },
@@ -207,7 +183,7 @@ const Piutang = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

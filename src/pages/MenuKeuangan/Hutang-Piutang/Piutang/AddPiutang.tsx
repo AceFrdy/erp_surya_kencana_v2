@@ -211,7 +211,7 @@ const AddPiutang = () => {
                         <button type="submit" className="btn btn-primary !mt-6 mr-8">
                             Tambah
                         </button>
-                        <button className="btn btn-primary !mt-6" onClick={handleCancel}>
+                        <button type="button" className="btn btn-primary !mt-6" onClick={handleCancel}>
                             Kembali
                         </button>
                     </div>

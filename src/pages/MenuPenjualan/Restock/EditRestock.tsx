@@ -199,11 +199,9 @@ const EditRestock = () => {
                         <button type="submit" className="btn btn-outline-primary !mt-6">
                             Update
                         </button>
-                        <Link to="/menupenjualan/restock/restock">
-                            <button type="button" className="btn btn-outline-danger !mt-6 ml-6">
-                                Kembali
-                            </button>
-                        </Link>
+                        <button onClick={() => navigate(-1)} type="button" className="btn btn-outline-danger !mt-6 ml-6">
+                            Kembali
+                        </button>
                     </div>
                 </form>
             </div>

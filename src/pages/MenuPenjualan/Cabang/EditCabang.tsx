@@ -27,13 +27,8 @@ const EditCabang = () => {
                 },
             })
             .then((response) => {
-                console.log('API Response:', response.data);
                 const branchData = response.data.data.resource;
-                setFormData({
-                    branch_name: branchData.branch_name,
-                    branch_address: branchData.branch_address,
-                    branch_contact: branchData.branch_contact,
-                });
+                setFormData(branchData);
             })
             .catch((error) => {
                 console.error('Error fetching branch data:', error);
@@ -61,26 +56,57 @@ const EditCabang = () => {
                 },
             })
             .then((response) => {
-                console.log('Branch data successfully updated:', response.data);
-                navigate('/menupenjualan/cabang/listcabang');
-                toast.success('Data berhasil diedit', {
-                    position: 'top-right',
-                    autoClose: 3000,
-                });
+                const notification = {
+                    type: 'success',
+                    message: 'Cabang Berhasil Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                handleCancel();
             })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    setErrors(error.response.data);
-                    console.log('Validation Errors:', error.response.data);
-                }
-                console.error('Error updating branch data:', error);
-                toast.error('Error updating data');
+            .catch((err: any) => {
+                // set_old_value
+                const oldValueBefore = {
+                    branch_name: formData.branch_name,
+                    branch_address: formData.branch_address,
+                    branch_contact: formData.branch_contact,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
+                const notification = {
+                    type: 'error',
+                    message: 'Cabang Gagal Ditambahkan',
+                    log: err.message,
+                    title: 'ERROR_ADDING_CABANG',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
     const handleCancel = () => {
-        navigate('/menupenjualan/cabang/listcabang');
+        navigate(-1);
     };
+
+    useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+
+            return sessionStorage.removeItem('old_value');
+        }
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+
+                return localStorage.removeItem('notification');
+            }
+        }
+    }, []);
 
     return (
         <div>

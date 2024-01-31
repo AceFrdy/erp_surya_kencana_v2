@@ -53,11 +53,11 @@ const DetailCabang = () => {
     const [branchList, setBranchList] = useState<BranchDataProps[]>([]);
     const [branch, setBranch] = useState<string>('-');
     const [selectedBranch, setSelectedBranch] = useState<BranchDataProps | null>(null);
-    
+
     // Sale &stock
     const [penjualan, setPenjualan] = useState<PenjualanDataProps[]>([]);
     const [stock, setStock] = useState<StockDataProps[]>([]);
-    
+
     useEffect(() => {
         axios
             .get('https://erp.digitalindustryagency.com/api/branches', {
@@ -68,7 +68,6 @@ const DetailCabang = () => {
             })
             .then((response) => {
                 setBranchList(response.data.data.resource.data);
-                console.log('BRANCH', branch);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -83,7 +82,6 @@ const DetailCabang = () => {
             })
             .then((response) => {
                 setStock(response.data.data.resource.data);
-                console.log('STOCK', response.data.data.resource.data);
             })
             .catch((error) => {
                 console.error('Error fetching data:', error);
@@ -246,14 +244,17 @@ const DetailCabang = () => {
                                             title: 'Pelanggan',
                                             sortable: true,
                                         },
-                                        { accessor: 'sale_report_grand_total', title: 'Total', sortable: true,render: (e) => formatPrice(e.sale_report_grand_total),
-                                    },
+                                        { accessor: 'sale_report_grand_total', title: 'Total', sortable: true, render: (e) => formatPrice(e.sale_report_grand_total) },
                                         {
                                             accessor: 'sale_report_status',
                                             title: 'Status',
                                             sortable: true,
                                             render: (data) => (
-                                                <span className={`badge whitespace-nowrap ${data.sale_report_status === 'lunas' ? 'bg-primary' : data.sale_report_status === 'hutang' ? 'bg-danger' : 'bg-success'}`}>
+                                                <span
+                                                    className={`badge whitespace-nowrap ${
+                                                        data.sale_report_status === 'lunas' ? 'bg-primary' : data.sale_report_status === 'hutang' ? 'bg-danger' : 'bg-success'
+                                                    }`}
+                                                >
                                                     {data.sale_report_status}
                                                 </span>
                                             ),

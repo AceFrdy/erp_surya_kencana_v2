@@ -1,15 +1,18 @@
-import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
-import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import IconPencil from '../../../../components/Icon/IconPencil';
-import { Link } from 'react-router-dom';
-import IconNotes from '../../../../components/Icon/IconNotes';
-import IconPlus from '../../../../components/Icon/IconPlus';
 import axios from 'axios';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../../utils';
+import sortBy from 'lodash/sortBy';
+import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+
 import Pagination from '../../../../components/Pagination';
+import IconPlus from '../../../../components/Icon/IconPlus';
+import IconNotes from '../../../../components/Icon/IconNotes';
+import IconPencil from '../../../../components/Icon/IconPencil';
+import { setPageTitle } from '../../../../store/themeConfigSlice';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../../utils';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface DebtDataProps {
     id: number;
@@ -26,7 +29,7 @@ const Hutang = () => {
         dispatch(setPageTitle('Hutang'));
     });
     const [initialRecords, setInitialRecords] = useState<DebtDataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [page, setPage] = useState('');
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -36,25 +39,6 @@ const Hutang = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/debts');
-
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return (
-                    item.id.toString().includes(search.toLowerCase()) ||
-                    item.debt_balance.toString().includes(search.toLowerCase()) ||
-                    item.debt_status.toLowerCase().includes(search.toLowerCase()) ||
-                    item.creditur_name.toLowerCase().includes(search.toLowerCase()) ||
-                    item.debt_date.toLowerCase().includes(search.toLowerCase())
-                );
-            });
-        });
-    }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -72,6 +56,7 @@ const Hutang = () => {
     };
 
     const fetchData = () => {
+        const url = `https://erp.digitalindustryagency.com/api/debts${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -82,7 +67,6 @@ const Hutang = () => {
             .then((response) => {
                 const debts = response.data.data.resource.data;
                 setInitialRecords(debts);
-                setRecordsData(debts);
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
@@ -106,8 +90,22 @@ const Hutang = () => {
     };
 
     useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+            }
+        }
+        return localStorage.removeItem('notification');
+    }, []);
+
+    useEffect(() => {
         fetchData();
-    }, [token]);
+    }, [search, page]);
 
     return (
         <div>
@@ -140,9 +138,9 @@ const Hutang = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             {
                                 accessor: 'creditur_name',
                                 title: 'Nama Kreditur',
@@ -159,9 +157,7 @@ const Hutang = () => {
                                 accessor: 'debt_status',
                                 title: 'Status',
                                 sortable: true,
-                                render: (rowData) => (
-                                    <span className={`badge whitespace-nowrap ${rowData.debt_status === 'Belum Lunas' ? 'bg-red-500' : 'bg-green-500'}`}>{rowData.debt_status}</span>
-                                ),
+                                render: (rowData) => <span className={`badge whitespace-nowrap ${rowData.debt_status === 'Belum Lunas' ? 'bg-red-500' : 'bg-green-500'}`}>{rowData.debt_status}</span>,
                             },
                             {
                                 accessor: 'action',
@@ -187,7 +183,7 @@ const Hutang = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

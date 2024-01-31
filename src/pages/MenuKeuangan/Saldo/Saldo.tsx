@@ -1,15 +1,17 @@
-import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
-import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { Link, useNavigate } from 'react-router-dom';
-import IconPlus from '../../../components/Icon/IconPlus';
 import axios from 'axios';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
-import { useModal } from '../../../hooks/use-modal';
+import sortBy from 'lodash/sortBy';
+import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+
+import { setPageTitle } from '../../../store/themeConfigSlice';
+import IconPlus from '../../../components/Icon/IconPlus';
 import Pagination from '../../../components/Pagination';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface SaldoDataProps {
     id: number;
@@ -24,12 +26,11 @@ interface SaldoDataProps {
 const Saldo = () => {
     const dispatch = useDispatch();
     const token = localStorage.getItem('accessToken') ?? '';
-    const { onOpen } = useModal();
     useEffect(() => {
         dispatch(setPageTitle('Saldo'));
     });
     const [initialRecords, setInitialRecords] = useState<SaldoDataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
+    const [page, setPage] = useState('');
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -40,22 +41,6 @@ const Saldo = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/saldos');
-
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return (
-                    item.detail_account?.detail_acc_code.toLowerCase().includes(search.toLowerCase()) ||
-                    item.detail_account?.detail_acc_name.toLowerCase().includes(search.toLowerCase()) ||
-                    item.detail_account?.detail_acc_type.toLowerCase().includes(search.toLowerCase())
-                );
-            });
-        });
-    }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -63,6 +48,7 @@ const Saldo = () => {
     }, [sortStatus]);
 
     useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/saldos${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -72,7 +58,6 @@ const Saldo = () => {
             })
             .then((response) => {
                 const saldo = response.data.data.resource.data;
-                setRecordsData(saldo);
                 setInitialRecords(saldo);
                 // page
                 setMetaLink({
@@ -94,7 +79,21 @@ const Saldo = () => {
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, [url]);
+    }, [search, page]);
+
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+            }
+        }
+        return localStorage.removeItem('notification');
+    }, []);
 
     return (
         <div>
@@ -129,9 +128,9 @@ const Saldo = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             {
                                 accessor: 'detail_account.detail_acc_code',
                                 title: 'Kode Akun',
@@ -145,24 +144,12 @@ const Saldo = () => {
                                 sortable: true,
                                 render: (e) => formatPrice(e.saldo_amount),
                             },
-                            // {
-                            //     accessor: 'action',
-                            //     title: 'Opsi',
-                            //     titleClassName: '!text-center',
-                            //     render: (e) => (
-                            //         <div className="flex items-center w-max mx-auto gap-2">
-                            //             <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-saldo', e.id)}>
-                            //                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                            //             </button>
-                            //         </div>
-                            //     ),
-                            // },
                         ]}
                         sortStatus={sortStatus}
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

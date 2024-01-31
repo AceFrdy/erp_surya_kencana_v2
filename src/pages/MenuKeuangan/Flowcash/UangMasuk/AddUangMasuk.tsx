@@ -1,9 +1,12 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { setPageTitle } from '../../../../store/themeConfigSlice';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+
+import { setPageTitle } from '../../../../store/themeConfigSlice';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface FormState {
     id: number;
@@ -101,32 +104,28 @@ const AddUangMasuk = () => {
             .then((response) => {
                 const notification = {
                     type: 'success',
-                    message: 'Uang masuk berhasil ditambahkan.',
+                    message: 'Uang Masuk Berhasil Ditambahkan',
                 };
-                navigate('/menukeuangan/flowcash/uangmasuk');
                 localStorage.setItem('notification', JSON.stringify(notification));
-                // console.log('Data Uang Masuk berhasil ditambahkan:', response.data);
-                // navigate('/menukeuangan/flowcash/uangmasuk');
-                // toast.success('Data berhasil ditambahkan', {
-                //     position: 'top-right',
-                //     autoClose: 3000,
-                // });
+                handleCancel();
             })
             .catch((err: any) => {
-                // if (error.response && error.response.data) {
-                //     const apiErrors = error.response.data;
-                //     setFormData((prevData) => ({
-                //         ...prevData,
-                //         errors: apiErrors,
-                //     }));
-                // }
-                // console.error('Error adding cash inflow data:', error);
-                // toast.error('Error adding data');
+                // set_old_value
+                const oldValueBefore = {
+                    index_id: formData.index_id,
+                    detail_account_id: formData.detail_account_id,
+                    cash_inflow_amount: formData.cash_inflow_amount,
+                    cash_inflow_info: formData.cash_inflow_info,
+                    cash_inflow_date: formData.cash_inflow_date,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
                 const notification = {
                     type: 'error',
                     message: 'Uang Masuk Gagal Ditambahkan',
                     log: err.message,
-                    title: 'ERROR_ADDING_UANG_MASUK',
+                    title: 'ERROR_ADDING_INFLOW',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
@@ -134,7 +133,7 @@ const AddUangMasuk = () => {
     };
 
     const handleCancel = () => {
-        navigate('/menukeuangan/flowcash/uangmasuk');
+        navigate(-1);
     };
 
     useEffect(() => {
@@ -142,28 +141,25 @@ const AddUangMasuk = () => {
         if (isOldValue) {
             const oldValue = JSON.parse(isOldValue);
             setFormData(oldValue);
+
+            return sessionStorage.removeItem('old_value');
         }
         const notificationMessage = localStorage.getItem('notification');
         if (notificationMessage) {
             const { title, log, type, message } = JSON.parse(notificationMessage);
-            if (type === 'success') {
-                toast.success(message);
-            } else if (type === 'error') {
+            if (type === 'error') {
                 toast.error(message);
                 console.log(title, log);
+
                 return localStorage.removeItem('notification');
             }
         }
-        return () => {
-            sessionStorage.removeItem('old_value');
-        };
     }, []);
 
     return (
         <div>
             <ul className="flex space-x-2 rtl:space-x-reverse mb-10">
                 <li>
-                    
                     <Link to="/" className="text-primary hover:underline">
                         Home
                     </Link>

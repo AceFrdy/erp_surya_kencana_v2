@@ -6,12 +6,10 @@ import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 
-import { useModal } from '../../../../hooks/use-modal';
 import Pagination from '../../../../components/Pagination';
 import IconPlus from '../../../../components/Icon/IconPlus';
 import IconNotes from '../../../../components/Icon/IconNotes';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
-import IconTrashLines from '../../../../components/Icon/IconTrashLines';
 import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
@@ -30,11 +28,10 @@ interface DataProps {
 }
 
 const UangKeluar = () => {
-    const { onOpen } = useModal();
     const dispatch = useDispatch();
     const [initialRecords, setInitialRecords] = useState<DataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
 
+    const [page, setPage] = useState('');
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -45,10 +42,10 @@ const UangKeluar = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/cash-outflows');
 
     // get_data
     useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/cash-outflows${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -75,20 +72,7 @@ const UangKeluar = () => {
                     prev: response.data.data.resource.prev_page_url,
                 });
             });
-    }, [url]);
-
-    // handle_search
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return item.index.index_info.toLowerCase().includes(search.toLowerCase()) || item.detail_account.detail_acc_code.toLowerCase().includes(search.toLowerCase());
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, initialRecords]);
+    }, [page, search]);
 
     // handle_sort
     useEffect(() => {
@@ -148,9 +132,9 @@ const UangKeluar = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             {
                                 accessor: 'detail_account.detail_acc_code',
                                 title: 'Kode Detail Akun',
@@ -180,9 +164,6 @@ const UangKeluar = () => {
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-uang-keluar', e.id)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
                                     </div>
                                 ),
                             },
@@ -191,7 +172,7 @@ const UangKeluar = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

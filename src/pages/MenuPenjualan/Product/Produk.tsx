@@ -6,15 +6,15 @@ import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, ProductList, formatPrice } from '../../../utils';
 import { useModal } from '../../../hooks/use-modal';
+import Pagination from '../../../components/Pagination';
 import IconPlus from '../../../components/Icon/IconPlus';
 import IconPencil from '../../../components/Icon/IconPencil';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, ProductList, formatPrice } from '../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
-import Pagination from '../../../components/Pagination';
 
 const Produk = () => {
     const { onOpen } = useModal();
@@ -23,8 +23,8 @@ const Produk = () => {
     const token = localStorage.getItem('accessToken') ?? '';
 
     const [initialRecords, setInitialRecords] = useState<ProductList[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState<string>('');
+    const [page, setPage] = useState<string>('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
@@ -34,10 +34,10 @@ const Produk = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/products');
 
     // get produk
     useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/products${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -61,19 +61,7 @@ const Produk = () => {
                     console.log('ERROR_GETTING_DATA:', err.message);
                 }
             });
-    }, [url]);
-
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return item.product_name.toLowerCase().includes(search.toLowerCase()) || item.product_barcode.toLowerCase().includes(search.toLowerCase());
-            });
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search, recordsData]);
+    }, [page, search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -125,7 +113,15 @@ const Produk = () => {
                         </button>
                     </Link>
                     <div className="ltr:ml-auto rtl:mr-auto">
-                        <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
+                        <input
+                            type="text"
+                            className="form-input w-auto"
+                            placeholder="Search..."
+                            value={search}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                            }}
+                        />
                     </div>
                 </div>
                 <h5 className="font-semibold text-lg dark:text-white-light mb-2">Data Produk</h5>
@@ -133,9 +129,9 @@ const Produk = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             {
                                 accessor: 'product_image',
                                 title: 'Foto',
@@ -191,7 +187,7 @@ const Produk = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

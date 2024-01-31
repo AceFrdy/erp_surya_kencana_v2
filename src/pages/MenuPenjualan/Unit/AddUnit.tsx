@@ -19,9 +19,7 @@ const AddUnit = () => {
     const [formData, setFormData] = useState({
         unit_stock_name: '',
         number_of_units: '',
-        errors: {},
     });
-    console.log('FORM DATA', formData.unit_stock_name);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -47,30 +45,57 @@ const AddUnit = () => {
                 },
             })
             .then((response) => {
-                console.log('Data Unit berhasil ditambahkan:', response.data);
-                navigate('/menupenjualan/product/unit');
-                toast.success('Data berhasil ditambahkan', {
-                    position: 'top-right',
-                    autoClose: 3000,
-                });
+                const notification = {
+                    type: 'success',
+                    message: 'Unit Berhasil Ditambahkan',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                handleCancel();
             })
-            .catch((error) => {
-                if (error.response && error.response.data) {
-                    const apiErrors = error.response.data;
-                    setFormData((prevData) => ({
-                        ...prevData,
-                        errors: apiErrors,
-                    }));
-                }
-                console.error('Error adding unit data:', error);
-                toast.error('Error adding data');
+            .catch((err: any) => {
+                // set_old_value
+                const oldValueBefore = {
+                    unit_stock_name: formData.unit_stock_name,
+                    number_of_units: formData.number_of_units,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
+                const notification = {
+                    type: 'error',
+                    message: 'Unit Gagal Ditambahkan',
+                    log: err.message,
+                    title: 'ERROR_ADDING_UNIT',
+                };
+                localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
     const handleCancel = () => {
         // Instead of using a Link, directly use the navigate function
-        navigate('/menupenjualan/product/unit');
+        navigate(-1);
     };
+
+    useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue = JSON.parse(isOldValue);
+            setFormData(oldValue);
+
+            return sessionStorage.removeItem('old_value');
+        }
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+
+                return localStorage.removeItem('notification');
+            }
+        }
+    }, []);
 
     return (
         <div>
@@ -103,7 +128,7 @@ const AddUnit = () => {
                                 <button type="submit" className="btn btn-primary !mt-6">
                                     Simpan
                                 </button>
-                                <button type="submit" className="btn btn-primary !mt-6 ml-6" onClick={handleCancel}>
+                                <button type="button" className="btn btn-primary !mt-6 ml-6" onClick={handleCancel}>
                                     Batal
                                 </button>
                             </div>

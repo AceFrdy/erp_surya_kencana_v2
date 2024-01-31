@@ -49,7 +49,6 @@ const DetailJabatan = () => {
                 setPrivilagesTotal(response.data.data.resource[1].total);
                 setInitialRecords(response.data.data.resource[1].data);
                 setRecordsData(response.data.data.resource[1].data);
-                console.log('NAME', response.data.data.resource);
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource[1].current_page,

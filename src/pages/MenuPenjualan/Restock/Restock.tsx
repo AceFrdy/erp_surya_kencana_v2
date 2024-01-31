@@ -94,13 +94,31 @@ const Restock = () => {
                 navigate(0);
             })
             .catch((err: any) => {
-                navigate(0);
-                console.log('ERROR', err.message);
+                // set_old_value
+                const oldFormData = {
+                    product_price: formData.product_price,
+                    product_qty: formData.product_qty,
+                    product_name: formData.product_name,
+                };
+                const oldFormRestock = {
+                    suplier_id: formRestock.suplier_id,
+                    operating_cost: formRestock.operating_cost,
+                };
+                const oldValueBefore = {
+                    oldFormData: oldFormData,
+                    oldFormRestock: oldFormRestock,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
                 const notification = {
                     type: 'error',
                     message: 'Restock Gagal Ditambahkan',
+                    log: err.message,
+                    title: 'ERROR_ADDING_RESTOCK',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
@@ -128,12 +146,31 @@ const Restock = () => {
                 localStorage.setItem('notification', JSON.stringify(notification));
             })
             .catch((err: any) => {
-                navigate(0);
+                // set_old_value
+                const oldFormData = {
+                    product_price: formData.product_price,
+                    product_qty: formData.product_qty,
+                    product_name: formData.product_name,
+                };
+                const oldFormRestock = {
+                    suplier_id: formRestock.suplier_id,
+                    operating_cost: formRestock.operating_cost,
+                };
+                const oldValueBefore = {
+                    oldFormData: oldFormData,
+                    oldFormRestock: oldFormRestock,
+                };
+                sessionStorage.setItem('old_value', JSON.stringify(oldValueBefore));
+
+                // set_notif
                 const notification = {
-                    type: 'success',
+                    type: 'error',
                     message: 'Data Restock Gagal Ditambahkan',
+                    log: err.message,
+                    title: 'ERROR_ADDING_DATA_RESTOCK',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
+                navigate(0);
             });
     };
 
@@ -239,13 +276,22 @@ const Restock = () => {
     }, [sortStatus]);
 
     useEffect(() => {
+        const isOldValue = sessionStorage.getItem('old_value');
+        if (isOldValue) {
+            const oldValue: any = JSON.parse(isOldValue);
+            setFormData(oldValue.oldFormData);
+            setFormRestock(oldValue.oldFormRestock);
+
+            return sessionStorage.removeItem('old_value');
+        }
         const notificationMessage = localStorage.getItem('notification');
         if (notificationMessage) {
-            const { type, message } = JSON.parse(notificationMessage);
+            const { title, log, type, message } = JSON.parse(notificationMessage);
             if (type === 'success') {
                 toast.success(message);
             } else if (type === 'error') {
                 toast.error(message);
+                console.log(title, log);
             }
         }
         return localStorage.removeItem('notification');

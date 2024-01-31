@@ -1,16 +1,18 @@
-import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
+import axios from 'axios';
 import sortBy from 'lodash/sortBy';
-import { setPageTitle } from '../../../../store/themeConfigSlice';
-import { useDispatch } from 'react-redux';
-import IconTrashLines from '../../../../components/Icon/IconTrashLines';
+import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+
+import { setPageTitle } from '../../../../store/themeConfigSlice';
 import IconNotes from '../../../../components/Icon/IconNotes';
 import IconPlus from '../../../../components/Icon/IconPlus';
-import axios from 'axios';
-import { useModal } from '../../../../hooks/use-modal';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../../utils';
 import Pagination from '../../../../components/Pagination';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../../utils';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 interface InflowDataProps {
     id: number;
@@ -31,9 +33,8 @@ const UangMasuk = () => {
         dispatch(setPageTitle('Uang Masuk'));
     });
     const [initialRecords, setInitialRecords] = useState<InflowDataProps[]>([]);
-    const [recordsData, setRecordsData] = useState(initialRecords);
-    const { onOpen } = useModal();
     const [search, setSearch] = useState('');
+    const [page, setPage] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
         direction: 'asc',
@@ -43,22 +44,6 @@ const UangMasuk = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/cash-inflows');
-
-    useEffect(() => {
-        if (!initialRecords) {
-            return;
-        }
-        setRecordsData(() => {
-            return initialRecords.filter((item) => {
-                return (
-                    item.detail_account?.detail_acc_code.toLowerCase().includes(search.toLowerCase()) ||
-                    item.detail_account?.detail_acc_name.toLowerCase().includes(search.toLowerCase()) ||
-                    item.detail_account?.detail_acc_type.toLowerCase().includes(search.toLowerCase())
-                );
-            });
-        });
-    }, [search]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -66,6 +51,7 @@ const UangMasuk = () => {
     }, [sortStatus]);
 
     useEffect(() => {
+        const url = `https://erp.digitalindustryagency.com/api/cash-inflows${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -76,7 +62,6 @@ const UangMasuk = () => {
             .then((response) => {
                 const inflows = response.data.data.resource.data;
                 setInitialRecords(inflows);
-                setRecordsData(inflows);
                 // page
                 setMetaLink({
                     current_page: response.data.data.resource.current_page,
@@ -97,7 +82,21 @@ const UangMasuk = () => {
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, [url]);
+    }, [search, page]);
+
+    useEffect(() => {
+        const notificationMessage = localStorage.getItem('notification');
+        if (notificationMessage) {
+            const { title, log, type, message } = JSON.parse(notificationMessage);
+            if (type === 'success') {
+                toast.success(message);
+            } else if (type === 'error') {
+                toast.error(message);
+                console.log(title, log);
+            }
+        }
+        return localStorage.removeItem('notification');
+    }, []);
 
     return (
         <div>
@@ -130,9 +129,9 @@ const UangMasuk = () => {
                     <DataTable
                         highlightOnHover
                         className="whitespace-nowrap table-hover"
-                        records={recordsData}
+                        records={initialRecords}
                         columns={[
-                            { accessor: 'id', title: 'No', sortable: true, render: (e) => recordsData.indexOf(e) + 1 },
+                            { accessor: 'id', title: 'No', sortable: true, render: (e) => initialRecords.indexOf(e) + 1 },
                             {
                                 accessor: 'detail_account.detail_acc_code',
                                 title: 'Kode Detail Akun',
@@ -158,14 +157,6 @@ const UangMasuk = () => {
                                                 <IconNotes className="ltr:mr-2 rtl:ml-2 " />
                                             </Link>
                                         </button>
-                                        {/* <button type="button" style={{ color: 'orange' }}>
-                                                <Link to="/menupenjualan/restock/editrestock">
-                                                    <IconPencil className="ltr:mr-2 rtl:ml-2 " />
-                                                </Link>
-                                            </button> */}
-                                        {/* <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-inflow-cash', e.id)}>
-                                            <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
-                                        </button> */}
                                     </div>
                                 ),
                             },
@@ -174,7 +165,7 @@ const UangMasuk = () => {
                         onSortStatusChange={setSortStatus}
                         minHeight={200}
                     />
-                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                    {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                 </div>
             </div>
         </div>

@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, Fragment, useEffect, useState } from 'react';
 
 import { useModal } from '../../../hooks/use-modal';
 import IconEye from '../../../components/Icon/IconEye';
@@ -15,12 +15,13 @@ import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { Dialog, Transition } from '@headlessui/react';
 
 interface FormDataProps {
     index_info: string;
-    income: string;
-    outcome: string;
-    submission: string;
+    income: boolean;
+    outcome: boolean;
+    submission: boolean;
 }
 
 interface DataProps {
@@ -46,7 +47,10 @@ const ControlPanel = () => {
     });
     const [initialRecords, setInitialRecords] = useState<DataProps[]>([]);
     const token = localStorage.getItem('accessToken') ?? '';
+    const [page, setPage] = useState<string>('');
+    const [id, setId] = useState<number>(0);
     const navigate = useNavigate();
+    const [open, setOpen] = useState<boolean>(false);
 
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: 'id',
@@ -54,9 +58,9 @@ const ControlPanel = () => {
     });
     const [formData, setFormData] = useState<FormDataProps>({
         index_info: '',
-        income: '',
-        outcome: '',
-        submission: '',
+        income: false,
+        outcome: false,
+        submission: false,
     });
     const [saldo, setSaldo] = useState<SaldoProps>({
         saldo_akhir: 0,
@@ -64,6 +68,44 @@ const ControlPanel = () => {
         inflow_total: 0,
         outflow_total: 0,
     });
+
+    // pagination
+    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
+    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
+    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
+
+    const fetchData = () => {
+        const url = `https://erp.digitalindustryagency.com/api/indexs${page && '?q=' + page}`;
+        axios
+            .get(url, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                setInitialRecords(response.data.data.resource.data);
+                // page
+                setMetaLink({
+                    current_page: response.data.data.resource.current_page,
+                    last_page: response.data.data.resource.last_page,
+                    from: response.data.data.resource.from,
+                    to: response.data.data.resource.to,
+                    per_page: response.data.data.resource.per_page,
+                    total: response.data.data.resource.total,
+                });
+                setMetaLinksLink(response.data.data.resource.links);
+                setLinksLink({
+                    first: response.data.data.resource.first_page_url,
+                    last: response.data.data.resource.last_page_url,
+                    next: response.data.data.resource.next_page_url,
+                    prev: response.data.data.resource.prev_page_url,
+                });
+            })
+            .catch((err: any) => {
+                console.log('ERROR_INDEX', err.message);
+            });
+    };
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -103,21 +145,13 @@ const ControlPanel = () => {
                 },
             })
             .then((response) => {
-                const notification = {
-                    type: 'success',
-                    message: 'Index Berhasil Ditambahkan',
-                };
-                localStorage.setItem('notification', JSON.stringify(notification));
-                navigate(0);
+                setFormData((prev) => ({ ...prev, index_info: '', income: false, outcome: false, submission: false }));
+                fetchData();
+                toast.success('Index berhasil ditambahkan');
             })
             .catch((err: any) => {
-                navigate(0);
-                console.log('ERROR', err.message);
-                const notification = {
-                    type: 'error',
-                    message: 'Index Gagal Ditambahkan',
-                };
-                localStorage.setItem('notification', JSON.stringify(notification));
+                toast.error('Index gagal ditambahkan');
+                console.log('ERROR_ADDING_INDEX', err.message);
             });
     };
 
@@ -139,62 +173,39 @@ const ControlPanel = () => {
                 },
             })
             .then((response) => {
-                const notification = {
-                    type: 'success',
-                    message: 'Index Berhasil Diupdate',
-                };
-                localStorage.setItem('notification', JSON.stringify(notification));
-                navigate(0);
+                fetchData();
+                toast.success('Index berhasil diperbarui');
             })
             .catch((err: any) => {
-                navigate(0);
-                console.log('ERROR', err);
-                const notification = {
-                    type: 'error',
-                    message: 'Index Gagal Diupdate',
-                };
-                localStorage.setItem('notification', JSON.stringify(notification));
+                toast.error('Index gagal diperbarui');
+                console.log('ERROR_UPDATING_INDEX', err.message);
             });
     };
 
-    // pagination
-    const [metaLink, setMetaLink] = useState<MetaLinkProps>();
-    const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
-    const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/indexs');
-
-    // get index
-    useEffect(() => {
+    const handleDelete = (id: number) => {
         axios
-            .get(url, {
+            .delete(`https://erp.digitalindustryagency.com/api/indexs/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
-            .then((response) => {
-                setInitialRecords(response.data.data.resource.data);
-                // page
-                setMetaLink({
-                    current_page: response.data.data.resource.current_page,
-                    last_page: response.data.data.resource.last_page,
-                    from: response.data.data.resource.from,
-                    to: response.data.data.resource.to,
-                    per_page: response.data.data.resource.per_page,
-                    total: response.data.data.resource.total,
-                });
-                setMetaLinksLink(response.data.data.resource.links);
-                setLinksLink({
-                    first: response.data.data.resource.first_page_url,
-                    last: response.data.data.resource.last_page_url,
-                    next: response.data.data.resource.next_page_url,
-                    prev: response.data.data.resource.prev_page_url,
-                });
+            .then(() => {
+                setOpen(false);
+                fetchData();
+                toast.success('Index berhasil dihapus');
             })
-            .catch((err: any) => {
-                console.log('ERROR_INDEX', err.message);
+            .catch((err) => {
+                setOpen(false);
+                toast.error('Index gagal dihapus');
+                console.log('ERROR_DELETING_INDEX');
             });
-    }, [url]);
+    };
+
+    // get index
+    useEffect(() => {
+        fetchData();
+    }, [page]);
 
     // get saldo
     useEffect(() => {
@@ -228,6 +239,49 @@ const ControlPanel = () => {
 
     return (
         <div>
+            <Transition appear show={open} as={Fragment}>
+                <Dialog as="div" open={open} onClose={() => setOpen(false)}>
+                    <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
+                        <div className="fixed inset-0" />
+                    </Transition.Child>
+                    <div className="fixed inset-0 bg-[black]/60 z-[999] overflow-y-auto">
+                        <div className="flex items-start justify-center min-h-screen px-4">
+                            <Transition.Child
+                                as={Fragment}
+                                enter="ease-out duration-300"
+                                enterFrom="opacity-0 scale-95"
+                                enterTo="opacity-100 scale-100"
+                                leave="ease-in duration-200"
+                                leaveFrom="opacity-100 scale-100"
+                                leaveTo="opacity-0 scale-95"
+                            >
+                                <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
+                                    <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
+                                        <div className="text-lg font-bold">Hapus Index</div>
+                                    </div>
+                                    <div className="p-5">
+                                        <div>
+                                            <form className="space-y-5">
+                                                <div>
+                                                    <h1>Apakah Anda yakin ingin menghapus Index</h1>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div className="flex justify-end items-center mt-8">
+                                            <button type="button" className="btn btn-outline-danger" onClick={() => setOpen(false)}>
+                                                Kembali
+                                            </button>
+                                            <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => handleDelete(id)}>
+                                                Hapus
+                                            </button>
+                                        </div>
+                                    </div>
+                                </Dialog.Panel>
+                            </Transition.Child>
+                        </div>
+                    </div>
+                </Dialog>
+            </Transition>
             <ul className="flex space-x-2 rtl:space-x-reverse">
                 <li>
                     <Link to="/" className="text-primary hover:underline">
@@ -362,7 +416,14 @@ const ControlPanel = () => {
                                     titleClassName: '!text-center',
                                     render: (e) => (
                                         <div className="flex items-center w-max mx-auto gap-2">
-                                            <button type="button" style={{ color: 'red' }} onClick={() => onOpen('delete-index', e.id)}>
+                                            <button
+                                                type="button"
+                                                style={{ color: 'red' }}
+                                                onClick={() => {
+                                                    setOpen(true);
+                                                    setId(e.id);
+                                                }}
+                                            >
                                                 <IconTrashLines className="ltr:mr-2 rtl:ml-2 " />
                                             </button>
                                         </div>
@@ -373,7 +434,7 @@ const ControlPanel = () => {
                             onSortStatusChange={setSortStatus}
                             minHeight={200}
                         />
-                        {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setUrl} />}
+                        {metaLink && linksLink && <Pagination metaLink={metaLink} linksMeta={metaLinksLink} links={linksLink} setUrl={setPage} />}
                     </div>
                     <form className="space-y-5 panel w-full xl:w-1/3 h-[400px]" onSubmit={handleSubmit}>
                         <h1 className="font-semibold text-xl dark:text-white-light mb-2 justify-center flex">Tambah Index</h1>
@@ -388,19 +449,19 @@ const ControlPanel = () => {
                                 <div className="text-xl font-medium">Jenis :</div>
                                 <div>
                                     <label className="inline-flex">
-                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" name="income" onChange={handleChange} value={formData.income} />
+                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" name="income" onChange={handleChange} checked={formData.income} />
                                         <span className="text-lg">Pemasukan</span>
                                     </label>
                                 </div>
                                 <div>
                                     <label className="inline-flex">
-                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" name="outcome" onChange={handleChange} value={formData.outcome} />
+                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" name="outcome" onChange={handleChange} checked={formData.outcome} />
                                         <span className="text-lg ">Pengeluaran</span>
                                     </label>
                                 </div>
                                 <div>
                                     <label className="inline-flex">
-                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" name="submission" onChange={handleChange} value={formData.submission} />
+                                        <input type="checkbox" className="form-checkbox outline-info w-6 h-6" name="submission" onChange={handleChange} checked={formData.submission} />
                                         <span className="text-lg">Pengajuan</span>
                                     </label>
                                 </div>
