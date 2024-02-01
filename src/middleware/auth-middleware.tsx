@@ -17,7 +17,7 @@ const AuthMiddleware = ({ children, menu }: AuthMiddlewareProps) => {
         return <Navigate to="/auth/boxed-signin" />;
     }
 
-    if (authorize === 'isAuthorized' && akses[parseFloat(menu)]) {
+    if (authorize === 'isAuthorized' && (akses[parseFloat(menu)] || menu === 'profile')) {
         return <DefaultLayout>{children}</DefaultLayout>;
     } else if (authorize === 'isAuthorized' && !akses[parseFloat(menu)]) {
         return <Navigate to="/" />;
