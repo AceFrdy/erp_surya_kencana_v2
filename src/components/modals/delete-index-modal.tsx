@@ -2,42 +2,39 @@ import { Fragment } from 'react';
 import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 
-const DeleteProductModal = () => {
+const DeleteIndexModal = () => {
     const { isOpen, type, onClose, data } = useModal();
     const token = localStorage.getItem('accessToken') ?? '';
-    const navigate = useNavigate();
 
-    const isModalOpen = isOpen && type === 'delete-product';
+    const isModalOpen = isOpen && type === 'delete-index';
+    const navigate = useNavigate();
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/products/${id}`, {
+            .delete(`https://erp.digitalindustryagency.com/api/indexs/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             })
-            .then((response) => {
+            .then(() => {
                 onClose();
                 const notification = {
                     type: 'success',
-                    message: 'Data Product Berhasil Dihapus',
+                    message: 'Index Berhasil Dihapus',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
             })
             .catch((err) => {
                 onClose();
-                console.log(err);
                 const notification = {
                     type: 'error',
-                    message: 'Product Gagal Dihapus / Sedang Digunakan.',
+                    message: 'Index Gagal Dihapus/Sedang Dipakai.',
                     log: err.message,
-                    title: 'ERROR_DELETING_PRODUCT',
+                    title: 'ERROR_DELETING_INDEX',
                 };
                 localStorage.setItem('notification', JSON.stringify(notification));
                 navigate(0);
@@ -63,13 +60,13 @@ const DeleteProductModal = () => {
                         >
                             <Dialog.Panel as="div" className="panel border-0 p-0 rounded-lg overflow-hidden my-8 w-full max-w-lg text-black dark:text-white-dark">
                                 <div className="flex bg-[#fbfbfb] dark:bg-[#121c2c] items-center justify-between px-5 py-3">
-                                    <div className="text-lg font-bold">Hapus Product</div>
+                                    <div className="text-lg font-bold">Hapus Index</div>
                                 </div>
                                 <div className="p-5">
                                     <div>
                                         <form className="space-y-5">
                                             <div>
-                                                <h1>Apakah Anda yakin ingin menghapus Product</h1>
+                                                <h1>Apakah Anda yakin ingin menghapus Index</h1>
                                             </div>
                                         </form>
                                     </div>
@@ -77,13 +74,7 @@ const DeleteProductModal = () => {
                                         <button type="button" className="btn btn-outline-danger" onClick={onClose}>
                                             Kembali
                                         </button>
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary ltr:ml-4 rtl:mr-4"
-                                            onClick={() => {
-                                                handleDelete(data);
-                                            }}
-                                        >
+                                        <button type="button" className="btn btn-primary ltr:ml-4 rtl:mr-4" onClick={() => handleDelete(data)}>
                                             Hapus
                                         </button>
                                     </div>
@@ -97,4 +88,4 @@ const DeleteProductModal = () => {
     );
 };
 
-export default DeleteProductModal;
+export default DeleteIndexModal;
