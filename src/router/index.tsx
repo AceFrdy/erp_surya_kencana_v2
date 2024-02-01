@@ -4,6 +4,8 @@ import { routes } from './routes';
 import AuthMiddleware from '../middleware/auth-middleware';
 import PublicMiddleware from '../middleware/public-middleware';
 import { Suspense } from 'react';
+import Loader from '../components/Layouts/loader';
+import DefaultLayout from '../components/Layouts/DefaultLayout';
 
 const finalMiddleware = routes.map((route) => {
     return {
@@ -11,7 +13,7 @@ const finalMiddleware = routes.map((route) => {
         element:
             route.middleware === 'auth' ? (
                 <AuthMiddleware menu={route.menuAkses}>
-                    <Suspense fallback={<div>Loading...</div>}>{route.element}</Suspense>
+                    <Suspense fallback={<Loader type="default" />}>{route.element}</Suspense>
                 </AuthMiddleware>
             ) : (
                 <PublicMiddleware>{route.element}</PublicMiddleware>
