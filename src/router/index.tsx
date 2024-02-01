@@ -13,7 +13,7 @@ const finalMiddleware = routes.map((route) => {
         element:
             route.middleware === 'auth' ? (
                 <AuthMiddleware menu={route.menuAkses}>
-                    <Suspense fallback={<Loader />}>{route.element}</Suspense>
+                    <Suspense fallback={<Loader type="default" />}>{route.element}</Suspense>
                 </AuthMiddleware>
             ) : (
                 <PublicMiddleware>{route.element}</PublicMiddleware>
