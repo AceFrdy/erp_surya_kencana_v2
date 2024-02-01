@@ -90,7 +90,7 @@ const routes = [
         path: '/user/profile',
         element: <Profile />,
         middleware: 'auth',
-        menuAkses: '-',
+        menuAkses: 'profile',
     },
     // dashboard
     {
