@@ -82,3 +82,10 @@ export interface ProductList {
     product_stock: StockProps[];
     product_price: number;
 }
+
+export interface TotalSales {
+    total_sales: number;
+    revenue: number;
+    total_customers: number;
+    total_employees: number;
+}

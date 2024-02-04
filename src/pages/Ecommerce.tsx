@@ -7,15 +7,36 @@ import IconTrendingUp from '../components/Icon/IconTrendingUp';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../store';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import IconMultipleForwardRight from '../components/Icon/IconMultipleForwardRight';
+import { Navigate } from 'react-router-dom';
+// import IconMultipleForwardRight from '../components/Icon/IconMultipleForwardRight';
 import { setPageTitle } from '../store/themeConfigSlice';
+import { RecentOrderProps, TopSellingProps, formatPrice, CashFlowProps, TotalSales, } from '../utils'; 
+import axios from 'axios';
+import clsx from 'clsx';
+import { DataTable } from 'mantine-datatable';
 
 const Ecommerce = () => {
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
+    const [recent, setRecent] = useState<RecentOrderProps[]>([]);
+    const [topSelling, setTopSelling] = useState<TopSellingProps[]>([]);
+    const token = localStorage.getItem('accessToken') ?? '';
+    const [error, setError] = useState('');
+    const [cashFlow, setCashFlow] = useState<CashFlowProps[]>([]);
+    const [anualSelling, setAnualSelling] = useState<[]>([]);
+    const [total, setTotal] = useState<TotalSales>({
+        total_sales: 0,
+        revenue: 0,
+        total_customers: 0,
+        total_employers: 0,
+    });
     const totalVisit: any = {
-        series: [{ data: [21, 9, 36, 12, 44, 25, 59, 41, 66, 25] }],
+        series: [
+            {
+                name: 'sales',
+                data: cashFlow,
+            },
+        ],
         options: {
             chart: {
                 height: 58,
@@ -107,11 +128,11 @@ const Ecommerce = () => {
         series: [
             {
                 name: 'Income',
-                data: [16800, 16800, 15500, 17800, 15500, 17000, 19000, 16000, 15000, 17000, 14000, 17000],
+                data: cashFlow.slice(0, 5).map(item => item.amount),
             },
             {
                 name: 'Expenses',
-                data: [16500, 17500, 16200, 17300, 16000, 19500, 16000, 17000, 16000, 19000, 18000, 19000],
+                data: [16500, 175000, 162000, 17300, 160000,],
             },
         ],
         options: {
@@ -148,14 +169,14 @@ const Ecommerce = () => {
                 discrete: [
                     {
                         seriesIndex: 0,
-                        dataPointIndex: 6,
+                        dataPointIndex: 4,
                         fillColor: '#1B55E2',
                         strokeColor: 'transparent',
                         size: 7,
                     },
                     {
                         seriesIndex: 1,
-                        dataPointIndex: 5,
+                        dataPointIndex: 4,
                         fillColor: '#E7515A',
                         strokeColor: 'transparent',
                         size: 7,
@@ -251,10 +272,41 @@ const Ecommerce = () => {
             },
         },
     };
+    useEffect(() => {
+        axios
+            .get('https://erp.digitalindustryagency.com/api/dashboard', {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((response) => {
+                // setCard(response.data.data.resource);
+                setRecent(response.data.data.resource.recent_orders);
+                setCashFlow(response.data.data.resource.cash_flows);
+                setTopSelling(response.data.data.resource.top_selling_product);
+                setTotal(response.data.data.resource);
+                setAnualSelling(response.data.data.resource.anual_sales.map((item: any) => item.total_sales));
+            })
+            .catch((err: any) => {
+                if (err.response && err.response.status === 500) {
+                    setError('500');
+                } else if (err.response && err.response.status === 503) {
+                    setError('503');
+                } else {
+                    console.log('ERROR_GETTING_Data:', err.message);
+                }
+            });
+    }, []);
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle('E-Commerce'));
     });
+    if (error === '503') {
+        return <Navigate to="/pages/error/error503" />;
+    } else if (error === '500') {
+        return <Navigate to="/pages/error/error500" />;
+    }
     const [loading] = useState(false);
     return (
         <div>
@@ -263,7 +315,7 @@ const Ecommerce = () => {
                     {/* statistics */}
                     <div className="flex justify-between dark:text-white-light mb-5">
                         <h5 className="font-semibold text-lg ">Statistics</h5>
-                        <div className="dropdown">
+                        {/* <div className="dropdown">
                             <Dropdown
                                 offset={[0, 5]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
@@ -285,25 +337,25 @@ const Ecommerce = () => {
                                     </li>
                                 </ul>
                             </Dropdown>
-                        </div>
+                        </div> */}
                     </div>
                     <div className="grid sm:grid-cols-2 gap-8 text-sm text-[#515365] font-bold">
                         <div>
                             <div>
                                 <div>Total Visits</div>
-                                <div className="text-[#f8538d] text-lg">423,964</div>
+                                <div className="text-[#f8538d] text-lg">{total.total_customers}</div>
                             </div>
 
-                            <ReactApexChart series={totalVisit.series} options={totalVisit.options} type="line" height={58} className="overflow-hidden" />
+                            {/* <ReactApexChart series={totalVisit.series} options={totalVisit.options} type="line" height={58} className="overflow-hidden" /> */}
                         </div>
 
                         <div>
                             <div>
                                 <div>Paid Visits</div>
-                                <div className="text-[#f8538d] text-lg">7,929</div>
+                                <div className="text-[#f8538d] text-lg">{total.total_employers}</div>
                             </div>
 
-                            <ReactApexChart series={paidVisit.series} options={paidVisit.options} type="line" height={58} className="overflow-hidden" />
+                            {/* <ReactApexChart series={paidVisit.series} options={paidVisit.options} type="line" height={58} className="overflow-hidden" /> */}
                         </div>
                     </div>
                 </div>
@@ -312,7 +364,7 @@ const Ecommerce = () => {
                     <div className="flex justify-between dark:text-white-light mb-5">
                         <h5 className="font-semibold text-lg ">Expenses</h5>
 
-                        <div className="dropdown">
+                        {/* <div className="dropdown">
                             <Dropdown
                                 offset={[0, 5]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
@@ -334,14 +386,14 @@ const Ecommerce = () => {
                                     </li>
                                 </ul>
                             </Dropdown>
-                        </div>
+                        </div> */}
                     </div>
                     <div className=" text-[#e95f2b] text-3xl font-bold my-10">
-                        <span>$ 45,141 </span>
+                        <span>{formatPrice(total.total_sales)} </span>
                         <span className="text-black text-sm dark:text-white-light ltr:mr-2 rtl:ml-2">this week</span>
                         <IconTrendingUp className="text-success inline" />
                     </div>
-                    <div className="flex items-center justify-between">
+                    {/* <div className="flex items-center justify-between">
                         <div className="w-full rounded-full h-5 p-1 bg-dark-light overflow-hidden shadow-3xl dark:shadow-none dark:bg-dark-light/10">
                             <div
                                 className="bg-gradient-to-r from-[#4361ee] to-[#805dca] w-full h-full rounded-full relative before:absolute before:inset-y-0 ltr:before:right-0.5 rtl:before:left-0.5 before:bg-white before:w-2 before:h-2 before:rounded-full before:m-auto"
@@ -349,7 +401,7 @@ const Ecommerce = () => {
                             ></div>
                         </div>
                         <span className="ltr:ml-5 rtl:mr-5 dark:text-white-light">57%</span>
-                    </div>
+                    </div> */}
                 </div>
 
                 <div
@@ -384,7 +436,7 @@ const Ecommerce = () => {
             <div className="panel h-full xl:col-span-2">
                 <div className="flex items-center justify-between dark:text-white-light mb-5">
                     <h5 className="font-semibold text-lg">Revenue</h5>
-                    <div className="dropdown">
+                    {/* <div className="dropdown">
                         <Dropdown
                             offset={[0, 1]}
                             placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
@@ -402,10 +454,10 @@ const Ecommerce = () => {
                                 </li>
                             </ul>
                         </Dropdown>
-                    </div>
+                    </div> */}
                 </div>
                 <p className="text-lg dark:text-white-light/90">
-                    Total Profit <span className="text-primary ml-2">$10,840</span>
+                    Total Profit <span className="text-primary ml-2">{formatPrice(total.revenue)}</span>
                 </p>
                 <div className="relative">
                     <div className="bg-white dark:bg-black rounded-lg overflow-hidden">
@@ -425,99 +477,43 @@ const Ecommerce = () => {
                         <h5 className="font-semibold text-lg dark:text-white-light">Recent Orders</h5>
                     </div>
                     <div className="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th className="ltr:rounded-l-md rtl:rounded-r-md">Customer</th>
-                                    <th>Product</th>
-                                    <th>Invoice</th>
-                                    <th>Price</th>
-                                    <th className="ltr:rounded-r-md rtl:rounded-l-md">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                    <td className="min-w-[150px] text-black dark:text-white">
-                                        <div className="flex items-center">
-                                            <img className="w-8 h-8 rounded-md ltr:mr-3 rtl:ml-3 object-cover" src="/assets/images/profile-6.jpeg" alt="avatar" />
-                                            <span className="whitespace-nowrap">Luke Ivory</span>
-                                        </div>
-                                    </td>
-                                    <td className="text-primary">Headphone</td>
-                                    <td>
-                                        <Link to="/apps/invoice/preview">#46894</Link>
-                                    </td>
-                                    <td>$56.07</td>
-                                    <td>
-                                        <span className="badge bg-success shadow-md dark:group-hover:bg-transparent">Paid</span>
-                                    </td>
-                                </tr>
-                                <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                    <td className="text-black dark:text-white">
-                                        <div className="flex items-center">
-                                            <img className="w-8 h-8 rounded-md ltr:mr-3 rtl:ml-3 object-cover" src="/assets/images/profile-7.jpeg" alt="avatar" />
-                                            <span className="whitespace-nowrap">Andy King</span>
-                                        </div>
-                                    </td>
-                                    <td className="text-info">Nike Sport</td>
-                                    <td>
-                                        <Link to="/apps/invoice/preview">#76894</Link>
-                                    </td>
-                                    <td>$126.04</td>
-                                    <td>
-                                        <span className="badge bg-secondary shadow-md dark:group-hover:bg-transparent">Shipped</span>
-                                    </td>
-                                </tr>
-                                <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                    <td className="text-black dark:text-white">
-                                        <div className="flex items-center">
-                                            <img className="w-8 h-8 rounded-md ltr:mr-3 rtl:ml-3 object-cover" src="/assets/images/profile-8.jpeg" alt="avatar" />
-                                            <span className="whitespace-nowrap">Laurie Fox</span>
-                                        </div>
-                                    </td>
-                                    <td className="text-warning">Sunglasses</td>
-                                    <td>
-                                        <Link to="/apps/invoice/preview">#66894</Link>
-                                    </td>
-                                    <td>$56.07</td>
-                                    <td>
-                                        <span className="badge bg-success shadow-md dark:group-hover:bg-transparent">Paid</span>
-                                    </td>
-                                </tr>
-                                <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                    <td className="text-black dark:text-white">
-                                        <div className="flex items-center">
-                                            <img className="w-8 h-8 rounded-md ltr:mr-3 rtl:ml-3 object-cover" src="/assets/images/profile-9.jpeg" alt="avatar" />
-                                            <span className="whitespace-nowrap">Ryan Collins</span>
-                                        </div>
-                                    </td>
-                                    <td className="text-danger">Sport</td>
-                                    <td>
-                                        <Link to="/apps/invoice/preview">#75844</Link>
-                                    </td>
-                                    <td>$110.00</td>
-                                    <td>
-                                        <span className="badge bg-secondary shadow-md dark:group-hover:bg-transparent">Shipped</span>
-                                    </td>
-                                </tr>
-                                <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                    <td className="text-black dark:text-white">
-                                        <div className="flex items-center">
-                                            <img className="w-8 h-8 rounded-md ltr:mr-3 rtl:ml-3 object-cover" src="/assets/images/profile-10.jpeg" alt="avatar" />
-                                            <span className="whitespace-nowrap">Irene Collins</span>
-                                        </div>
-                                    </td>
-                                    <td className="text-secondary">Speakers</td>
-                                    <td>
-                                        <Link to="/apps/invoice/preview">#46894</Link>
-                                    </td>
-                                    <td>$56.07</td>
-                                    <td>
-                                        <span className="badge bg-success shadow-md dark:group-hover:bg-transparent">Paid</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <DataTable
+                            highlightOnHover
+                            className="whitespace-nowrap table-hover"
+                            records={recent}
+                            idAccessor="sale_report_invoice"
+                            columns={[
+                                { accessor: 'id', title: 'No', render: (e) => recent.indexOf(e) + 1 },
+                                {
+                                    accessor: 'sale_report_invoice',
+                                    title: 'Invoice',
+                                },
+                                {
+                                    accessor: 'sale_report_customer',
+                                    title: 'Customer',
+                                },
+                                {
+                                    accessor: 'sale_report_grand_total',
+                                    title: 'Price',
+                                    render: (e) => formatPrice(e.sale_report_grand_total),
+                                },
+                                {
+                                    accessor: 'sale_report_status',
+                                    title: 'Status',
+                                    render: (e) => (
+                                        <span
+                                            className={clsx(
+                                                'px-3 py-1 rounded font-semibold text-sm',
+                                                e.sale_report_status === 'lunas' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+                                            )}
+                                        >
+                                            {e.sale_report_status}
+                                        </span>
+                                    ),
+                                },
+                            ]}
+                            minHeight={200}
+                        />
                     </div>
                 </div>
                 <div className="panel h-full w-full">
@@ -525,115 +521,33 @@ const Ecommerce = () => {
                         <h5 className="font-semibold text-lg dark:text-white-light">Top Selling Product</h5>
                     </div>
                     <div className="table-responsive">
-                        <table>
-                            <thead>
-                                <tr className="border-b-0">
-                                    <th className="ltr:rounded-l-md rtl:rounded-r-md">Product</th>
-                                    <th>Price</th>
-                                    <th>Discount</th>
-                                    <th>Sold</th>
-                                    <th className="ltr:rounded-r-md rtl:rounded-l-md">Source</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                    <td className="min-w-[150px] text-black dark:text-white">
-                                        <div className="flex">
-                                            <img className="w-8 h-8 rounded-md ltr:mr-3 rtl:ml-3 object-cover" src="/assets/images/product-headphones.jpg" alt="avatar" />
-                                            <p className="whitespace-nowrap">
-                                                Headphone
-                                                <span className="text-primary block text-xs">Digital</span>
-                                            </p>
-                                        </div>
-                                    </td>
-                                    <td>$168.09</td>
-                                    <td>$60.09</td>
-                                    <td>170</td>
-                                    <td>
-                                        <Link className="text-danger flex items-center" to="/">
-                                            <IconMultipleForwardRight className="rtl:rotate-180 ltr:mr-1 rtl:ml-1" />
-                                            Direct
-                                        </Link>
-                                    </td>
-                                </tr>
-                                <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                    <td className="text-black dark:text-white">
-                                        <div className="flex">
-                                            <img className="w-8 h-8 rounded-md ltr:mr-3 rtl:ml-3 object-cover" src="/assets/images/product-shoes.jpg" alt="avatar" />
-                                            <p className="whitespace-nowrap">
-                                                Shoes <span className="text-warning block text-xs">Faishon</span>
-                                            </p>
-                                        </div>
-                                    </td>
-                                    <td>$126.04</td>
-                                    <td>$47.09</td>
-                                    <td>130</td>
-                                    <td>
-                                        <Link className="text-success flex items-center" to="/">
-                                            <IconMultipleForwardRight className="rtl:rotate-180 ltr:mr-1 rtl:ml-1" />
-                                            Google
-                                        </Link>
-                                    </td>
-                                </tr>
-                                <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                    <td className="text-black dark:text-white">
-                                        <div className="flex">
-                                            <img className="w-8 h-8 rounded-md ltr:mr-3 rtl:ml-3 object-cover" src="/assets/images/product-watch.jpg" alt="avatar" />
-                                            <p className="whitespace-nowrap">
-                                                Watch <span className="text-danger block text-xs">Accessories</span>
-                                            </p>
-                                        </div>
-                                    </td>
-                                    <td>$56.07</td>
-                                    <td>$20.00</td>
-                                    <td>66</td>
-                                    <td>
-                                        <Link className="text-warning flex items-center" to="/">
-                                            <IconMultipleForwardRight className="rtl:rotate-180 ltr:mr-1 rtl:ml-1" />
-                                            Ads
-                                        </Link>
-                                    </td>
-                                </tr>
-                                <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                    <td className="text-black dark:text-white">
-                                        <div className="flex">
-                                            <img className="w-8 h-8 rounded-md ltr:mr-3 rtl:ml-3 object-cover" src="/assets/images/product-laptop.jpg" alt="avatar" />
-                                            <p className="whitespace-nowrap">
-                                                Laptop <span className="text-primary block text-xs">Digital</span>
-                                            </p>
-                                        </div>
-                                    </td>
-                                    <td>$110.00</td>
-                                    <td>$33.00</td>
-                                    <td>35</td>
-                                    <td>
-                                        <Link className="text-secondary flex items-center" to="/">
-                                            <IconMultipleForwardRight className="rtl:rotate-180 ltr:mr-1 rtl:ml-1" />
-                                            Email
-                                        </Link>
-                                    </td>
-                                </tr>
-                                <tr className="text-white-dark hover:text-black dark:hover:text-white-light/90 group">
-                                    <td className="text-black dark:text-white">
-                                        <div className="flex">
-                                            <img className="w-8 h-8 rounded-md ltr:mr-3 rtl:ml-3 object-cover" src="/assets/images/product-camera.jpg" alt="avatar" />
-                                            <p className="whitespace-nowrap">
-                                                Camera <span className="text-primary block text-xs">Digital</span>
-                                            </p>
-                                        </div>
-                                    </td>
-                                    <td>$56.07</td>
-                                    <td>$26.04</td>
-                                    <td>30</td>
-                                    <td>
-                                        <Link className="text-primary flex items-center" to="/">
-                                            <IconMultipleForwardRight className="rtl:rotate-180 ltr:mr-1 rtl:ml-1" />
-                                            Referral
-                                        </Link>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <DataTable
+                            highlightOnHover
+                            className="whitespace-nowrap table-hover"
+                            records={topSelling}
+                            idAccessor="product_name"
+                            columns={[
+                                { accessor: 'id', title: 'No', render: (e) => topSelling.indexOf(e) + 1 },
+                                {
+                                    accessor: 'product_name',
+                                    title: 'Produk',
+                                },
+                                {
+                                    accessor: 'total_sold',
+                                    title: 'Qty',
+                                },
+                                {
+                                    accessor: 'product_price',
+                                    title: 'Price',
+                                    render: (e) => formatPrice(e.product_price),
+                                },
+                                {
+                                    accessor: 'branch_name',
+                                    title: 'Cabang',
+                                },
+                            ]}
+                            minHeight={200}
+                        />
                     </div>
                 </div>
             </div>
