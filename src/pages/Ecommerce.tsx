@@ -1,8 +1,4 @@
 import ReactApexChart from 'react-apexcharts';
-import Dropdown from '../components/Dropdown';
-import IconCreditCard from '../components/Icon/IconCreditCard';
-import IconHorizontalDots from '../components/Icon/IconHorizontalDots';
-import IconPlus from '../components/Icon/IconPlus';
 import IconTrendingUp from '../components/Icon/IconTrendingUp';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../store';
@@ -23,107 +19,106 @@ const Ecommerce = () => {
     const token = localStorage.getItem('accessToken') ?? '';
     const [error, setError] = useState('');
     const [cashFlow, setCashFlow] = useState<CashFlowProps[]>([]);
-    const [anualSelling, setAnualSelling] = useState<[]>([]);
+    // const [anualSelling, setAnualSelling] = useState<[]>([]);
     const [total, setTotal] = useState<TotalSales>({
         total_sales: 0,
         revenue: 0,
         total_customers: 0,
-        total_employers: 0,
     });
-    const totalVisit: any = {
-        series: [
-            {
-                name: 'sales',
-                data: cashFlow,
-            },
-        ],
-        options: {
-            chart: {
-                height: 58,
-                type: 'line',
-                fontFamily: 'Nunito, sans-serif',
-                sparkline: {
-                    enabled: true,
-                },
-                dropShadow: {
-                    enabled: true,
-                    blur: 3,
-                    color: '#009688',
-                    opacity: 0.4,
-                },
-            },
-            stroke: {
-                curve: 'smooth',
-                width: 2,
-            },
-            colors: ['#009688'],
-            grid: {
-                padding: {
-                    top: 5,
-                    bottom: 5,
-                    left: 5,
-                    right: 5,
-                },
-            },
-            tooltip: {
-                x: {
-                    show: false,
-                },
-                y: {
-                    title: {
-                        formatter: () => {
-                            return '';
-                        },
-                    },
-                },
-            },
-        },
-    };
-    // paidVisitOptions
-    const paidVisit: any = {
-        series: [{ data: [22, 19, 30, 47, 32, 44, 34, 55, 41, 69] }],
-        options: {
-            chart: {
-                height: 58,
-                type: 'line',
-                fontFamily: 'Nunito, sans-serif',
-                sparkline: {
-                    enabled: true,
-                },
-                dropShadow: {
-                    enabled: true,
-                    blur: 3,
-                    color: '#e2a03f',
-                    opacity: 0.4,
-                },
-            },
-            stroke: {
-                curve: 'smooth',
-                width: 2,
-            },
-            colors: ['#e2a03f'],
-            grid: {
-                padding: {
-                    top: 5,
-                    bottom: 5,
-                    left: 5,
-                    right: 5,
-                },
-            },
-            tooltip: {
-                x: {
-                    show: false,
-                },
-                y: {
-                    title: {
-                        formatter: () => {
-                            return '';
-                        },
-                    },
-                },
-            },
-        },
-    };
+    // const totalVisit: any = {
+    //     series: [
+    //         {
+    //             name: 'sales',
+    //             data: cashFlow,
+    //         },
+    //     ],
+    //     options: {
+    //         chart: {
+    //             height: 58,
+    //             type: 'line',
+    //             fontFamily: 'Nunito, sans-serif',
+    //             sparkline: {
+    //                 enabled: true,
+    //             },
+    //             dropShadow: {
+    //                 enabled: true,
+    //                 blur: 3,
+    //                 color: '#009688',
+    //                 opacity: 0.4,
+    //             },
+    //         },
+    //         stroke: {
+    //             curve: 'smooth',
+    //             width: 2,
+    //         },
+    //         colors: ['#009688'],
+    //         grid: {
+    //             padding: {
+    //                 top: 5,
+    //                 bottom: 5,
+    //                 left: 5,
+    //                 right: 5,
+    //             },
+    //         },
+    //         tooltip: {
+    //             x: {
+    //                 show: false,
+    //             },
+    //             y: {
+    //                 title: {
+    //                     formatter: () => {
+    //                         return '';
+    //                     },
+    //                 },
+    //             },
+    //         },
+    //     },
+    // };
+    // // paidVisitOptions
+    // const paidVisit: any = {
+    //     series: [{ data: [22, 19, 30, 47, 32, 44, 34, 55, 41, 69] }],
+    //     options: {
+    //         chart: {
+    //             height: 58,
+    //             type: 'line',
+    //             fontFamily: 'Nunito, sans-serif',
+    //             sparkline: {
+    //                 enabled: true,
+    //             },
+    //             dropShadow: {
+    //                 enabled: true,
+    //                 blur: 3,
+    //                 color: '#e2a03f',
+    //                 opacity: 0.4,
+    //             },
+    //         },
+    //         stroke: {
+    //             curve: 'smooth',
+    //             width: 2,
+    //         },
+    //         colors: ['#e2a03f'],
+    //         grid: {
+    //             padding: {
+    //                 top: 5,
+    //                 bottom: 5,
+    //                 left: 5,
+    //                 right: 5,
+    //             },
+    //         },
+    //         tooltip: {
+    //             x: {
+    //                 show: false,
+    //             },
+    //             y: {
+    //                 title: {
+    //                     formatter: () => {
+    //                         return '';
+    //                     },
+    //                 },
+    //             },
+    //         },
+    //     },
+    // };
     const revenueChart: any = {
         series: [
             {
@@ -286,7 +281,7 @@ const Ecommerce = () => {
                 setCashFlow(response.data.data.resource.cash_flows);
                 setTopSelling(response.data.data.resource.top_selling_product);
                 setTotal(response.data.data.resource);
-                setAnualSelling(response.data.data.resource.anual_sales.map((item: any) => item.total_sales));
+                // setAnualSelling(response.data.data.resource.anual_sales.map((item: any) => item.total_sales));
             })
             .catch((err: any) => {
                 if (err.response && err.response.status === 500) {
@@ -315,29 +310,7 @@ const Ecommerce = () => {
                     {/* statistics */}
                     <div className="flex justify-between dark:text-white-light mb-5">
                         <h5 className="font-semibold text-lg ">Statistics</h5>
-                        {/* <div className="dropdown">
-                            <Dropdown
-                                offset={[0, 5]}
-                                placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                btnClassName="hover:text-primary"
-                                button={<IconHorizontalDots className="text-black/70 dark:text-white/70 hover:!text-primary" />}
-                            >
-                                <ul>
-                                    <li>
-                                        <button type="button">This Week</button>
-                                    </li>
-                                    <li>
-                                        <button type="button">Last Week</button>
-                                    </li>
-                                    <li>
-                                        <button type="button">This Month</button>
-                                    </li>
-                                    <li>
-                                        <button type="button">Last Month</button>
-                                    </li>
-                                </ul>
-                            </Dropdown>
-                        </div> */}
+                       
                     </div>
                     <div className="grid sm:grid-cols-2 gap-8 text-sm text-[#515365] font-bold">
                         <div>
@@ -350,10 +323,10 @@ const Ecommerce = () => {
                         </div>
 
                         <div>
-                            <div>
+                            {/* <div>
                                 <div>Paid Visits</div>
                                 <div className="text-[#f8538d] text-lg">{total.total_employers}</div>
-                            </div>
+                            </div> */}
 
                             {/* <ReactApexChart series={paidVisit.series} options={paidVisit.options} type="line" height={58} className="overflow-hidden" /> */}
                         </div>
@@ -364,29 +337,7 @@ const Ecommerce = () => {
                     <div className="flex justify-between dark:text-white-light mb-5">
                         <h5 className="font-semibold text-lg ">Expenses</h5>
 
-                        {/* <div className="dropdown">
-                            <Dropdown
-                                offset={[0, 5]}
-                                placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                                btnClassName="hover:text-primary"
-                                button={<IconHorizontalDots className="text-black/70 dark:text-white/70 hover:!text-primary" />}
-                            >
-                                <ul>
-                                    <li>
-                                        <button type="button">This Week</button>
-                                    </li>
-                                    <li>
-                                        <button type="button">Last Week</button>
-                                    </li>
-                                    <li>
-                                        <button type="button">This Month</button>
-                                    </li>
-                                    <li>
-                                        <button type="button">Last Month</button>
-                                    </li>
-                                </ul>
-                            </Dropdown>
-                        </div> */}
+                        
                     </div>
                     <div className=" text-[#e95f2b] text-3xl font-bold my-10">
                         <span>{formatPrice(total.total_sales)} </span>
@@ -436,25 +387,7 @@ const Ecommerce = () => {
             <div className="panel h-full xl:col-span-2">
                 <div className="flex items-center justify-between dark:text-white-light mb-5">
                     <h5 className="font-semibold text-lg">Revenue</h5>
-                    {/* <div className="dropdown">
-                        <Dropdown
-                            offset={[0, 1]}
-                            placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
-                            button={<IconHorizontalDots className="text-black/70 dark:text-white/70 hover:!text-primary" />}
-                        >
-                            <ul>
-                                <li>
-                                    <button type="button">Weekly</button>
-                                </li>
-                                <li>
-                                    <button type="button">Monthly</button>
-                                </li>
-                                <li>
-                                    <button type="button">Yearly</button>
-                                </li>
-                            </ul>
-                        </Dropdown>
-                    </div> */}
+                   
                 </div>
                 <p className="text-lg dark:text-white-light/90">
                     Total Profit <span className="text-primary ml-2">{formatPrice(total.revenue)}</span>
