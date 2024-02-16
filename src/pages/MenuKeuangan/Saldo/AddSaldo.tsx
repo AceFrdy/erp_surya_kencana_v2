@@ -64,12 +64,11 @@ const AddSaldo = () => {
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const data = {
-            saldo_date: formData.saldo_date,
-            detail_account_id: formData.detail_account_id,
-            saldo_amount: formData.saldo_amount,
-            saldo_info: formData.saldo_info,
-        };
+        const data = new FormData();
+        data.append('saldo_date', formData.saldo_date);
+        data.append('detail_account_id', formData.detail_account_id);
+        data.append('saldo_amount', formData.saldo_amount);
+        data.append('saldo_date', formData.saldo_info);
 
         axios
             .post('https://erp.digitalindustryagency.com/api/saldos', data, {
