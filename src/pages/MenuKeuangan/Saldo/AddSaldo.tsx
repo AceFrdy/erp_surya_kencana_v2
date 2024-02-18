@@ -14,6 +14,13 @@ interface DataDetailAccountProps {
     detail_acc_name: string;
 }
 
+interface DataProps {
+    saldo_date: string;
+    detail_account_id: number;
+    saldo_amount: string;
+    saldo_info: string;
+}
+
 const AddSaldo = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -22,27 +29,20 @@ const AddSaldo = () => {
     useEffect(() => {
         dispatch(setPageTitle('Tambah Saldo'));
     });
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<DataProps>({
         saldo_date: '',
-        detail_account_id: '',
+        detail_account_id: 0,
         saldo_amount: '',
         saldo_info: '',
     });
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value, type } = e.target;
-        if (type === 'checkbox') {
-            const checkboxValue = (e.target as HTMLInputElement).checked ? 'yes' : '';
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: checkboxValue,
-            }));
-        } else {
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: value,
-            }));
-        }
+        const { name, value } = e.target;
+
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
     };
 
     useEffect(() => {
@@ -61,22 +61,27 @@ const AddSaldo = () => {
             });
     }, []);
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
         const data = new FormData();
         data.append('saldo_date', formData.saldo_date);
-        data.append('detail_account_id', formData.detail_account_id);
+        data.append('detail_account_id', formData.detail_account_id.toString());
         data.append('saldo_amount', formData.saldo_amount);
-        data.append('saldo_date', formData.saldo_info);
+        data.append('saldo_info', formData.saldo_info);
 
-        axios
-            .post('https://erp.digitalindustryagency.com/api/saldos', data, {
-                headers: {
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+        const config = {
+            method: 'post',
+            url: 'https://erp.digitalindustryagency.com/api/saldos',
+            headers: {
+                Accept: 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            data: data,
+        };
+
+        await axios
+            .request(config)
             .then((response) => {
                 const notification = {
                     type: 'success',
@@ -171,7 +176,7 @@ const AddSaldo = () => {
                     </div>
                     <div>
                         <label htmlFor="saldo_info">Keterangan Saldo</label>
-                        <input type="text" placeholder="Keterangan Saldo..." className="form-input" name="saldo_info" value={formData.saldo_info} onChange={handleChange} />
+                        <input type="text" placeholder="Keterangan Saldo..." minLength={11} className="form-input" name="saldo_info" value={formData.saldo_info} onChange={handleChange} />
                     </div>
                     <div className="flex">
                         <button type="submit" className="btn btn-primary !mt-6 mr-8">
