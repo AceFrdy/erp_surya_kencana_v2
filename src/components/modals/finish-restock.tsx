@@ -3,6 +3,7 @@ import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { endpoint } from '../../utils';
 
 const FinishRestock = () => {
     const { isOpen, type, onClose, data } = useModal();
@@ -14,7 +15,7 @@ const FinishRestock = () => {
     const handleFinished = (id: number) => {
         axios
             .post(
-                `https://erp.digitalindustryagency.com/api/distribution-reports-approved-restok/${id}`,
+                `${endpoint}/api/distribution-reports-approved-restok/${id}`,
                 {},
                 {
                     headers: {

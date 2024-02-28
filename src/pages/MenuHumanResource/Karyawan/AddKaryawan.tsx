@@ -7,6 +7,7 @@ import { useModal } from '../../../hooks/use-modal';
 import IconSearch from '../../../components/Icon/IconSearch';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../utils';
 
 interface BranchProps {
     id: number;
@@ -98,7 +99,7 @@ const AddKaryawan = () => {
             };
 
             axios
-                .post('https://erp.digitalindustryagency.com/api/users', data, {
+                .post(`${endpoint}/api/users', dat`, {
                     headers: {
                         Accept: 'application/json',
                         Authorization: `Bearer ${token}`,
@@ -137,7 +138,7 @@ const AddKaryawan = () => {
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/dropdown-karyawan', {
+            .get(`${endpoint}/api/dropdown-karyawan`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -150,7 +151,7 @@ const AddKaryawan = () => {
                 console.log('ERROR_GETTING_DROPDOWN', err.message);
             });
         axios
-            .get('https://erp.digitalindustryagency.com/api/branches', {
+            .get(`${endpoint}/api/branches`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

@@ -4,6 +4,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { endpoint } from '../../utils';
 
 const DeleteSaldoModal = () => {
     const { isOpen, type, onClose, data } = useModal();
@@ -14,7 +15,7 @@ const DeleteSaldoModal = () => {
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/saldos/${id}`, {
+            .delete(`${endpoint}/api/saldos/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

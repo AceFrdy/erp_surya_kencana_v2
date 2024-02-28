@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 
 import { useModal } from '../../hooks/use-modal';
+import { endpoint } from '../../utils';
 
 const DeletePiutang = () => {
     const navigate = useNavigate();
@@ -14,7 +15,7 @@ const DeletePiutang = () => {
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/receivables/${id}}`, {
+            .delete(`${endpoint}/api/receivables/${id}}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

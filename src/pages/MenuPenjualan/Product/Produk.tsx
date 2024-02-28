@@ -12,7 +12,7 @@ import IconPlus from '../../../components/Icon/IconPlus';
 import IconPencil from '../../../components/Icon/IconPencil';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, ProductList, formatPrice } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, ProductList, endpoint, formatPrice } from '../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -37,7 +37,7 @@ const Produk = () => {
 
     // get produk
     useEffect(() => {
-        const url = `https://erp.digitalindustryagency.com/api/products${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
+        const url = `${endpoint}/api/products${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {

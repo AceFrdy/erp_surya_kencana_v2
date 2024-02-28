@@ -12,7 +12,7 @@ import Pagination from '../../../components/Pagination';
 import IconPlus from '../../../components/Icon/IconPlus';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint, formatPrice } from '../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
 import { Dialog, Transition } from '@headlessui/react';
@@ -75,7 +75,7 @@ const ControlPanel = () => {
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
 
     const fetchData = () => {
-        const url = `https://erp.digitalindustryagency.com/api/indexs${page && '?q=' + page}`;
+        const url = `${endpoint}/api/indexs${page && '?q=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -138,7 +138,7 @@ const ControlPanel = () => {
         data.append('submission', formData.submission ? 'yes' : 'no');
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/indexs', data, {
+            .post(`${endpoint}/api/indexs`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -166,7 +166,7 @@ const ControlPanel = () => {
         };
 
         axios
-            .put(`https://erp.digitalindustryagency.com/api/indexs/${id}`, dataSubmission, {
+            .put(`${endpoint}/api/indexs/${id}`, dataSubmission, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -184,7 +184,7 @@ const ControlPanel = () => {
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/indexs/${id}`, {
+            .delete(`${endpoint}/api/indexs/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -210,7 +210,7 @@ const ControlPanel = () => {
     // get saldo
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/saldo-total', {
+            .get(`${endpoint}/api/saldo-total`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

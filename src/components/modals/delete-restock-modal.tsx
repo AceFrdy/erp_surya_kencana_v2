@@ -3,6 +3,7 @@ import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { endpoint } from '../../utils';
 
 const DeleteRestockModal = () => {
     const { isOpen, type, onClose, data } = useModal();
@@ -13,7 +14,7 @@ const DeleteRestockModal = () => {
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/distribution-restok/${id}`, {
+            .delete(`${endpoint}/api/distribution-restok/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

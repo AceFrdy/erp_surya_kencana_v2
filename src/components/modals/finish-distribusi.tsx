@@ -3,6 +3,7 @@ import { Fragment } from 'react';
 import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import { useNavigate } from 'react-router-dom';
+import { endpoint } from '../../utils';
 
 const FinishDistribusi = () => {
     const { isOpen, type, onClose, data } = useModal();
@@ -14,7 +15,7 @@ const FinishDistribusi = () => {
     const handleFinished = (id: number) => {
         axios
             .post(
-                `https://erp.digitalindustryagency.com/api/distribution-reports-approved/${id}`,
+                `${endpoint}/api/distribution-reports-approved/${id}`,
                 {},
                 {
                     headers: {

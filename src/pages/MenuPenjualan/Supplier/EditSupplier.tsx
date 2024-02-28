@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { setPageTitle } from '../../../store/themeConfigSlice';
+import { endpoint } from '../../../utils';
 
 const EditSupplier = () => {
     const dispatch = useDispatch();
@@ -25,7 +26,7 @@ const EditSupplier = () => {
 
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/suplier/${id}`, {
+            .get(`${endpoint}/api/suplier/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -58,7 +59,7 @@ const EditSupplier = () => {
 
     const handleEditSuplier = () => {
         axios
-            .put(`https://erp.digitalindustryagency.com/api/suplier/${id}`, formData, {
+            .put(`${endpoint}/api/suplier/${id}`, formData, {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
@@ -115,7 +116,7 @@ const EditSupplier = () => {
                                     type="text"
                                     placeholder="Nama Supplier..."
                                     className="form-input"
-name='suplier_name'
+                                    name="suplier_name"
                                     value={formData.suplier_name}
                                     onChange={(e) => handleInputChange('suplier_name', e.target.value)}
                                 />

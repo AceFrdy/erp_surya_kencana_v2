@@ -4,6 +4,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../utils';
 
 interface AkunDataProps {
     acc_type: string;
@@ -42,7 +43,7 @@ const EditAkun = () => {
         };
 
         axios
-            .put(`https://erp.digitalindustryagency.com/api/accounts/${id}`, data, {
+            .put(`${endpoint}/api/accounts/${id}`, data, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     Accept: 'application/json',
@@ -80,7 +81,7 @@ const EditAkun = () => {
     // get_data
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/accounts/${id}`, {
+            .get(`${endpoint}/api/accounts/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

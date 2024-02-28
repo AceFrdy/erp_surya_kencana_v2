@@ -10,7 +10,7 @@ import { setPageTitle } from '../../../../store/themeConfigSlice';
 import IconNotes from '../../../../components/Icon/IconNotes';
 import IconPlus from '../../../../components/Icon/IconPlus';
 import Pagination from '../../../../components/Pagination';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint } from '../../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -51,7 +51,7 @@ const UangMasuk = () => {
     }, [sortStatus]);
 
     useEffect(() => {
-        const url = `https://erp.digitalindustryagency.com/api/cash-inflows${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
+        const url = `${endpoint}/api/cash-inflows${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {

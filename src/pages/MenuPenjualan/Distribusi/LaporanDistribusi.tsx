@@ -11,7 +11,7 @@ import { useModal } from '../../../hooks/use-modal';
 import IconNotes from '../../../components/Icon/IconNotes';
 import IconArchive from '../../../components/Icon/IconArchive';
 import { setPageTitle } from '../../../store/themeConfigSlice';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint } from '../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -48,7 +48,7 @@ const LaporanDistribusi = () => {
 
     // get distribution report
     useEffect(() => {
-        const url = `https://erp.digitalindustryagency.com/api/distribution-reports${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
+        const url = `${endpoint}/api/distribution-reports${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {

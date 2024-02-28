@@ -3,6 +3,7 @@ import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { endpoint } from '../../utils';
 
 const DeleteIndexModal = () => {
     const { isOpen, type, onClose, data } = useModal();
@@ -13,7 +14,7 @@ const DeleteIndexModal = () => {
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/indexs/${id}`, {
+            .delete(`${endpoint}/api/indexs/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

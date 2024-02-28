@@ -3,6 +3,7 @@ import { Fragment } from 'react';
 import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import { useNavigate } from 'react-router-dom';
+import { endpoint } from '../../utils';
 
 const DeleteKaryawanModal = () => {
     const { isOpen, type, onClose, data } = useModal();
@@ -13,7 +14,7 @@ const DeleteKaryawanModal = () => {
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/users/${id}`, {
+            .delete(`${endpoint}/api/users/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

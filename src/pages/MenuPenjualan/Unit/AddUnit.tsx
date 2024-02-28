@@ -7,6 +7,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
+import { endpoint } from '../../../utils';
 
 const AddUnit = () => {
     const dispatch = useDispatch();
@@ -38,7 +39,7 @@ const AddUnit = () => {
         };
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/unit-stock', data, {
+            .post(`${endpoint}/api/unit-stock`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

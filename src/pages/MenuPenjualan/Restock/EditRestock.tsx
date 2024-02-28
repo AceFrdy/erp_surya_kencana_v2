@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 
 import { setPageTitle } from '../../../store/themeConfigSlice';
+import { endpoint } from '../../../utils';
 
 interface ProductListProps {
     id: number;
@@ -41,7 +42,7 @@ const EditRestock = () => {
         };
 
         axios
-            .put(`https://erp.digitalindustryagency.com/api/distribution-restok/${id}`, data, {
+            .put(`${endpoint}/api/distribution-restok/${id}`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -68,7 +69,7 @@ const EditRestock = () => {
     // get data by id
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/distribution-restok/${id}`, {
+            .get(`${endpoint}/api/distribution-restok/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -105,7 +106,7 @@ const EditRestock = () => {
     // get product
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/products', {
+            .get(`${endpoint}/api/products`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

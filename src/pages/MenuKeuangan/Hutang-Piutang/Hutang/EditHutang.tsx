@@ -9,7 +9,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Pagination from '../../../../components/Pagination';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 import IconArrowBackward from '../../../../components/Icon/IconArrowBackward';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint, formatPrice } from '../../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -70,9 +70,9 @@ const EditHutang = () => {
     };
 
     const fetchData = () => {
-        const url = `https://erp.digitalindustryagency.com/api/debt-pays/${id + (page && '?page=' + page)}`;
+        const url = `${endpoint}/api/debt-pays/${id + (page && '?page=' + page)}`;
         axios
-            .get(`https://erp.digitalindustryagency.com/api/debts/${id}`, {
+            .get(`${endpoint}/api/debts/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -132,7 +132,7 @@ const EditHutang = () => {
         };
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/debt-pay', data, {
+            .post(`${endpoint}/api/debt-pay`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

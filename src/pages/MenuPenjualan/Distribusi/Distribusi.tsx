@@ -14,7 +14,7 @@ import IconSearch from '../../../components/Icon/IconSearch';
 import IconPencil from '../../../components/Icon/IconPencil';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint } from '../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -95,7 +95,7 @@ const Distribusi = () => {
         };
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/distribution', data, {
+            .post(`${endpoint}/api/distribution`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -124,7 +124,7 @@ const Distribusi = () => {
 
         axios
             .post(
-                'https://erp.digitalindustryagency.com/api/distribution-request',
+                `${endpoint}/api/distribution-request`,
                 {},
                 {
                     headers: {
@@ -160,7 +160,7 @@ const Distribusi = () => {
         };
 
         axios
-            .put(`https://erp.digitalindustryagency.com/api/distribution/${idEdit}`, data, {
+            .put(`${endpoint}/api/distribution/${idEdit}`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -188,7 +188,7 @@ const Distribusi = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution');
+    const [url, setUrl] = useState<string>(`${endpoint}/api/distribution`);
 
     // get distribution
     useEffect(() => {
@@ -218,7 +218,7 @@ const Distribusi = () => {
     // get product, unit, branch
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/branches', {
+            .get(`${endpoint}/api/branches`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -232,7 +232,7 @@ const Distribusi = () => {
             });
 
         axios
-            .get('https://erp.digitalindustryagency.com/api/unit-stock', {
+            .get(`${endpoint}/api/unit-stock`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -246,7 +246,7 @@ const Distribusi = () => {
             });
 
         axios
-            .get('https://erp.digitalindustryagency.com/api/products', {
+            .get(`${endpoint}/api/products`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

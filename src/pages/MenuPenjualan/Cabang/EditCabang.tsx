@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../utils';
 
 const EditCabang = () => {
     const navigate = useNavigate();
@@ -20,7 +21,7 @@ const EditCabang = () => {
 
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/branches/${id}`, {
+            .get(`${endpoint}/api/branches/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -48,7 +49,7 @@ const EditCabang = () => {
 
     const handleEditBranch = () => {
         axios
-            .put(`https://erp.digitalindustryagency.com/api/branches/${id}`, formData, {
+            .put(`${endpoint}/api/branches/${id}`, formData, {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',

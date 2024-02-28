@@ -10,6 +10,7 @@ import IconPlus from '../../components/Icon/IconPlus';
 import IconPencil from '../../components/Icon/IconPencil';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconTrashLines from '../../components/Icon/IconTrashLines';
+import { endpoint } from '../../utils';
 
 interface MenusProps {
     id: number;
@@ -75,7 +76,7 @@ const HakAkses = () => {
 
     const fetchMenu = () => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/menus', {
+            .get(`${endpoint}/api/menus`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -96,7 +97,7 @@ const HakAkses = () => {
 
     const fetchPrivilage = () => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/privilages', {
+            .get(`${endpoint}/api/privilages`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -119,7 +120,7 @@ const HakAkses = () => {
         data.append('user_menu_id', '1');
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/menus', data, {
+            .post(`${endpoint}/api/menus`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -142,7 +143,7 @@ const HakAkses = () => {
         event.preventDefault();
 
         axios
-            .get(`https://erp.digitalindustryagency.com/api/menus/${id}`, {
+            .get(`${endpoint}/api/menus/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -165,7 +166,7 @@ const HakAkses = () => {
         data.append('user_menu_id', '1');
         data.append('_method', 'put');
         axios
-            .post(`https://erp.digitalindustryagency.com/api/menus/${dataFormModal}`, data, {
+            .post(`${endpoint}/api/menus/${dataFormModal}`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -188,7 +189,7 @@ const HakAkses = () => {
         e.preventDefault();
 
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/menus/${dataFormModal}`, {
+            .delete(`${endpoint}/api/menus/${dataFormModal}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -212,7 +213,7 @@ const HakAkses = () => {
 
         setPrivilageId(id);
         axios
-            .get(`https://erp.digitalindustryagency.com/api/privilages/${id}`, {
+            .get(`${endpoint}/api/privilages/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -231,7 +232,7 @@ const HakAkses = () => {
 
         if (akses === true) {
             await axios
-                .delete(`https://erp.digitalindustryagency.com/api/menu-privilage/${pivotId}`, {
+                .delete(`${endpoint}/api/menu-privilage/${pivotId}`, {
                     headers: {
                         Accept: 'application/json',
                         Authorization: `Bearer ${token}`,
@@ -254,7 +255,7 @@ const HakAkses = () => {
             data.append('privilage_id', privilageId.toString());
 
             await axios
-                .post('https://erp.digitalindustryagency.com/api/menu-privilage', data, {
+                .post(`${endpoint}/api/menu-privilage`, data, {
                     headers: {
                         Accept: 'application/json',
                         Authorization: `Bearer ${token}`,

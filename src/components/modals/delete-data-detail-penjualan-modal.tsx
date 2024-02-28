@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 
 import { useModal } from '../../hooks/use-modal';
+import { endpoint } from '../../utils';
 
 const DeleteDataDetailPenjualanModal = () => {
     const { isOpen, type, onClose, data } = useModal();
@@ -14,7 +15,7 @@ const DeleteDataDetailPenjualanModal = () => {
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/sale-reports/${id}`, {
+            .delete(`${endpoint}/api/sale-reports/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

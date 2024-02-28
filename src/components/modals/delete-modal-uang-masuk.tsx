@@ -4,6 +4,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { endpoint } from '../../utils';
 
 const DeleteInflowCashModal = () => {
     const { isOpen, type, onClose, data } = useModal();
@@ -13,7 +14,7 @@ const DeleteInflowCashModal = () => {
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/cash-inflows/${id}`, {
+            .delete(`${endpoint}/api/cash-inflows/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

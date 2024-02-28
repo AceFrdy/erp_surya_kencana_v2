@@ -7,6 +7,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../utils';
 
 interface DataDetailAccountProps {
     id: number;
@@ -47,7 +48,7 @@ const AddSaldo = () => {
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/saldo-dropdown', {
+            .get(`${endpoint}/api/saldo-dropdown`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -72,7 +73,7 @@ const AddSaldo = () => {
 
         const config = {
             method: 'post',
-            url: 'https://erp.digitalindustryagency.com/api/saldos',
+            url: `${endpoint}/api/saldos`,
             headers: {
                 Accept: 'application/json',
                 Authorization: `Bearer ${token}`,

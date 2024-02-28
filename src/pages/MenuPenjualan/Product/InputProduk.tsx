@@ -9,6 +9,7 @@ import IconTrash from '../../../components/Icon/IconTrash';
 import IconUpload from '../../../components/Icon/icon-upload';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../utils';
 
 interface CategoriesProps {
     id: number;
@@ -114,7 +115,7 @@ const InputProduk = () => {
         data.append('suplier_id', formData.suplier_id.toString());
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/products', data, {
+            .post(`${endpoint}/api/products`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -159,7 +160,7 @@ const InputProduk = () => {
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/product-categories', { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
+            .get(`${endpoint}/api/product-categories`, { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
             .then((response) => {
                 setCategoriesProduct(response.data.data.resource.data);
             })
@@ -167,7 +168,7 @@ const InputProduk = () => {
                 console.log('CATEGORIES PRODUCT', err.message);
             });
         axios
-            .get('https://erp.digitalindustryagency.com/api/supliers', { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
+            .get(`${endpoint}/api/supliers`, { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
             .then((response) => {
                 setSupliers(response.data.data.resource.data);
             })

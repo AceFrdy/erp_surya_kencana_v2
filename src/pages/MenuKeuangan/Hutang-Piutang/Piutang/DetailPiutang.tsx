@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 
-import { formatPrice } from '../../../../utils';
+import { endpoint, formatPrice } from '../../../../utils';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 import IconArrowBackward from '../../../../components/Icon/IconArrowBackward';
 
@@ -60,7 +60,7 @@ const DetailPiutang = () => {
     });
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/receivables/${id}`, {
+            .get(`${endpoint}/api/receivables/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

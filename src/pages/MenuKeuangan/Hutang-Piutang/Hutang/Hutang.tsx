@@ -11,7 +11,7 @@ import IconPlus from '../../../../components/Icon/IconPlus';
 import IconNotes from '../../../../components/Icon/IconNotes';
 import IconPencil from '../../../../components/Icon/IconPencil';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint, formatPrice } from '../../../../utils';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface DebtDataProps {
@@ -56,7 +56,7 @@ const Hutang = () => {
     };
 
     const fetchData = () => {
-        const url = `https://erp.digitalindustryagency.com/api/debts${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
+        const url = `${endpoint}/api/debts${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {

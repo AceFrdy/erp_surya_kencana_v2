@@ -11,7 +11,7 @@ import { useModal } from '../../../hooks/use-modal';
 import IconNotes from '../../../components/Icon/IconNotes';
 import IconArchive from '../../../components/Icon/IconArchive';
 import { setPageTitle } from '../../../store/themeConfigSlice';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint, formatPrice } from '../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -50,7 +50,7 @@ const ListRestock = () => {
 
     // get distribution report
     useEffect(() => {
-        const url = `https://erp.digitalindustryagency.com/api/distribution-report-restoks${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
+        const url = `${endpoint}/api/distribution-report-restoks${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {

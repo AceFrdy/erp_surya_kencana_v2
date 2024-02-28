@@ -13,6 +13,7 @@ import { setPageTitle } from '../../../store/themeConfigSlice';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../utils';
 
 interface CustomersDataProps {
     id: number;
@@ -37,7 +38,7 @@ const CustomerOffline = () => {
     const { onOpen } = useModal();
 
     useEffect(() => {
-        const url = `https://erp.digitalindustryagency.com/api/customers-offline${search && '?q=' + search}`;
+        const url = `${endpoint}/api/customers-offline${search && '?q=' + search}`;
         axios
             .get(url, {
                 headers: {

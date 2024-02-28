@@ -10,7 +10,7 @@ import axios from 'axios';
 import Pagination from '../../../components/Pagination';
 import { toast } from 'react-toastify';
 import { useModal } from '../../../hooks/use-modal';
-import { formatPrice } from '../../../utils';
+import { endpoint, formatPrice } from '../../../utils';
 import IconSearch from '../../../components/Icon/IconSearch';
 
 interface SaleOrderListProps {
@@ -133,7 +133,7 @@ const Penjualan = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/sale-orders');
+    const [url, setUrl] = useState<string>(`${endpoint}/api/sale-orders`);
 
     const [formData, setFormData] = useState<FormState>({
         product_category_id: 0,
@@ -189,7 +189,7 @@ const Penjualan = () => {
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/branches', {
+            .get(`${endpoint}/api/branches`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -203,7 +203,7 @@ const Penjualan = () => {
             });
 
         axios
-            .get('https://erp.digitalindustryagency.com/api/unit-stock', {
+            .get(`${endpoint}/api/unit-stock`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -216,7 +216,7 @@ const Penjualan = () => {
                 console.error('Error fetching data:', error);
             });
         axios
-            .get('https://erp.digitalindustryagency.com/api/customers-offline', {
+            .get(`${endpoint}/api/customers-offline`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -239,7 +239,7 @@ const Penjualan = () => {
         const branch_id = selectedBranch ? selectedBranch.id : null;
 
         axios
-            .get(`https://erp.digitalindustryagency.com/api/branch-products/${branch_id}`, {
+            .get(`${endpoint}/api/branch-products/${branch_id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -273,7 +273,7 @@ const Penjualan = () => {
         console.log('DATA SENT:', data);
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/sale-orders', data, {
+            .post(`${endpoint}/api/sale-orders`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -342,7 +342,7 @@ const Penjualan = () => {
         };
 
         axios
-            .put(`https://erp.digitalindustryagency.com/api/sale-report-pay/${saleReportId}`, data, {
+            .put(`${endpoint}/api/sale-report-pay/${saleReportId}`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

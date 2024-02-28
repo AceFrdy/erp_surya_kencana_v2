@@ -7,7 +7,7 @@ import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 
 import Pagination from '../../../components/Pagination';
 import { setPageTitle } from '../../../store/themeConfigSlice';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint, formatPrice } from '../../../utils';
 
 interface DataProps {
     id: number;
@@ -39,7 +39,7 @@ const Laporan = () => {
 
     // get_data
     useEffect(() => {
-        const url = `https://erp.digitalindustryagency.com/api/financial-statements${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
+        const url = `${endpoint}/api/financial-statements${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {

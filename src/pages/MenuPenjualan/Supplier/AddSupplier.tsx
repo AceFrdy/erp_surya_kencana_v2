@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../../store/themeConfigSlice';
+import { endpoint } from '../../../utils';
 
 const AddSupplier = () => {
     const dispatch = useDispatch();
@@ -38,7 +39,7 @@ const AddSupplier = () => {
         };
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/supliers', data, {
+            .post(`${endpoint}/api/supliers`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
