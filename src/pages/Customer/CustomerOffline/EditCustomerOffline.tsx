@@ -7,6 +7,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../utils';
 
 interface FormState {
     name: string;
@@ -38,7 +39,7 @@ const EditCustomerOffline = () => {
         };
 
         axios
-            .put(`https://erp.digitalindustryagency.com/api/customers/${id}`, data, {
+            .put(`${endpoint}/api/customers/${id}`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -87,7 +88,7 @@ const EditCustomerOffline = () => {
 
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/users/${id}`, {
+            .get(`${endpoint}/api/users/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

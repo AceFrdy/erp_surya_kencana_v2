@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-import { formatPrice } from '../../../../utils';
+import { formatPrice, endpoint } from '../../../../utils';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 import IconNoImage from '../../../../components/Icon/icon-no-image';
 
@@ -47,7 +47,7 @@ const DetailUangKeluar = () => {
     // get_data
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/cash-outflows/${id}`, {
+            .get(`${endpoint}/api/cash-outflows/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

@@ -8,7 +8,7 @@ import IconPencil from '../../../components/Icon/IconPencil';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../../store/themeConfigSlice';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint } from '../../../utils';
 import Pagination from '../../../components/Pagination';
 
 const KategoriProduk = () => {
@@ -28,7 +28,7 @@ const KategoriProduk = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/product-categories');
+    const [url, setUrl] = useState<string>(`${endpoint}/api/product-categories`);
 
     const fetchData = () => {
         axios
@@ -88,7 +88,7 @@ const KategoriProduk = () => {
         };
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/product-categories', data, {
+            .post(`${endpoint}/api/product-categories`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -145,7 +145,7 @@ const KategoriProduk = () => {
 
         console.log('Edited Data:', editedData);
         axios
-            .put(`https://erp.digitalindustryagency.com/api/product-categories/${editedCategoryId}`, editedData, {
+            .put(`${endpoint}/api/product-categories/${editedCategoryId}`, editedData, {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
@@ -200,7 +200,7 @@ const KategoriProduk = () => {
         };
         console.log('Delete Data:', deleteData);
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/product-categories/${deleteCategoryId}`, {
+            .delete(`${endpoint}/api/product-categories/${deleteCategoryId}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

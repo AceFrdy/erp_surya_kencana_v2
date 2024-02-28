@@ -7,6 +7,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../utils';
 
 interface FormState {
     name: string;
@@ -37,7 +38,7 @@ const AddCustomerOffline = () => {
         };
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/customers', data, {
+            .post(`${endpoint}/api/customers`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

@@ -13,7 +13,7 @@ import IconNotes from '../../../components/Icon/IconNotes';
 import IconPencil from '../../../components/Icon/IconPencil';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint } from '../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -53,7 +53,7 @@ const Jabatan = () => {
     }, [sortStatus]);
 
     const fetchData = () => {
-        const url = `https://erp.digitalindustryagency.com/api/privilages${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
+        const url = `${endpoint}/api/privilages${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {
@@ -110,7 +110,7 @@ const Jabatan = () => {
         };
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/privilages', data, {
+            .post('${endpoint}/api/privilages', data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -161,7 +161,7 @@ const Jabatan = () => {
 
         console.log('Edited Data:', editedData);
         axios
-            .put(`https://erp.digitalindustryagency.com/api/privilages/${editedPrivilagesId}`, editedData, {
+            .put(`${endpoint}/api/privilages/${editedPrivilagesId}`, editedData, {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
@@ -215,7 +215,7 @@ const Jabatan = () => {
         };
         console.log('Delete Data:', deleteData);
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/privilages/${deletePrivilagesId}`, {
+            .delete(`${endpoint}/api/privilages/${deletePrivilagesId}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

@@ -6,7 +6,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 
-import { formatPrice } from '../../../../utils';
+import { endpoint, formatPrice } from '../../../../utils';
 import { useModal } from '../../../../hooks/use-modal';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 import IconTrashLines from '../../../../components/Icon/IconTrashLines';
@@ -94,7 +94,7 @@ const EditPiutang = () => {
             payment_total: formData.payment_total,
         };
         axios
-            .post('https://erp.digitalindustryagency.com/api/receivable-pay', data, {
+            .post(`${endpoint}/api/receivable-pay`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -131,7 +131,7 @@ const EditPiutang = () => {
     // get_data
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/receivables/${id}`, {
+            .get(`${endpoint}/api/receivables/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

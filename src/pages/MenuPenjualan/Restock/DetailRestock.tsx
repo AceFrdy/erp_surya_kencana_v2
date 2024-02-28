@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 
-import { formatPrice } from '../../../utils';
+import { endpoint, formatPrice } from '../../../utils';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
 
@@ -38,7 +38,7 @@ const DetailRestock = () => {
     // get data
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/distribution-reports/${id}`, {
+            .get(`${endpoint}/api/distribution-reports/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

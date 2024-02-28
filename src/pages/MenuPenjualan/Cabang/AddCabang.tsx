@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 
 import { setPageTitle } from '../../../store/themeConfigSlice';
+import { endpoint } from '../../../utils';
 
 const AddCabang = () => {
     const dispatch = useDispatch();
@@ -39,7 +40,7 @@ const AddCabang = () => {
         };
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/branches', data, {
+            .post(`${endpoint}/api/branches`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

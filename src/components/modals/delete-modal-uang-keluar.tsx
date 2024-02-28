@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
 
 import { useModal } from '../../hooks/use-modal';
+import { endpoint } from '../../utils';
 
 const DeleteUangKeluar = () => {
     const navigate = useNavigate();
@@ -14,7 +15,7 @@ const DeleteUangKeluar = () => {
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/cash-outflows/${id}}`, {
+            .delete(`${endpoint}/api/cash-outflows/${id}}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

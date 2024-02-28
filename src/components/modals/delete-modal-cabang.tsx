@@ -4,6 +4,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { endpoint } from '../../utils';
 
 const DeleteCabangModal = () => {
     const { isOpen, type, onClose, data } = useModal();
@@ -14,7 +15,7 @@ const DeleteCabangModal = () => {
 
     const handleDelete = (id: number) => {
         axios
-            .delete(`https://erp.digitalindustryagency.com/api/branches/${id}`, {
+            .delete(`${endpoint}/api/branches/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

@@ -7,7 +7,7 @@ import IconPencil from '../../../components/Icon/IconPencil';
 import { Link } from 'react-router-dom';
 import IconPlus from '../../../components/Icon/IconPlus';
 import axios from 'axios';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint } from '../../../utils';
 import Pagination from '../../../components/Pagination';
 
 interface SuplierDataProps {
@@ -43,7 +43,7 @@ const Suplier = () => {
 
     // get supplier
     useEffect(() => {
-        const url = `https://erp.digitalindustryagency.com/api/supliers${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
+        const url = `${endpoint}/api/supliers${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {

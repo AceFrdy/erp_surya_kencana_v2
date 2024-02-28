@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../../store/themeConfigSlice';
+import { endpoint } from '../../../utils';
 
 const AddCustomerOnline = () => {
     const dispatch = useDispatch();
@@ -29,7 +30,7 @@ const AddCustomerOnline = () => {
         };
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/customers', data, {
+            .post(`${endpoint}/api/customers`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

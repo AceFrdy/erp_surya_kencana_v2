@@ -7,6 +7,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../utils';
 
 const EditPenjualan = () => {
     const dispatch = useDispatch();
@@ -25,7 +26,7 @@ const EditPenjualan = () => {
 
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/sale-orders/${id}`, {
+            .get(`${endpoint}/api/sale-orders/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -55,7 +56,7 @@ const EditPenjualan = () => {
 
     const handleEditSale = () => {
         axios
-            .put(`https://erp.digitalindustryagency.com/api/sale-orders/${id}`, formData, {
+            .put(`${endpoint}/api/sale-orders/${id}`, formData, {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { setPageTitle } from '../../../store/themeConfigSlice';
+import { endpoint } from '../../../utils';
 
 const EditUnit = () => {
     const dispatch = useDispatch();
@@ -22,7 +23,7 @@ const EditUnit = () => {
 
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/unit-stock/${id}`, {
+            .get(`${endpoint}/api/unit-stock/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -47,7 +48,7 @@ const EditUnit = () => {
 
     const handleEditunit = () => {
         axios
-            .put(`https://erp.digitalindustryagency.com/api/unit-stock/${id}`, formData, {
+            .put(`${endpoint}/api/unit-stock/${id}`, formData, {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',

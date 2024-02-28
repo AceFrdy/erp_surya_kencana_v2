@@ -8,7 +8,7 @@ import Dropdown from '../../../components/Dropdown';
 import { IRootState } from '../../../store';
 import IconCaretDown from '../../../components/Icon/IconCaretDown';
 import axios from 'axios';
-import { formatPrice } from '../../../utils';
+import { endpoint, formatPrice } from '../../../utils';
 
 interface BranchDataProps {
     id: number;
@@ -60,7 +60,7 @@ const DetailCabang = () => {
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/branches', {
+            .get(`${endpoint}/api/branches`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -74,7 +74,7 @@ const DetailCabang = () => {
             });
 
         axios
-            .get('https://erp.digitalindustryagency.com/api/stocks', {
+            .get(`${endpoint}/api/stocks`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -98,7 +98,7 @@ const DetailCabang = () => {
         }
         const branch_id = selectedBranch.id;
         axios
-            .get(`https://erp.digitalindustryagency.com/api/branch-sales-details/${branch_id}`, {
+            .get(`${endpoint}/api/branch-sales-details/${branch_id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -119,7 +119,7 @@ const DetailCabang = () => {
         const branch_id = selectedBranch.id;
 
         axios
-            .get(`https://erp.digitalindustryagency.com/api/branch-products/${branch_id}`, {
+            .get(`${endpoint}/api/branch-products/${branch_id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

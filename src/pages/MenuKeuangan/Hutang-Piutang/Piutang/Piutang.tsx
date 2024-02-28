@@ -11,7 +11,7 @@ import IconPlus from '../../../../components/Icon/IconPlus';
 import IconNotes from '../../../../components/Icon/IconNotes';
 import IconPencil from '../../../../components/Icon/IconPencil';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint } from '../../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -41,7 +41,7 @@ const Piutang = () => {
 
     // get_data
     useEffect(() => {
-        const url = `https://erp.digitalindustryagency.com/api/receivables${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
+        const url = `${endpoint}/api/receivables${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {

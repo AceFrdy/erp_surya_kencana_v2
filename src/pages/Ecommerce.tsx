@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 // import IconMultipleForwardRight from '../components/Icon/IconMultipleForwardRight';
 import { setPageTitle } from '../store/themeConfigSlice';
-import { RecentOrderProps, TopSellingProps, formatPrice, CashFlowProps, TotalSales, } from '../utils'; 
+import { RecentOrderProps, TopSellingProps, formatPrice, CashFlowProps, TotalSales, endpoint } from '../utils';
 import axios from 'axios';
 import clsx from 'clsx';
 import { DataTable } from 'mantine-datatable';
@@ -25,109 +25,16 @@ const Ecommerce = () => {
         revenue: 0,
         total_customers: 0,
     });
-    // const totalVisit: any = {
-    //     series: [
-    //         {
-    //             name: 'sales',
-    //             data: cashFlow,
-    //         },
-    //     ],
-    //     options: {
-    //         chart: {
-    //             height: 58,
-    //             type: 'line',
-    //             fontFamily: 'Nunito, sans-serif',
-    //             sparkline: {
-    //                 enabled: true,
-    //             },
-    //             dropShadow: {
-    //                 enabled: true,
-    //                 blur: 3,
-    //                 color: '#009688',
-    //                 opacity: 0.4,
-    //             },
-    //         },
-    //         stroke: {
-    //             curve: 'smooth',
-    //             width: 2,
-    //         },
-    //         colors: ['#009688'],
-    //         grid: {
-    //             padding: {
-    //                 top: 5,
-    //                 bottom: 5,
-    //                 left: 5,
-    //                 right: 5,
-    //             },
-    //         },
-    //         tooltip: {
-    //             x: {
-    //                 show: false,
-    //             },
-    //             y: {
-    //                 title: {
-    //                     formatter: () => {
-    //                         return '';
-    //                     },
-    //                 },
-    //             },
-    //         },
-    //     },
-    // };
-    // // paidVisitOptions
-    // const paidVisit: any = {
-    //     series: [{ data: [22, 19, 30, 47, 32, 44, 34, 55, 41, 69] }],
-    //     options: {
-    //         chart: {
-    //             height: 58,
-    //             type: 'line',
-    //             fontFamily: 'Nunito, sans-serif',
-    //             sparkline: {
-    //                 enabled: true,
-    //             },
-    //             dropShadow: {
-    //                 enabled: true,
-    //                 blur: 3,
-    //                 color: '#e2a03f',
-    //                 opacity: 0.4,
-    //             },
-    //         },
-    //         stroke: {
-    //             curve: 'smooth',
-    //             width: 2,
-    //         },
-    //         colors: ['#e2a03f'],
-    //         grid: {
-    //             padding: {
-    //                 top: 5,
-    //                 bottom: 5,
-    //                 left: 5,
-    //                 right: 5,
-    //             },
-    //         },
-    //         tooltip: {
-    //             x: {
-    //                 show: false,
-    //             },
-    //             y: {
-    //                 title: {
-    //                     formatter: () => {
-    //                         return '';
-    //                     },
-    //                 },
-    //             },
-    //         },
-    //     },
-    // };
+
     const revenueChart: any = {
         series: [
             {
                 name: 'Income',
-                data: cashFlow.slice(0, 5).map(item => item.amount),
+                data: cashFlow.slice(0, 5).map((item) => item.amount),
             },
             {
                 name: 'Expenses',
-                data: [16500, 175000, 162000, 17300, 160000,],
+                data: [16500, 175000, 162000, 17300, 160000],
             },
         ],
         options: {
@@ -269,7 +176,7 @@ const Ecommerce = () => {
     };
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/dashboard', {
+            .get(`${endpoint}/api/dashboard`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -310,7 +217,6 @@ const Ecommerce = () => {
                     {/* statistics */}
                     <div className="flex justify-between dark:text-white-light mb-5">
                         <h5 className="font-semibold text-lg ">Statistics</h5>
-                       
                     </div>
                     <div className="grid sm:grid-cols-2 gap-8 text-sm text-[#515365] font-bold">
                         <div>
@@ -336,8 +242,6 @@ const Ecommerce = () => {
                 <div className="panel h-full">
                     <div className="flex justify-between dark:text-white-light mb-5">
                         <h5 className="font-semibold text-lg ">Expenses</h5>
-
-                        
                     </div>
                     <div className=" text-[#e95f2b] text-3xl font-bold my-10">
                         <span>{formatPrice(total.total_sales)} </span>
@@ -376,10 +280,10 @@ const Ecommerce = () => {
                                 <IconCreditCard />
                             </button>
                         </div> */}
-                        <a href='https://dashboard-ecommers.digitalindustryagency.com/'>
-                        <button type="button" className="btn btn-gradient !mt-6 border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
-                            E-commerce
-                        </button>
+                        <a href="https://dashboard-ecommers.digitalindustryagency.com/">
+                            <button type="button" className="btn btn-gradient !mt-6 border-0 uppercase shadow-[0_10px_20px_-10px_rgba(67,97,238,0.44)]">
+                                E-commerce
+                            </button>
                         </a>
                     </div>
                 </div>
@@ -387,7 +291,6 @@ const Ecommerce = () => {
             <div className="panel h-full xl:col-span-2">
                 <div className="flex items-center justify-between dark:text-white-light mb-5">
                     <h5 className="font-semibold text-lg">Revenue</h5>
-                   
                 </div>
                 <p className="text-lg dark:text-white-light/90">
                     Total Profit <span className="text-primary ml-2">{formatPrice(total.revenue)}</span>

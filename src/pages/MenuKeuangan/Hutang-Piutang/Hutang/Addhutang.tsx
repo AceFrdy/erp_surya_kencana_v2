@@ -7,6 +7,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../../utils';
 
 interface FormState {
     // id: number;
@@ -65,7 +66,7 @@ const AddHutang = () => {
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/debt-dropdown', {
+            .get(`${endpoint}/api/debt-dropdown`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -92,7 +93,7 @@ const AddHutang = () => {
         };
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/debts', data, {
+            .post(`${endpoint}/api/debts`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

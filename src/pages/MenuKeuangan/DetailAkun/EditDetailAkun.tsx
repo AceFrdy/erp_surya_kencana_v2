@@ -7,6 +7,7 @@ import { ChangeEvent, FormEvent, useState, useEffect } from 'react';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../utils';
 
 interface DetailAkunDataProps {
     detail_acc_type: string;
@@ -41,7 +42,7 @@ const EditDetailAkun = () => {
     // get account type
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/accounts?acc_type=${akun}`, {
+            .get(`${endpoint}/api/accounts?acc_type=${akun}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -59,7 +60,7 @@ const EditDetailAkun = () => {
     useEffect(() => {
         // Fetch account details from the API
         axios
-            .get(`https://erp.digitalindustryagency.com/api/detail-accounts/${id}`, {
+            .get(`${endpoint}/api/detail-accounts/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -89,7 +90,7 @@ const EditDetailAkun = () => {
         };
 
         axios
-            .put(`https://erp.digitalindustryagency.com/api/detail-accounts/${id}`, data, {
+            .put(`${endpoint}/api/detail-accounts/${id}`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

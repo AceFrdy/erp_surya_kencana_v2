@@ -7,6 +7,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../../utils';
 
 interface FormState {
     id: number;
@@ -68,7 +69,7 @@ const AddUangMasuk = () => {
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/cash-inflow-dropdown', {
+            .get(`${endpoint}/api/cash-inflow-dropdown`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -95,7 +96,7 @@ const AddUangMasuk = () => {
         };
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/cash-inflows', data, {
+            .post(`${endpoint}/api/cash-inflows`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

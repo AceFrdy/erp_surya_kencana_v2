@@ -7,6 +7,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../../utils';
 
 interface AccProps {
     id: number;
@@ -65,7 +66,7 @@ const AddPiutang = () => {
         };
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/receivables', data, {
+            .post(`${endpoint}/api/receivables`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -105,7 +106,7 @@ const AddPiutang = () => {
     // get_dropdown
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/receivable-dropdown', {
+            .get(`${endpoint}/api/receivable-dropdown`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

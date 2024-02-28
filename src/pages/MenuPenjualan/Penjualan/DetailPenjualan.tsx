@@ -7,7 +7,7 @@ import IconTrashLines from '../../../components/Icon/IconTrashLines';
 import { Link, useParams } from 'react-router-dom';
 import IconArrowBackward from '../../../components/Icon/IconArrowBackward';
 import axios from 'axios';
-import { formatPrice } from '../../../utils';
+import { endpoint, formatPrice } from '../../../utils';
 import { useModal } from '../../../hooks/use-modal';
 
 interface DetailPenjualan {
@@ -49,10 +49,7 @@ const DetailPenjualan = () => {
 
         setRecordsData(() => {
             return initialRecords.filter((item) => {
-                return (
-                    item.sale_order_invoice.toLowerCase().includes(search.toLowerCase()) ||
-                    item.product?.product_name.toLowerCase().includes(search.toLowerCase())
-                );
+                return item.sale_order_invoice.toLowerCase().includes(search.toLowerCase()) || item.product?.product_name.toLowerCase().includes(search.toLowerCase());
             });
         });
     }, [search, initialRecords]);
@@ -64,7 +61,7 @@ const DetailPenjualan = () => {
 
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/sale-reports/${id}`, {
+            .get(`${endpoint}/api/sale-reports/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -192,7 +189,7 @@ const DetailPenjualan = () => {
                         </div>
                         <div>
                             <label htmlFor="gridTotal">Kembalian </label>
-                            <input type ="text" value={formatPrice(debt)} className="form-input text-black border-zinc-300" disabled />
+                            <input type="text" value={formatPrice(debt)} className="form-input text-black border-zinc-300" disabled />
                         </div>
                         {/* <div>
                             <label className="flex items-center mt-1 cursor-pointer">

@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { IRootState } from '../store';
 import { setPageTitle } from '../store/themeConfigSlice';
-import { CashFlowProps, DashboardCard, RecentOrderProps, TopSellingProps, iconClassFlow, formatPrice } from '../utils';
+import { CashFlowProps, DashboardCard, RecentOrderProps, TopSellingProps, iconClassFlow, formatPrice, endpoint } from '../utils';
 import { Navigate } from 'react-router-dom';
 
 const Index = () => {
@@ -135,7 +135,7 @@ const Index = () => {
     // get_data
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/dashboard', {
+            .get(`${endpoint}/api/dashboard`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

@@ -8,6 +8,7 @@ import i18next from 'i18next';
 import Dropdown from '../Dropdown';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { endpoint } from '../../utils';
 
 const Header = () => {
     const location = useLocation();
@@ -125,7 +126,7 @@ const Header = () => {
     const handleFetch = () => {
         if (token && storedId) {
             axios
-                .get(`https://erp.digitalindustryagency.com/api/users/${storedId}`, {
+                .get(`${endpoint}/api/users/${storedId}`, {
                     headers: {
                         Accept: 'application/json',
                         Authorization: `Bearer ${token}`,
@@ -146,7 +147,7 @@ const Header = () => {
     const handleSignOut = async () => {
         try {
             axios.post(
-                'https://erp.digitalindustryagency.com/api/logout',
+                `${endpoint}/api/logout`,
                 {},
                 {
                     headers: {

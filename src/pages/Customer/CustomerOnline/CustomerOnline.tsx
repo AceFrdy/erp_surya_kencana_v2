@@ -10,6 +10,7 @@ import { setPageTitle } from '../../../store/themeConfigSlice';
 import IconNotes from '../../../components/Icon/IconNotes';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../utils';
 
 interface CustomersDataProps {
     id: number;
@@ -38,7 +39,7 @@ const CustomerOnline = () => {
     }, [sortStatus]);
 
     useEffect(() => {
-        const url = `https://erp.digitalindustryagency.com/api/customers-online${search && '?q=' + search}`;
+        const url = `${endpoint}/api/customers-online${search && '?q=' + search}`;
         axios
             .get(url, {
                 headers: {

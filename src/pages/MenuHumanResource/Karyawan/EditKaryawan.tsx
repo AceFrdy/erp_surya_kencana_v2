@@ -7,6 +7,7 @@ import IconSearch from '../../../components/Icon/IconSearch';
 import { useModal } from '../../../hooks/use-modal';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../utils';
 
 interface DetailProps {
     address: string;
@@ -84,7 +85,7 @@ const EditKaryawan = () => {
         };
 
         axios
-            .put(`https://erp.digitalindustryagency.com/api/users/${id}`, data, {
+            .put(`${endpoint}/api/users/${id}`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -122,7 +123,7 @@ const EditKaryawan = () => {
 
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/users/${id}`, {
+            .get(`${endpoint}/api/users/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -139,7 +140,7 @@ const EditKaryawan = () => {
 
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/dropdown-karyawan', {
+            .get('${endpoint}/api/dropdown-karyawan', {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -152,7 +153,7 @@ const EditKaryawan = () => {
                 console.log('ERROR_GETTING_DROPDOWN', err.message);
             });
         axios
-            .get('https://erp.digitalindustryagency.com/api/branches', {
+            .get('${endpoint}/api/branches', {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

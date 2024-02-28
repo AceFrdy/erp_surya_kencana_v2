@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
+import { endpoint } from '../../../../utils';
 
 const DetailUangMasuk = () => {
     const dispatch = useDispatch();
@@ -20,7 +21,7 @@ const DetailUangMasuk = () => {
 
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/cash-inflows/${id}`, {
+            .get(`${endpoint}/api/cash-inflows/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

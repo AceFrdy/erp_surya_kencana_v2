@@ -3,6 +3,7 @@ import { useModal } from '../../hooks/use-modal';
 import { Dialog, Transition } from '@headlessui/react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { endpoint } from '../../utils';
 
 const DeleteSeluruhDistribusiModal = () => {
     const { isOpen, type, onClose } = useModal();
@@ -13,7 +14,7 @@ const DeleteSeluruhDistribusiModal = () => {
 
     const handleDelete = () => {
         axios
-            .delete('https://erp.digitalindustryagency.com/api/distributions', {
+            .delete(`${endpoint}/api/distributions`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

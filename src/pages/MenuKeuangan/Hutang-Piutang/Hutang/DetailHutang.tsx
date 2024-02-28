@@ -8,7 +8,7 @@ import { Link, useParams } from 'react-router-dom';
 import 'flatpickr/dist/flatpickr.css';
 import IconArrowBackward from '../../../../components/Icon/IconArrowBackward';
 import axios from 'axios';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint, formatPrice } from '../../../../utils';
 import Pagination from '../../../../components/Pagination';
 
 interface DebtPayDataProps {
@@ -48,9 +48,9 @@ const DetailHutang = () => {
     }, [sortStatus]);
 
     const fetchData = () => {
-        const url = `https://erp.digitalindustryagency.com/api/debt-pays/${id + (page && '?page=' + page)}`;
+        const url = `${endpoint}/api/debt-pays/${id + (page && '?page=' + page)}`;
         axios
-            .get(`https://erp.digitalindustryagency.com/api/debts/${id}`, {
+            .get(`${endpoint}/api/debts/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../utils';
 
 interface AkunDataProps {
     acc_type: string;
@@ -33,7 +34,7 @@ const AddAkun = () => {
         };
 
         await axios
-            .post('https://erp.digitalindustryagency.com/api/accounts', data, {
+            .post(`${endpoint}/api/accounts`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

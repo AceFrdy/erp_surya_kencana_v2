@@ -9,6 +9,7 @@ import IconUpload from '../../../../components/Icon/icon-upload';
 import { setPageTitle } from '../../../../store/themeConfigSlice';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../../utils';
 
 interface DataFormProps {
     cash_outflow_date: string;
@@ -86,7 +87,7 @@ const AddUangKeluar = () => {
             data.append('photo_struk', file);
         }
         axios
-            .post('https://erp.digitalindustryagency.com/api/cash-outflows', data, {
+            .post(`${endpoint}/api/cash-outflows`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -127,7 +128,7 @@ const AddUangKeluar = () => {
     // get_option
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/cash-outflow-dropdown', {
+            .get(`${endpoint}/api/cash-outflow-dropdown`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

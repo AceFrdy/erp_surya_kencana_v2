@@ -7,6 +7,7 @@ import IconMail from '../../components/Icon/IconMail';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconLockDots from '../../components/Icon/IconLockDots';
 import { toast } from 'react-toastify';
+import { endpoint } from '../../utils';
 
 const Login = () => {
     const dispatch = useDispatch();
@@ -62,7 +63,7 @@ const Login = () => {
         }
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/login', credentials)
+            .post(`${endpoint}/api/login`, credentials)
             .then((response) => {
                 if (response.data.data.status) {
                     localStorage.setItem('accessToken', response.data.data.resource.token);

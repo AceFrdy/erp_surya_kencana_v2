@@ -10,7 +10,7 @@ import IconPlus from '../../../components/Icon/IconPlus';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useModal } from '../../../hooks/use-modal';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint } from '../../../utils';
 import Pagination from '../../../components/Pagination';
 
 interface UnitsDataProps {
@@ -39,7 +39,7 @@ const Unit = () => {
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
 
     useEffect(() => {
-        const url = `https://erp.digitalindustryagency.com/api/unit-stock${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
+        const url = `${endpoint}/api/unit-stock${search && page ? '?q=' + search + '&&page=' + page : search ? '?q=' + search : page && '?page=' + page}`;
         axios
             .get(url, {
                 headers: {

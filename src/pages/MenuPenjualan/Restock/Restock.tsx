@@ -12,7 +12,7 @@ import IconSend from '../../../components/Icon/IconSend';
 import IconPencil from '../../../components/Icon/IconPencil';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 import IconTrashLines from '../../../components/Icon/IconTrashLines';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, formatPrice } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint, formatPrice } from '../../../utils';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -77,7 +77,7 @@ const Restock = () => {
         };
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/distribution-restok', data, {
+            .post(`${endpoint}/api/distribution-restok`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -131,7 +131,7 @@ const Restock = () => {
         };
 
         axios
-            .post('https://erp.digitalindustryagency.com/api/distribution-restok-request', data, {
+            .post(`${endpoint}/api/distribution-restok-request`, data, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -217,7 +217,7 @@ const Restock = () => {
     // get product & suplier
     useEffect(() => {
         axios
-            .get('https://erp.digitalindustryagency.com/api/products', {
+            .get(`${endpoint}/api/products`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -230,7 +230,7 @@ const Restock = () => {
                 console.log('DISTRIBUTION', err.message);
             });
         axios
-            .get('https://erp.digitalindustryagency.com/api/supliers', {
+            .get(`${endpoint}/api/supliers`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -248,7 +248,7 @@ const Restock = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>('https://erp.digitalindustryagency.com/api/distribution-restok');
+    const [url, setUrl] = useState<string>(`${endpoint}/api/distribution-restok`);
 
     //get data
     useEffect(() => {

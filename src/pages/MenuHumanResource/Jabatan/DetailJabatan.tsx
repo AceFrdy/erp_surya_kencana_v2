@@ -6,7 +6,7 @@ import { setPageTitle } from '../../../store/themeConfigSlice';
 import { useDispatch } from 'react-redux';
 import IconUsersGroup from '../../../components/Icon/IconUsersGroup';
 import axios from 'axios';
-import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps } from '../../../utils';
+import { LinksLinkProps, MetaLinkProps, MetaLinksLinkProps, endpoint } from '../../../utils';
 import { useParams } from 'react-router-dom';
 import Pagination from '../../../components/Pagination';
 
@@ -34,7 +34,7 @@ const DetailJabatan = () => {
     const [metaLink, setMetaLink] = useState<MetaLinkProps>();
     const [metaLinksLink, setMetaLinksLink] = useState<MetaLinksLinkProps[]>([]);
     const [linksLink, setLinksLink] = useState<LinksLinkProps>();
-    const [url, setUrl] = useState<string>(`https://erp.digitalindustryagency.com/api/detail-privilage/${id}`);
+    const [url, setUrl] = useState<string>(`${endpoint}/api/detail-privilage/${id}`);
 
     const fetchData = () => {
         axios

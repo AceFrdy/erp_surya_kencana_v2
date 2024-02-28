@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../utils';
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -18,7 +19,7 @@ const Profile = () => {
     const handleFetch = () => {
         if (token && storedId) {
             axios
-                .get(`https://erp.digitalindustryagency.com/api/users/${storedId}`, {
+                .get(`${endpoint}/api/users/${storedId}`, {
                     headers: {
                         Accept: 'application/json',
                         Authorization: `Bearer ${token}`,

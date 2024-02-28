@@ -9,6 +9,7 @@ import IconUpload from '../../../components/Icon/icon-upload';
 import { setPageTitle } from '../../../store/themeConfigSlice';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { endpoint } from '../../../utils';
 
 interface FormState {
     product_category_id: number;
@@ -74,7 +75,7 @@ const InputProduk = () => {
 
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/products/${id}`, {
+            .get(`${endpoint}/api/products/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -87,7 +88,7 @@ const InputProduk = () => {
                 setFormRadio({ product_ecommers: data.product_ecommers === 'yes' ? true : false, product_pos: data.product_pos === 'yes' ? true : false });
             });
         axios
-            .get('https://erp.digitalindustryagency.com/api/product-categories', { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
+            .get(`${endpoint}/api/product-categories`, { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
             .then((response) => {
                 setCategoriesProduct(response.data.data.resource.data);
             })
@@ -95,7 +96,7 @@ const InputProduk = () => {
                 console.log('ERROR_CATEGORIES_PRODUCT', err.message);
             });
         axios
-            .get('https://erp.digitalindustryagency.com/api/supliers', { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
+            .get(`${endpoint}/api/supliers`, { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
             .then((response) => {
                 setSupliers(response.data.data.resource.data);
             })
@@ -152,7 +153,7 @@ const InputProduk = () => {
         dataRequest.append('_method', 'put');
 
         axios
-            .post(`https://erp.digitalindustryagency.com/api/products/${id}`, dataRequest, {
+            .post(`${endpoint}/api/products/${id}`, dataRequest, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,

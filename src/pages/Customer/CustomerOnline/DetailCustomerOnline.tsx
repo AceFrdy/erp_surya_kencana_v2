@@ -4,6 +4,7 @@ import axios from 'axios';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../../store/themeConfigSlice';
+import { endpoint } from '../../../utils';
 
 const DetailCustomerOnline = () => {
     const dispatch = useDispatch();
@@ -19,7 +20,7 @@ const DetailCustomerOnline = () => {
 
     useEffect(() => {
         axios
-            .get(`https://erp.digitalindustryagency.com/api/users/${id}`, {
+            .get(`${endpoint}/api/users/${id}`, {
                 headers: {
                     Accept: 'application/json',
                     Authorization: `Bearer ${token}`,
