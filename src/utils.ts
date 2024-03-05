@@ -89,4 +89,4 @@ export interface TotalSales {
     total_customers: number;
 }
 
-export const endpoint = 'https://erp-server.digitalindustryagency.com';
+export const endpoint = 'https://api-erp.my.id';
